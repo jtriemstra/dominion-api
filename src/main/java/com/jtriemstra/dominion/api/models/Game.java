@@ -9,7 +9,7 @@ public class Game {
 
 	private List<Player> players = new ArrayList<>();
 	
-	
+	private String currentPlayer;
 	
 	
 }
