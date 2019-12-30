@@ -80,7 +80,7 @@ public class CardFactory {
 	}
 	public static Card adventurer() {
 		Card c = new Card(6, "Adventurer", 0, 0, Card.CardType.ACTION, 0, 0, 0);
-		c.setExtraAction(new CardAction() {
+		c.setSpecialAction(new CardAction() {
 			@Override
 			public void execute(Player player) {
 				int treasureCardsFound = 0;

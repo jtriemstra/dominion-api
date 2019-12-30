@@ -92,6 +92,9 @@ public class Player {
 			draw();
 		}
 		
+		if (cardToPlay.getSpecialAction() != null) {
+			cardToPlay.getSpecialAction().execute(this);
+		}
 	}
 	
 	public void buy(String name) {

@@ -17,7 +17,7 @@ public class Card {
 	@NonNull private int treasure;
 	@NonNull private int additionalCards;
 	
-	private CardAction extraAction;
+	private CardAction specialAction;
 	
 	public String toString() {
 		return name;
