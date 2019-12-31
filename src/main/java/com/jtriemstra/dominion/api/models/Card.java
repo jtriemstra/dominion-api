@@ -1,5 +1,7 @@
 package com.jtriemstra.dominion.api.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
@@ -17,7 +19,7 @@ public class Card {
 	@NonNull private int treasure;
 	@NonNull private int additionalCards;
 	
-	private CardAction specialAction;
+	@JsonIgnore private CardAction specialAction;
 	
 	public String toString() {
 		return name;

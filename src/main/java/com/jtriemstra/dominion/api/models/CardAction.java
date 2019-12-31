@@ -1,5 +1,7 @@
 package com.jtriemstra.dominion.api.models;
 
-public interface CardAction {
-	public void execute(Player player);
+import java.util.List;
+
+public abstract class CardAction {
+	public abstract void execute(Player player);	
 }

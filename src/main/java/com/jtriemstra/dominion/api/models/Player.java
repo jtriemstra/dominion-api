@@ -1,6 +1,10 @@
 package com.jtriemstra.dominion.api.models;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.AccessLevel;
+
 import java.util.*;
 
 import org.springframework.util.StringUtils;
@@ -14,6 +18,19 @@ public class Player {
 	private List<Card> discard = new ArrayList<>();
 	private List<Card> bought = new ArrayList<>();
 	private int numberOfBuysMade;
+	private ActionChoice currentChoice;
+	private int temporaryTreasure; 
+	private int temporaryBuys;
+	private int temporaryActions;
+	
+	@Getter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
+	private Stack<Card> throneRoomActions = new Stack<>();
+	
+	public void addThroneRoomAction(Card c) {
+		throneRoomActions.push(c);
+		throneRoomActions.push(null);
+	}
 	
 	public void init() {
 		deck = CardFactory.newDeck();
@@ -26,7 +43,12 @@ public class Player {
 		return deck.remove(0);
 	}
 	
-	public void discard(Card c) {
+	public void discardFromTemp(Card c) {
+		discard.add(c);
+	}
+	
+	public void discardFromHand(Card c) {
+		hand.remove(c);
 		discard.add(c);
 	}
 	
@@ -34,26 +56,38 @@ public class Player {
 		hand.add(c);
 	}
 	
-	public void draw() {
+	public Card draw() {
+		return privateDraw();
+	}
+	
+	private Card privateDraw() {
 		if (deck.size() == 0) {
-			throw new RuntimeException("no cards to draw in deck");
+			if (discard.size() == 0) {
+				throw new RuntimeException("no cards to draw in deck");
+			}
+			else {
+				deck.addAll(discard);
+				discard.clear();
+			}
 		}
-		hand.add(deck.remove(0));
+		
+		Card newCard = deck.remove(0);
+		hand.add(newCard);
+		
+		return newCard;
 	}
 	
 	public boolean hasActions() {
 		if (played.size() == 0) return true;
 		
-		int actionsAvailable = 1;
+		int actionsAvailable = 1 + temporaryActions;
 		
 		for (int cardIndex=0; cardIndex < played.size(); cardIndex++) {
 			Card c = played.get(cardIndex);
 			//TODO: this ultimately needs to handle multiple types
 			if (Card.CardType.ACTION.equals(c.getType())) {
 				actionsAvailable--;
-			}
-			
-			actionsAvailable += c.getAdditionalActions();			
+			}					
 		}
 		
 		return actionsAvailable > 0;
@@ -88,6 +122,10 @@ public class Player {
 		hand.remove(cardToPlay);
 		played.add(cardToPlay);
 		
+		temporaryTreasure += cardToPlay.getTreasure();
+		temporaryBuys += cardToPlay.getAdditionalBuys();
+		temporaryActions += cardToPlay.getAdditionalActions();
+		
 		for (int i=0; i<cardToPlay.getAdditionalCards(); i++) {
 			draw();
 		}
@@ -95,6 +133,23 @@ public class Player {
 		if (cardToPlay.getSpecialAction() != null) {
 			cardToPlay.getSpecialAction().execute(this);
 		}
+	}
+	
+	public void finishAction(List<String> options) {
+		if (currentChoice == null) {
+			throw new RuntimeException("player does not currently have an action choice waiting");
+		}
+		
+		currentChoice.doOptions(this, options);
+		
+		if (throneRoomActions.size() > 0) {
+			Card c = throneRoomActions.pop();
+			if (c != null) {
+				play(c.getName());
+				discardFromHand(c);
+			}
+		}
+		
 	}
 	
 	public void buy(String name) {
@@ -121,38 +176,28 @@ public class Player {
 		discard.addAll(hand);
 		hand.clear();
 		
+		currentChoice = null;
+		temporaryTreasure = 0;
+		temporaryBuys = 0;
+		temporaryActions = 0;
+		throneRoomActions.clear();
+		
 		for (int i=0; i<5; i++) {
 			draw();
 		}
 	}
 	
 	public boolean hasBuys() {
-		if (played.size() == 0) return true;
-		
-		int buysAvailable = 1;
-		
-		for (int cardIndex=0; cardIndex < played.size(); cardIndex++) {
-			Card c = played.get(cardIndex);
-			
-			buysAvailable += c.getAdditionalBuys();			
-		}
-		
-		return buysAvailable > 0;
+		return 1 + temporaryBuys - bought.size() > 0;
 	}
 	
 	public int treasureAvailable() {
-		int treasure = 0;
-		
-		for (int cardIndex=0; cardIndex < played.size(); cardIndex++) {
-			Card c = played.get(cardIndex);
-			
-			treasure += c.getTreasure();
-		}
+		int spent = 0;
 		
 		for (Card c : bought) {
-			treasure -= c.getCost();
+			spent += c.getCost();
 		}
 		
-		return treasure;
+		return temporaryTreasure - spent;
 	}
 }
