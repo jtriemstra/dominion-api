@@ -15,7 +15,7 @@ public class ConsoleTest {
 		Scanner command = new Scanner(System.in);
 
 		game.getPlayers().add(new Player());
-		game.getPlayers().get(0).init();
+		game.getPlayers().get(0).init(game);
 		
 	    
 	    boolean running = true;

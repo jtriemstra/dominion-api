@@ -3,12 +3,14 @@ package com.jtriemstra.dominion.api.models;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import lombok.AccessLevel;
 
 import java.util.*;
 
 import org.springframework.util.StringUtils;
 
+@Slf4j
 @Data
 public class Player {
 	private String name;
@@ -23,6 +25,9 @@ public class Player {
 	private int temporaryBuys;
 	private int temporaryActions;
 	
+	private Game game;
+	
+	//TODO: can I get the throne room specific stuff out of here?
 	@Getter(AccessLevel.NONE)
 	@Setter(AccessLevel.NONE)
 	private Stack<Card> throneRoomActions = new Stack<>();
@@ -32,8 +37,9 @@ public class Player {
 		throneRoomActions.push(null);
 	}
 	
-	public void init() {
-		deck = CardFactory.newDeck();
+	public void init(Game game) {
+		this.game = game;
+		deck = game.getBank().newDeck();
 		for (int i=0; i<5; i++) {
 			draw();
 		}
@@ -93,6 +99,21 @@ public class Player {
 		return actionsAvailable > 0;
 	}
 	
+	//NOTE: this only applies to the throne room right now
+	public void play(Card cardToPlay) {
+		temporaryTreasure += cardToPlay.getTreasure();
+		temporaryBuys += cardToPlay.getAdditionalBuys();
+		temporaryActions += cardToPlay.getAdditionalActions();
+		
+		for (int i=0; i<cardToPlay.getAdditionalCards(); i++) {
+			draw();
+		}
+		
+		if (cardToPlay.getSpecialAction() != null) {
+			cardToPlay.getSpecialAction().execute(this);
+		}
+	}
+	
 	public void play(String name) {
 		if (hand.size() == 0) {
 			throw new RuntimeException("no cards to play in hand");
@@ -145,8 +166,10 @@ public class Player {
 		if (throneRoomActions.size() > 0) {
 			Card c = throneRoomActions.pop();
 			if (c != null) {
-				play(c.getName());
-				discardFromHand(c);
+				//log.debug(c.getName());
+				play(c);
+				temporaryActions--;
+				//discardFromHand(c);
 			}
 		}
 		
@@ -161,7 +184,7 @@ public class Player {
 			throw new RuntimeException("no buys left");
 		}
 		
-		Card newCard = CardFactory.tryToBuy(name, treasureAvailable());
+		Card newCard = game.getBank().tryToBuy(name, treasureAvailable());
 		
 		bought.add(newCard);
 	}

@@ -23,7 +23,7 @@ public class MainController {
 
 	@RequestMapping("/start")
 	public Player init(String card) {
-		game.getPlayers().get(0).init();
+		game.getPlayers().get(0).init(game);
 		
 		return game.getPlayers().get(0);
 	}
@@ -56,4 +56,9 @@ public class MainController {
 		return game.getPlayers().get(0);
 	}
 	
+	@RequestMapping("/refresh")
+	public Player refresh() {
+		
+		return game.getPlayers().get(0);
+	}
 }
