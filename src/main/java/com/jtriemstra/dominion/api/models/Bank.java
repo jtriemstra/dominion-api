@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import org.springframework.util.StringUtils;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -87,6 +89,18 @@ public class Bank {
 		}
 		
 		throw new RuntimeException("not enough money to buy this card");
+	}
+	
+	public Card getByName(String cardName) {
+		if (!StringUtils.hasText(cardName)) {
+			throw new RuntimeException("no card name was passed to getByName");
+		}
+		
+		if (!bank.containsKey(cardName)) {
+			throw new RuntimeException("this card does not exist in the bank");
+		}
+		
+		return bank.get(cardName);
 	}
 	
 	public  Card gold() {
@@ -291,7 +305,7 @@ public class Bank {
 						}
 						
 						player.getDiscard().add(bank.get(options.get(0)));
-
+log.info("setting current choice null");
 						player.setCurrentChoice(null);
 					}
 				});
@@ -551,16 +565,12 @@ public class Bank {
 						if (options.size() == 0) return;
 						
 						for (Card c : player.getHand()) {
-							log.info("Card is null: " + (c == null ? "yes" : "no"));
+							
 							if (options.get(0).equals(c.getName())) {
 								player.addThroneRoomAction(c);
 								player.play(options.get(0));
 								player.setTemporaryActions(player.getTemporaryActions() - 1);
 								
-								if (player.getCurrentChoice() == null) {
-									player.play(c);
-									player.setTemporaryActions(player.getTemporaryActions() - 1);
-								}
 								break;
 							}
 						}

@@ -34,7 +34,6 @@ public class Player {
 	
 	public void addThroneRoomAction(Card c) {
 		throneRoomActions.push(c);
-		throneRoomActions.push(null);
 	}
 	
 	public void init(Game game) {
@@ -115,6 +114,7 @@ public class Player {
 	}
 	
 	public void play(String name) {
+		log.info("calling play");
 		if (hand.size() == 0) {
 			throw new RuntimeException("no cards to play in hand");
 		}
@@ -148,6 +148,7 @@ public class Player {
 		temporaryActions += cardToPlay.getAdditionalActions();
 		
 		for (int i=0; i<cardToPlay.getAdditionalCards(); i++) {
+			log.info("drawing card");
 			draw();
 		}
 		
@@ -163,13 +164,12 @@ public class Player {
 		
 		currentChoice.doOptions(this, options);
 		
-		if (throneRoomActions.size() > 0) {
+		if (currentChoice == null && throneRoomActions.size() > 0) {
+			
 			Card c = throneRoomActions.pop();
 			if (c != null) {
-				//log.debug(c.getName());
 				play(c);
 				temporaryActions--;
-				//discardFromHand(c);
 			}
 		}
 		

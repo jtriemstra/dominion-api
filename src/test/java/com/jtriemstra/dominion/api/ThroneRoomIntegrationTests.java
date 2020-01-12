@@ -4,12 +4,16 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 import com.jtriemstra.dominion.api.models.*;
+
+import lombok.extern.slf4j.Slf4j;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.util.*;
 
+@Slf4j
 public class ThroneRoomIntegrationTests {
 	
 	
@@ -68,6 +72,7 @@ public class ThroneRoomIntegrationTests {
 	
 	@Test
 	public void complexActionWorkshop() {
+		log.info("starting complexActionWorkshop");
 		Bank mockBank = spy(Bank.class);
 		List<Card> x = new ArrayList<>();
 		x.add(mockBank.workshop());
@@ -81,8 +86,11 @@ public class ThroneRoomIntegrationTests {
 		player.init(game);
 		
 		player.play("Throne Room");
+		assertEquals("Choose an action card to play twice", player.getCurrentChoice().getPrompt());
 		player.finishAction(Arrays.asList("Workshop"));
+		assertEquals("Choose a card costing up to 4", player.getCurrentChoice().getPrompt());
 		player.finishAction(Arrays.asList("Silver"));
+		assertEquals("Choose a card costing up to 4", player.getCurrentChoice().getPrompt());
 		player.finishAction(Arrays.asList("Silver"));
 		
 		assertEquals(0, player.getTemporaryActions());

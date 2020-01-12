@@ -1,8 +1,10 @@
 package com.jtriemstra.dominion.api;
 
+import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import lombok.extern.slf4j.Slf4j;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.spy;
@@ -16,34 +18,35 @@ import com.jtriemstra.dominion.api.models.Card;
 import com.jtriemstra.dominion.api.models.Game;
 import com.jtriemstra.dominion.api.models.Player;
 
+@Slf4j
 public class BasicCucumberTests extends CucumberTestBase{
 	
-	
+	@Before
+	public void setup() {
+		log.info("calling setup");
+		List<Card> x = new ArrayList<>();
+		for (int i=0; i<10; i++) { x.add(state.mockBank.copper());}
+		
+		when(state.mockBank.newDeck()).thenReturn(x);
+
+	}
 	
 	@Given("I am a player")
 	public void i_am_a_player() {
-		List<Card> x = new ArrayList<>();
-		x.add(getBank().village());
-		x.add(getBank().smithy());
-		x.add(getBank().festival());
-		x.add(getBank().throneroom());
-		for (int i=0; i<8; i++) { x.add(getBank().copper());}
-		
-		when(getBank().newDeck()).thenReturn(x);
-		
+		log.info("calling init");
 		state.player = new Player();
 		state.player.init(state.game);
 	}
 	
 	@Given("I have a {}")
     public void i_have_this_card(String cardName) {
-		for(Card c : getPlayer().getHand()) {
-			if (c.getName().equals(cardName)) {
-				return;
-			}
+		int firstCopperIndex = 0;
+		while (!getPlayer().getHand().get(firstCopperIndex).getName().equals("Copper")) {
+			firstCopperIndex++;
 		}
 		
-		throw new RuntimeException("hand is missing the specified card");
+		getPlayer().getHand().remove(firstCopperIndex);
+		getPlayer().getHand().add(firstCopperIndex, getBank().getByName(cardName));
 	}
     
 	@Given("I have {} cards in my hand")

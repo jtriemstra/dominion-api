@@ -11,6 +11,8 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.assertj.core.util.Arrays;
+
 import com.jtriemstra.dominion.api.models.Bank;
 import com.jtriemstra.dominion.api.models.Card;
 import com.jtriemstra.dominion.api.models.Game;
@@ -20,8 +22,14 @@ public class ThroneRoomCucumberTests extends CucumberTestBase{
 	
 	CucumberState state = new CucumberState();
 	
-	@Then("I should be asked what card to play twice")
-    public void i_should_be_asked() {
-        assertEquals("Choose an action card to play twice", state.player.getCurrentChoice().getPrompt());
+	@Then("I should be asked {}")
+    public void i_should_be_asked(String optionPrompt) {
+        assertEquals(optionPrompt, state.player.getCurrentChoice().getPrompt());
+    }
+	
+	@When("I opt for the {}")
+    public void i_opt_for(String optionName) {
+		assertNotNull(getPlayer().getCurrentChoice());
+        getPlayer().finishAction(java.util.Arrays.asList(optionName));
     }
 }
