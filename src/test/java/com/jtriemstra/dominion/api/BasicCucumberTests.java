@@ -27,16 +27,31 @@ public class BasicCucumberTests extends CucumberTestBase{
 	public void setup() {
 		log.info("calling setup");
 	}
-	
+		
 	@Given("the deck has {}")
 	public void i_am_a_player(String cardNames) {
 		String[] multipleCardNames = cardNames.split(",");
 		CucumberState.init(java.util.Arrays.asList(multipleCardNames));		
 	}
 	
+	@Given("there are {} other players")
+	public void there_are_n_other_players(int numPlayers){
+
+		for(int i=0; i<numPlayers; i++) {
+			
+			List<Card> x = new ArrayList<>();
+			for (int j=0; j<10; j++) { x.add(CucumberState.mockBank.copper());}
+			
+			when(CucumberState.mockBank.newDeck()).thenReturn(x);
+			
+			Player p = new Player();
+			p.init(getGame());
+			getGame().getPlayers().add(p);
+		}
+	}
+	
 	@Given("I am a player")
 	public void i_am_a_player() {
-		log.info("calling init");
 		
 		List<Card> x = new ArrayList<>();
 		for (int i=0; i<10; i++) { x.add(CucumberState.mockBank.copper());}
@@ -45,6 +60,16 @@ public class BasicCucumberTests extends CucumberTestBase{
 		
 		CucumberState.player = new Player();
 		CucumberState.player.init(CucumberState.game);		
+	}
+	
+	@Given("my hand is {}")
+    public void my_hand_is(String cardNames) {
+		getPlayer().getHand().clear();
+		
+		String[] multipleCardNames = cardNames.split(",");
+    	for (int i=0; i<multipleCardNames.length; i++) {
+    		getPlayer().getHand().add(getBank().getByName(multipleCardNames[i]));
+    	}
 	}
 	
 	@Given("I have a {}")

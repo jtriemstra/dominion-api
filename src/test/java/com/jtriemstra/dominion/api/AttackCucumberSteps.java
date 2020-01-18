@@ -11,17 +11,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AttackCucumberSteps extends CucumberTestBase{
 
-	@Given("the other player has a {}")
-    public void the_other_player_this_card(String cardName) {
+	@Given("the other players hand is {}")
+    public void the_other_player_this_card(String cardNames) {
 		Player otherPlayer = getGame().getOtherPlayers(getPlayer()).get(0);
+		otherPlayer.getHand().clear();
 		
-		int firstCopperIndex = 0;
-		while (!otherPlayer.getHand().get(firstCopperIndex).getName().equals("Copper")) {
-			firstCopperIndex++;
-		}
-		
-		otherPlayer.getHand().remove(firstCopperIndex);
-		otherPlayer.getHand().add(firstCopperIndex, getBank().getByName(cardName));
+		String[] multipleCardNames = cardNames.split(",");
+    	for (int i=0; i<multipleCardNames.length; i++) {
+    		otherPlayer.getHand().add(getBank().getByName(multipleCardNames[i]));
+    	}
 	}
 	
 	@Then("the other players deck should start with {}")
@@ -33,4 +31,10 @@ public class AttackCucumberSteps extends CucumberTestBase{
     		assertEquals(multipleCardNames[i], otherPlayer.getDeck().get(i).getName());
     	}
     }
+	
+	@Then("the other player should have {} cards in hand")
+	public void other_player_should_have_n_cards(int numberOfCards) {
+		Player otherPlayer = getGame().getOtherPlayers(getPlayer()).get(0);
+		assertEquals(numberOfCards, otherPlayer.getHand().size());
+	}
 }

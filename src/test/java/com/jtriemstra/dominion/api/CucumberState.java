@@ -26,10 +26,5 @@ public class CucumberState {
 		realBank = new Bank(cardNames);
 		mockBank = spy(realBank);
 		game = new Game(mockBank);
-		for(int i=0; i<2; i++) {
-			Player p = new Player();
-			p.init(game);
-			game.getPlayers().add(p);
-		}
 	}
 }
