@@ -59,6 +59,11 @@ public class BasicCucumberTests extends CucumberTestBase{
 		assertEquals(numberOfActions, getPlayer().getTemporaryActions() + 1);
 	}
 	
+	@Given("card {} in the deck is a {}")
+	public void card_n_is_x(int cardIndex, String cardName) {
+		getPlayer().getDeck().add(cardIndex, getBank().getByName(cardName));
+	}
+	
     @When("I play the {}")
     public void i_play_the_card(String cardName) {
     	getPlayer().play(cardName);
@@ -84,6 +89,9 @@ public class BasicCucumberTests extends CucumberTestBase{
         	break;
         case "played":
         	assertEquals(cardCount, getPlayer().getPlayed().size());
+        	break;
+        case "discard":
+        	assertEquals(cardCount, getPlayer().getDiscard().size());
         	break;
         default:
         	throw new RuntimeException("invalid source");

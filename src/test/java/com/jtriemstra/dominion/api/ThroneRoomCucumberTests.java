@@ -30,6 +30,7 @@ public class ThroneRoomCucumberTests extends CucumberTestBase{
 	@When("I opt for the {}")
     public void i_opt_for(String optionName) {
 		assertNotNull(getPlayer().getCurrentChoice());
-        getPlayer().finishAction(java.util.Arrays.asList(optionName));
+		String[] multipleOptionNames = optionName.split(",");
+        getPlayer().finishAction(java.util.Arrays.asList(multipleOptionNames));
     }
 }

@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class CucumberState {
-	static Bank realBank = new Bank(java.util.Arrays.asList("Smithy", "Village", "Throne Room", "Festival", "Moneylender", "Mine"));
+	static Bank realBank = new Bank(java.util.Arrays.asList("Smithy", "Village", "Throne Room", "Festival", "Moneylender", "Mine", "Remodel", "Library", "Cellar", "Chancellor"));
 	static Bank mockBank = spy(realBank);
 	static Game game = new Game(mockBank);
 	static Player player;

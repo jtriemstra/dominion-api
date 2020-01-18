@@ -382,7 +382,7 @@ log.info("setting current choice null");
 						}
 						
 						Card cardToTrash = null;
-						
+						//TODO: validate is treasure card - introduce validation function?
 						for (Card c : player.getHand()) {
 							if (c.getName().equals(options.get(0))) {
 								cardToTrash = c;
@@ -420,7 +420,11 @@ log.info("setting current choice null");
 									throw new RuntimeException("One and only one option can be chosen");
 								}
 								
+								//TODO: validate choice
+								
 								player.addToHand(bank.get(options.get(0)));
+								
+								player.setCurrentChoice(null);
 							}							
 						});
 						
@@ -495,8 +499,8 @@ log.info("setting current choice null");
 								if (options.size() != 1) {
 									throw new RuntimeException("One and only one option can be chosen");
 								}
-																
-								player.addToHand(bank.get(options.get(0)));
+										
+								player.discardFromTemp(bank.get(options.get(0)));
 							}							
 						});
 						
