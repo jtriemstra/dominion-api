@@ -57,6 +57,7 @@ public class BasicCucumberTests extends CucumberTestBase{
 		getPlayer().getHand().remove(firstCopperIndex);
 		getPlayer().getHand().add(firstCopperIndex, getBank().getByName(cardName));
 	}
+	
     
 	@Given("I have {} cards in my hand")
     public void i_have_n_cards(int numberOfCards) {
@@ -124,5 +125,12 @@ public class BasicCucumberTests extends CucumberTestBase{
         default:
         	throw new RuntimeException("invalid source");
         }
+    }
+    @Then("my deck should start with {}")
+    public void my_deck_should_start_with(String cardNames) {
+    	String[] multipleCardNames = cardNames.split(",");
+    	for (int i=0; i<multipleCardNames.length - 1; i++) {
+    		assertEquals(multipleCardNames[i], getPlayer().getDeck().get(i).getName());
+    	}
     }
 }

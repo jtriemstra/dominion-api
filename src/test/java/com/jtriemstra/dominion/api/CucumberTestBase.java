@@ -12,5 +12,6 @@ public class CucumberTestBase {
 	
 	Player getPlayer() {return state.player;}
 	Bank getBank() { return state.mockBank;}
+	Game getGame() {return state.game;}
 	
 }
