@@ -17,15 +17,14 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class CucumberState {
-	static Bank realBank = new Bank(java.util.Arrays.asList("Smithy", "Village", "Throne Room", "Festival", "Moneylender", "Mine", "Remodel", "Library", "Cellar", "Chancellor"));
-	static Bank mockBank = spy(realBank);
-	static Game game = new Game(mockBank);
+	static Bank realBank;
+	static Bank mockBank;
+	static Game game;
 	static Player player;
 	
-	static {
-		
-		log.info("calling static initializer");
-		
-		
+	static void init(List<String> cardNames) {
+		realBank = new Bank(cardNames);
+		mockBank = spy(realBank);
+		game = new Game(mockBank);
 	}
 }

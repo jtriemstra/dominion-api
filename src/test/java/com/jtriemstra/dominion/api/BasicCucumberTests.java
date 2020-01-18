@@ -13,6 +13,8 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.assertj.core.util.Arrays;
+
 import com.jtriemstra.dominion.api.models.Bank;
 import com.jtriemstra.dominion.api.models.Card;
 import com.jtriemstra.dominion.api.models.Game;
@@ -24,18 +26,25 @@ public class BasicCucumberTests extends CucumberTestBase{
 	@Before
 	public void setup() {
 		log.info("calling setup");
-		List<Card> x = new ArrayList<>();
-		for (int i=0; i<10; i++) { x.add(state.mockBank.copper());}
-		
-		when(state.mockBank.newDeck()).thenReturn(x);
-
+	}
+	
+	@Given("the deck has {}")
+	public void i_am_a_player(String cardNames) {
+		String[] multipleCardNames = cardNames.split(",");
+		CucumberState.init(java.util.Arrays.asList(multipleCardNames));		
 	}
 	
 	@Given("I am a player")
 	public void i_am_a_player() {
 		log.info("calling init");
-		state.player = new Player();
-		state.player.init(state.game);
+		
+		List<Card> x = new ArrayList<>();
+		for (int i=0; i<10; i++) { x.add(CucumberState.mockBank.copper());}
+		
+		when(CucumberState.mockBank.newDeck()).thenReturn(x);
+		
+		CucumberState.player = new Player();
+		CucumberState.player.init(CucumberState.game);		
 	}
 	
 	@Given("I have a {}")
@@ -92,6 +101,9 @@ public class BasicCucumberTests extends CucumberTestBase{
         	break;
         case "discard":
         	assertEquals(cardCount, getPlayer().getDiscard().size());
+        	break;
+        case "deck":
+        	assertEquals(cardCount, getPlayer().getDeck().size());
         	break;
         default:
         	throw new RuntimeException("invalid source");

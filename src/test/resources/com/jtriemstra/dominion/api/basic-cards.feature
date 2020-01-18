@@ -1,7 +1,8 @@
 Feature: Basic cards
   
   Background:
-    Given I am a player
+    Given the deck has Smithy,Village,Throne Room,Festival,Moneylender,Mine,Remodel,Library,Cellar,Chancellor
+    And I am a player
     And I have 5 cards in my hand
     And I have 1 actions
     

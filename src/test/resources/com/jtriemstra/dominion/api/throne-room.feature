@@ -1,7 +1,8 @@
 Feature: Throne room
   
   Background:
-    Given I am a player
+    Given the deck has Smithy,Village,Throne Room,Festival,Moneylender,Mine,Remodel,Library,Cellar,Chancellor
+    And I am a player
     And I have a Throne Room
     And I have 5 cards in my hand
     And I have 1 actions
