@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.util.StringUtils;
 
@@ -13,6 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 public class Bank {
 	
 	private HashMap<String, Card> bank = new HashMap<>();
+	
+	public HashMap<String, Card> getBankCards() {
+		return bank;
+	}
 	
 	public Bank() {
 		bank.put("Gold", gold());
