@@ -10,6 +10,8 @@ import java.util.*;
 
 import org.springframework.util.StringUtils;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Slf4j
 @Data
 public class Player {
@@ -25,6 +27,7 @@ public class Player {
 	private int temporaryBuys;
 	private int temporaryActions;
 	
+	@JsonIgnore
 	private Game game;
 	
 	//TODO: can I get the throne room specific stuff out of here?
