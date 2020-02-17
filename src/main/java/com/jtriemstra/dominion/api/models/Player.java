@@ -47,6 +47,7 @@ public class Player {
 		played.clear();
 		discard.clear();
 		bought.clear();
+		currentChoice = null;
 		
 		deck = game.getBank().newDeck();		
 		for (int i=0; i<5; i++) {

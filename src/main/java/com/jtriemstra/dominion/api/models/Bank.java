@@ -26,11 +26,16 @@ public class Bank {
 		bank.put("Estate", estate());
 		bank.put("Duchy",  duchy());
 		bank.put("Province", province());
+		
 		bank.put("Village",  village());
 		bank.put("Smithy", smithy());
 		bank.put("Chapel", chapel());
 		bank.put("Throne Room", throneroom());
 		bank.put("Workshop", workshop());
+		bank.put("Mine", mine());
+		bank.put("Cellar", cellar());
+		bank.put("Militia", militia());
+		bank.put("Market", market());
 	}
 	
 	public Bank(List<String> cardNames) {
