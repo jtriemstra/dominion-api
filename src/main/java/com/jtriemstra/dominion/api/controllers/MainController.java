@@ -41,6 +41,7 @@ public class MainController {
 		return game.getPlayers().get(0);
 	}
 	
+	@CrossOrigin(origins = "http://localhost:8001")
 	@RequestMapping("/buy")
 	public Player buy(String card) {
 		game.getPlayers().get(0).buy(card);
@@ -48,6 +49,7 @@ public class MainController {
 		return game.getPlayers().get(0);
 	}
 	
+	@CrossOrigin(origins = "http://localhost:8001")
 	@RequestMapping("/action")
 	public Player action(String[] options) {
 		game.getPlayers().get(0).finishAction(Arrays.asList(options));
@@ -55,6 +57,7 @@ public class MainController {
 		return game.getPlayers().get(0);
 	}
 	
+	@CrossOrigin(origins = "http://localhost:8001")
 	@RequestMapping("/cleanup")
 	public Player cleanup() {
 		game.getPlayers().get(0).cleanup();
@@ -62,6 +65,7 @@ public class MainController {
 		return game.getPlayers().get(0);
 	}
 	
+	@CrossOrigin(origins = "http://localhost:8001")
 	@RequestMapping("/refresh")
 	public Player refresh() {
 		
@@ -71,6 +75,7 @@ public class MainController {
 	@CrossOrigin(origins = "http://localhost:8001")
 	@RequestMapping("/bank")
 	public HashMap<String, Card> bank() {
+		//TODO: return an array like the properties of the Player object, so UI code is consistent
 		return game.getBank().getBankCards();
 	}
 }

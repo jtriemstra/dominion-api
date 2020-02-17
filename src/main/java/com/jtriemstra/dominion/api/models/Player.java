@@ -10,6 +10,7 @@ import java.util.*;
 
 import org.springframework.util.StringUtils;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Slf4j
@@ -21,11 +22,11 @@ public class Player {
 	private List<Card> played = new ArrayList<>();
 	private List<Card> discard = new ArrayList<>();
 	private List<Card> bought = new ArrayList<>();
-	private int numberOfBuysMade;
+	@JsonIgnore private int numberOfBuysMade;
 	private ActionChoice currentChoice;
-	private int temporaryTreasure; 
-	private int temporaryBuys;
-	private int temporaryActions;
+	@JsonIgnore private int temporaryTreasure; 
+	@JsonIgnore private int temporaryBuys;
+	@JsonIgnore private int temporaryActions;
 	
 	@JsonIgnore
 	private Game game;
@@ -41,7 +42,13 @@ public class Player {
 	
 	public void init(Game game) {
 		this.game = game;
-		deck = game.getBank().newDeck();
+		deck.clear();
+		hand.clear();
+		played.clear();
+		discard.clear();
+		bought.clear();
+		
+		deck = game.getBank().newDeck();		
 		for (int i=0; i<5; i++) {
 			draw();
 		}
@@ -85,6 +92,7 @@ public class Player {
 		return newCard;
 	}
 	
+	@JsonGetter(value = "hasActions")
 	public boolean hasActions() {
 		if (played.size() == 0) return true;
 		
@@ -213,6 +221,7 @@ public class Player {
 		}
 	}
 	
+	@JsonGetter(value = "hasBuys")
 	public boolean hasBuys() {
 		return 1 + temporaryBuys - bought.size() > 0;
 	}
