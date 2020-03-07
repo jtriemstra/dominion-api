@@ -33,11 +33,23 @@ public class Game {
 	}
 	
 	public void addPlayer(Player player) {
+		for (Player p : players) {
+			if (player.getName().equals(p.getName())) {
+				throw new RuntimeException("a player with this name already exists");
+			}
+		}
+		
 		players.add(player);
 	}
 	
 	public Player getPlayer(String name) {
-		return players.get(0);
+		for (Player p : players) {
+			if (name.equals(p.getName())) {
+				return p;
+			}
+		}
+		
+		throw new RuntimeException("player not found with specified name");
 	}
 	
 	public int getPlayerCount() {

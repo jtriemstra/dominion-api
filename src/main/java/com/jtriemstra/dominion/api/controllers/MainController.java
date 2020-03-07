@@ -41,41 +41,41 @@ public class MainController {
 	
 	@CrossOrigin(origins = "http://localhost:8001")
 	@RequestMapping("/play")
-	public Player play(String card) {
+	public Player play(String card, String playerName) {
 		game.getPlayer("").play(card);
 		
-		return game.getPlayer("");
+		return game.getPlayer(playerName);
 	}
 	
 	@CrossOrigin(origins = "http://localhost:8001")
 	@RequestMapping("/buy")
-	public Player buy(String card) {
+	public Player buy(String card, String playerName) {
 		game.getPlayer("").buy(card);
 		
-		return game.getPlayer("");
+		return game.getPlayer(playerName);
 	}
 	
 	@CrossOrigin(origins = "http://localhost:8001")
 	@RequestMapping("/action")
-	public Player action(String[] options) {
+	public Player action(String[] options, String playerName) {
 		game.getPlayer("").finishAction(Arrays.asList(options));
 		
-		return game.getPlayer("");
+		return game.getPlayer(playerName);
 	}
 	
 	@CrossOrigin(origins = "http://localhost:8001")
 	@RequestMapping("/cleanup")
-	public Player cleanup() {
+	public Player cleanup(String playerName) {
 		game.getPlayer("").cleanup();
 		
-		return game.getPlayer("");
+		return game.getPlayer(playerName);
 	}
 	
 	@CrossOrigin(origins = "http://localhost:8001")
 	@RequestMapping("/refresh")
-	public Player refresh() {
+	public Player refresh(String playerName) {
 		
-		return game.getPlayer("");
+		return game.getPlayer(playerName);
 	}
 	
 	@CrossOrigin(origins = "http://localhost:8001")
