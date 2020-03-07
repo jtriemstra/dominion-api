@@ -44,9 +44,9 @@ public class BasicCucumberTests extends CucumberTestBase{
 			
 			when(CucumberState.mockBank.newDeck()).thenReturn(x);
 			
-			Player p = new Player();
+			Player p = new Player("test");
 			p.init(getGame());
-			getGame().getPlayers().add(p);
+			getGame().addPlayer(p);
 		}
 	}
 	
@@ -58,7 +58,7 @@ public class BasicCucumberTests extends CucumberTestBase{
 		
 		when(CucumberState.mockBank.newDeck()).thenReturn(x);
 		
-		CucumberState.player = new Player();
+		CucumberState.player = new Player("test");
 		CucumberState.player.init(CucumberState.game);		
 	}
 	

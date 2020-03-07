@@ -4,12 +4,10 @@ import java.util.*;
 
 import lombok.Data;
 
-@Data
 public class Game {
 
 	private List<Player> players = new ArrayList<>();
 	private Bank bank;
-	private String currentPlayer;
 	
 	public Game() {
 		bank = new Bank();
@@ -28,5 +26,21 @@ public class Game {
 		}
 		
 		return others;
+	}
+	
+	public Bank getBank() {
+		return bank;
+	}
+	
+	public void addPlayer(Player player) {
+		players.add(player);
+	}
+	
+	public Player getPlayer(String name) {
+		return players.get(0);
+	}
+	
+	public int getPlayerCount() {
+		return players.size();
 	}
 }

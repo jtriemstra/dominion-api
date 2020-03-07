@@ -36,6 +36,10 @@ public class Player {
 	@Setter(AccessLevel.NONE)
 	private Stack<Card> throneRoomActions = new Stack<>();
 	
+	public Player(String name) {
+		this.name = name;
+	}
+	
 	public void addThroneRoomAction(Card c) {
 		throneRoomActions.push(c);
 	}

@@ -22,54 +22,60 @@ public class MainController {
 	
 	@PostConstruct
 	public void initialize() {
-		game.getPlayers().add(new Player());		
+
 	}
 
 	@CrossOrigin(origins = "http://localhost:8001")
 	@RequestMapping("/start")
-	public Player init(String card) {
-		game.getPlayers().get(0).init(game);
+	public Player init(String playerName) {
+		if (game.getPlayerCount() >= 4) {
+			throw new RuntimeException("game is full");
+		}
 		
-		return game.getPlayers().get(0);
+		Player newPlayer = new Player(playerName);
+		game.addPlayer(newPlayer);
+		newPlayer.init(game);
+		
+		return newPlayer;
 	}
 	
 	@CrossOrigin(origins = "http://localhost:8001")
 	@RequestMapping("/play")
 	public Player play(String card) {
-		game.getPlayers().get(0).play(card);
+		game.getPlayer("").play(card);
 		
-		return game.getPlayers().get(0);
+		return game.getPlayer("");
 	}
 	
 	@CrossOrigin(origins = "http://localhost:8001")
 	@RequestMapping("/buy")
 	public Player buy(String card) {
-		game.getPlayers().get(0).buy(card);
+		game.getPlayer("").buy(card);
 		
-		return game.getPlayers().get(0);
+		return game.getPlayer("");
 	}
 	
 	@CrossOrigin(origins = "http://localhost:8001")
 	@RequestMapping("/action")
 	public Player action(String[] options) {
-		game.getPlayers().get(0).finishAction(Arrays.asList(options));
+		game.getPlayer("").finishAction(Arrays.asList(options));
 		
-		return game.getPlayers().get(0);
+		return game.getPlayer("");
 	}
 	
 	@CrossOrigin(origins = "http://localhost:8001")
 	@RequestMapping("/cleanup")
 	public Player cleanup() {
-		game.getPlayers().get(0).cleanup();
+		game.getPlayer("").cleanup();
 		
-		return game.getPlayers().get(0);
+		return game.getPlayer("");
 	}
 	
 	@CrossOrigin(origins = "http://localhost:8001")
 	@RequestMapping("/refresh")
 	public Player refresh() {
 		
-		return game.getPlayers().get(0);
+		return game.getPlayer("");
 	}
 	
 	@CrossOrigin(origins = "http://localhost:8001")

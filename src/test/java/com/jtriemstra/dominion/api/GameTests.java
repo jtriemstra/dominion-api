@@ -23,13 +23,13 @@ public class GameTests {
 				
 		Game game = new Game(new Bank());
 		
-		Player player = new Player();
+		Player player = new Player("test");
 		player.init(game);
-		game.getPlayers().add(player);
+		game.addPlayer(player);
 		
-		Player otherPlayer = new Player();
+		Player otherPlayer = new Player("test1");
 		otherPlayer.init(game);
-		game.getPlayers().add(otherPlayer);
+		game.addPlayer(otherPlayer);
 		
 		List<Player> others = game.getOtherPlayers(player);
 		assertEquals(1, others.size());

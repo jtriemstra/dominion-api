@@ -29,7 +29,7 @@ public class ThroneRoomIntegrationTests {
 		
 		Game game = new Game(mockBank);
 		
-		Player player = new Player();
+		Player player = new Player("test");
 		player.init(game);
 		
 		player.play("Throne Room");
@@ -55,7 +55,7 @@ public class ThroneRoomIntegrationTests {
 		
 		Game game = new Game(mockBank);
 		
-		Player player = new Player();
+		Player player = new Player("test");
 		player.init(game);
 		
 		player.play("Throne Room");
@@ -82,7 +82,7 @@ public class ThroneRoomIntegrationTests {
 		
 		Game game = new Game(mockBank);
 		
-		Player player = new Player();
+		Player player = new Player("test");
 		player.init(game);
 		
 		player.play("Throne Room");
