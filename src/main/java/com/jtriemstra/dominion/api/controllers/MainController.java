@@ -42,7 +42,7 @@ public class MainController {
 	@CrossOrigin(origins = "http://localhost:8001")
 	@RequestMapping("/play")
 	public Player play(String card, String playerName) {
-		game.getPlayer("").play(card);
+		game.getPlayer(playerName).play(card);
 		
 		return game.getPlayer(playerName);
 	}
@@ -50,7 +50,7 @@ public class MainController {
 	@CrossOrigin(origins = "http://localhost:8001")
 	@RequestMapping("/buy")
 	public Player buy(String card, String playerName) {
-		game.getPlayer("").buy(card);
+		game.getPlayer(playerName).buy(card);
 		
 		return game.getPlayer(playerName);
 	}
@@ -58,7 +58,7 @@ public class MainController {
 	@CrossOrigin(origins = "http://localhost:8001")
 	@RequestMapping("/action")
 	public Player action(String[] options, String playerName) {
-		game.getPlayer("").finishAction(Arrays.asList(options));
+		game.getPlayer(playerName).finishAction(Arrays.asList(options));
 		
 		return game.getPlayer(playerName);
 	}
@@ -66,7 +66,7 @@ public class MainController {
 	@CrossOrigin(origins = "http://localhost:8001")
 	@RequestMapping("/cleanup")
 	public Player cleanup(String playerName) {
-		game.getPlayer("").cleanup();
+		game.getPlayer(playerName).cleanup();
 		
 		return game.getPlayer(playerName);
 	}
