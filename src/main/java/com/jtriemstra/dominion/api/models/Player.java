@@ -224,6 +224,8 @@ public class Player {
 		for (int i=0; i<5; i++) {
 			draw();
 		}
+		
+		game.moveToNextPlayer();
 	}
 	
 	@JsonGetter(value = "hasBuys")
@@ -239,5 +241,10 @@ public class Player {
 		}
 		
 		return temporaryTreasure - spent;
+	}
+	
+	@JsonGetter(value = "isCurrentPlayer")
+	public boolean isCurrentPlayer() {
+		return name.equals(game.getCurrentPlayer().getName());
 	}
 }

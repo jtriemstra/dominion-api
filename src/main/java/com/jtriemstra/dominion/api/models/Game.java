@@ -8,6 +8,7 @@ public class Game {
 
 	private List<Player> players = new ArrayList<>();
 	private Bank bank;
+	private int currentPlayer;
 	
 	public Game() {
 		bank = new Bank();
@@ -40,6 +41,10 @@ public class Game {
 		}
 		
 		players.add(player);
+		
+		if (players.size() == 1) {
+			currentPlayer = 0;
+		}
 	}
 	
 	public Player getPlayer(String name) {
@@ -54,5 +59,21 @@ public class Game {
 	
 	public int getPlayerCount() {
 		return players.size();
+	}
+	
+	public Player getCurrentPlayer() {
+		if (currentPlayer >= players.size()) {
+			throw new RuntimeException("server state has gotten out of sync. current player is greater than number of players");
+		}
+		return players.get(currentPlayer);
+	}
+	
+	public void moveToNextPlayer() {
+		if (currentPlayer == players.size() - 1) {
+			currentPlayer = 0;
+		}
+		else {
+			currentPlayer++;
+		}
 	}
 }
