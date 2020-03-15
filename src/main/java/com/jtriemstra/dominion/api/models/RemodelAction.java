@@ -1,34 +1,28 @@
 package com.jtriemstra.dominion.api.models;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-public class MineAction extends CardAction {
-	
+public class RemodelAction extends CardAction {
 	private Bank bank;
 	
-	public MineAction(Bank bank) {
+	public RemodelAction(Bank bank) {
 		this.bank = bank;
 	}
-	
-	
 	
 	@Override
 	public void execute(Player player) {
 		player.setCurrentChoice( new ActionChoice() {
 			@Override
 			public String getPrompt() { 
-				return "Choose a treasure card to trash";
+				return "Choose a card to trash";
 			}
 			
 			@Override
 			public List<String> getOptions(){
 				List<String> cardNames = new ArrayList<String>();
 				for (Card c : player.getHand()) {
-					if (c.getType() == Card.CardType.TREASURE) {
-						cardNames.add(c.getName());
-					}
+					cardNames.add(c.getName());							
 				}
 				return cardNames;
 			}
@@ -40,7 +34,7 @@ public class MineAction extends CardAction {
 				}
 				
 				Card cardToTrash = null;
-				//TODO: validate is treasure card - introduce validation function?
+				
 				for (Card c : player.getHand()) {
 					if (c.getName().equals(options.get(0))) {
 						cardToTrash = c;
@@ -58,12 +52,12 @@ public class MineAction extends CardAction {
 				player.setCurrentChoice( new ActionChoice() {
 					@Override
 					public String getPrompt() { 
-						return "Choose a treasure card to gain";
+						return "Choose a card to gain";
 					}
 					
 					@Override
 					public List<String> getOptions(){
-						return bank.getNamesByTypeAndMaxCost(Card.CardType.TREASURE, trashedCost + 3);
+						return bank.getNamesByMaxCost(trashedCost + 2);
 					}
 					
 					@Override
@@ -71,12 +65,8 @@ public class MineAction extends CardAction {
 						if (options.size() != 1) {
 							throw new RuntimeException("One and only one option can be chosen");
 						}
-						
-						//TODO: validate choice
-						
-						player.addToHand(bank.getByName(options.get(0)));
-						
-						player.setCurrentChoice(null);
+								
+						player.discardFromTemp(bank.getByName(options.get(0)));
 					}							
 				});
 				
@@ -84,5 +74,5 @@ public class MineAction extends CardAction {
 		});
 	}
 
-	
+
 }

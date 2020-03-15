@@ -247,4 +247,13 @@ public class Player {
 	public boolean isCurrentPlayer() {
 		return name.equals(game.getCurrentPlayer().getName());
 	}
+	
+	public boolean hasCard(String name) {
+		for (Card c : hand) {
+			if (name.equals(c.getName())) {
+				return true;
+			}
+		}
+		return false;
+	}
 }
