@@ -635,6 +635,8 @@ log.info("setting current choice null");
 										}
 									}
 								}
+								
+								player.setCurrentChoice(null);
 							}
 							
 						});
