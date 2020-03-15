@@ -172,6 +172,9 @@ public class Bank {
 	public  Card market() {
 		return new Card(5, "Market", 0, 1, Card.CardType.ACTION, 1, 1, 1);
 	}
+	public  Card moat() {
+		return new Card(2, "Moat", 0, 0, Card.CardType.ACTION, 0, 0, 2);
+	}
 	public  Card adventurer() {
 		Card c = new Card(6, "Adventurer", 0, 0, Card.CardType.ACTION, 0, 0, 0);
 		c.setSpecialAction(new AdventurerAction());

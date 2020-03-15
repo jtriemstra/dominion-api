@@ -242,12 +242,7 @@ public class Player {
 		
 		return temporaryTreasure - spent;
 	}
-	
-	@JsonGetter(value = "isCurrentPlayer")
-	public boolean isCurrentPlayer() {
-		return name.equals(game.getCurrentPlayer().getName());
-	}
-	
+		
 	public boolean hasCard(String name) {
 		for (Card c : hand) {
 			if (name.equals(c.getName())) {

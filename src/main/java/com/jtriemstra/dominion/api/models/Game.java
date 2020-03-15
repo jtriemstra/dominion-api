@@ -76,4 +76,21 @@ public class Game {
 			currentPlayer++;
 		}
 	}
+	
+	public String[] getPlayerNames() {
+		String[] names = new String[players.size()];
+		
+		for (int i=0; i<players.size(); i++) {
+			names[i] = players.get(i).getName();
+		}
+		
+		return names;
+	}
+	
+	public int getCurrentPlayerIndex() {
+		if (currentPlayer >= players.size()) {
+			throw new RuntimeException("server state has gotten out of sync. current player is greater than number of players");
+		}
+		return currentPlayer;
+	}
 }
