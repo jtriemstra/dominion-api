@@ -93,4 +93,10 @@ public class Game {
 		}
 		return currentPlayer;
 	}
+	
+	public void testGameOver() {
+		if (bank.isGameOver()) {
+			currentPlayer = -1;
+		}
+	}
 }

@@ -19,11 +19,27 @@ public class PlayerGameState {
 	
 	@JsonGetter(value = "isCurrentPlayer")
 	public boolean isCurrentPlayer() {
+		if (isGameOver()) return false;
+		
 		return thisPlayer.getName().equals(playerNames[currentPlayer]);
 	}
 	
 	@JsonGetter(value = "currentPlayerIndex")
 	public int getCurrentPlayerIndex() {
 		return currentPlayer;
+	}
+	
+	@JsonGetter(value = "isGameOver")
+	public boolean isGameOver() {
+		return currentPlayer == -1;
+	}
+	
+	@JsonGetter(value = "points")
+	public int points() {
+		if (isGameOver()) {
+			return thisPlayer.getPoints();
+		}
+		
+		return 0;
 	}
 }

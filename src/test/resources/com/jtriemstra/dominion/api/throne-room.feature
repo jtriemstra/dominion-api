@@ -1,7 +1,7 @@
 Feature: Throne room
   
   Background:
-    Given the deck has Smithy,Village,Throne Room,Festival,Moneylender,Mine,Remodel,Library,Cellar,Chancellor
+    Given the deck has Smithy,Village,Throne Room,Festival,Moneylender,Mine,Remodel,Library,Cellar,Chancellor,Market
     And I am a player
     And I have a Throne Room
     And I have 5 cards in my hand
@@ -17,7 +17,14 @@ Feature: Throne room
     And I opt for the Village
     Then I should have 5 cards in my hand
     And I should have 4 actions available
-    
+
+  Scenario: Playing a throne room and market     
+  	Given I have a Market
+    When I play the Throne Room
+    And I opt for the Market
+    Then I should have 5 cards in my hand
+    And I should have 2 actions available
+        
   Scenario: Playing a throne room and moneylender     
   	Given I have a Moneylender
     When I play the Throne Room

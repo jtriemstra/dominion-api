@@ -7,7 +7,7 @@ public class ThroneRoomAction extends CardAction {
 
 	@Override
 	public void execute(Player player) {
-		player.setTemporaryActions(player.getTemporaryActions() + 2); //this isn't strictly true, but the card triggered by the throne room needs some space
+		
 		player.setCurrentChoice( new ActionChoice() {
 			@Override
 			public String getPrompt() { 
@@ -39,8 +39,7 @@ public class ThroneRoomAction extends CardAction {
 					
 					if (options.get(0).equals(c.getName())) {
 						player.addThroneRoomAction(c);
-						player.play(options.get(0));
-						player.setTemporaryActions(player.getTemporaryActions() - 1);
+						player.play(c.getName(), true);
 						
 						break;
 					}

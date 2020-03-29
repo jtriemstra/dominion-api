@@ -1,5 +1,6 @@
 package com.jtriemstra.dominion.api.controllers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jtriemstra.dominion.api.dto.PlayerGameState;
+import com.jtriemstra.dominion.api.models.BankCard;
 import com.jtriemstra.dominion.api.models.Card;
 import com.jtriemstra.dominion.api.models.Game;
 import com.jtriemstra.dominion.api.models.Player;
@@ -64,8 +66,9 @@ public class MainController {
 	@CrossOrigin(origins = "http://localhost:8001")
 	@RequestMapping("/action")
 	public PlayerGameState action(String[] options, String playerName) {
+		List<String> optionsList = options == null ? new ArrayList<String>() : Arrays.asList(options);
 		
-		game.getPlayer(playerName).finishAction(Arrays.asList(options));
+		game.getPlayer(playerName).finishAction(optionsList);
 		
 		return new PlayerGameState(game.getPlayer(playerName), game.getPlayerNames(), game.getCurrentPlayerIndex());
 	}
@@ -89,8 +92,9 @@ public class MainController {
 	
 	@CrossOrigin(origins = "http://localhost:8001")
 	@RequestMapping("/bank")
-	public HashMap<String, Card> bank() {
+	public HashMap<String, BankCard> bank() {
 		//TODO: return an array like the properties of the Player object, so UI code is consistent
+		
 		return game.getBank().getBankCards();
 	}
 	

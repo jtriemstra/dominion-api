@@ -91,7 +91,7 @@ public class BasicCucumberTests extends CucumberTestBase{
 	
 	@Given("I have {} actions")
     public void i_have_n_actions(int numberOfActions) {
-		assertEquals(numberOfActions, getPlayer().getTemporaryActions() + 1);
+		assertEquals(numberOfActions, getPlayer().numberOfActions());
 	}
 	
 	@Given("card {} in the deck is a {}")
@@ -139,7 +139,7 @@ public class BasicCucumberTests extends CucumberTestBase{
     public void i_should_have_available(int itemCount, String itemName) {
         switch(itemName) {
         case "actions":
-        	assertEquals(itemCount, getPlayer().getTemporaryActions());
+        	assertEquals(itemCount, getPlayer().numberOfActions());
         	break;
         case "buys":
         	assertEquals(itemCount, getPlayer().getTemporaryBuys() + 1);

@@ -3,6 +3,7 @@ package com.jtriemstra.dominion.api.models;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -13,64 +14,68 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Bank {
 	
-	private HashMap<String, Card> bank = new HashMap<>();
+	private HashMap<String, BankCard> bank = new LinkedHashMap<>();
 	
-	public HashMap<String, Card> getBankCards() {
+	public HashMap<String, BankCard> getBankCards() {
 		return bank;
 	}
 	
+	private void addCard(String name, Card card, int quantity) {
+		bank.put(name, new BankCard(card, quantity));
+	}
+	
 	public Bank() {
-		bank.put("Gold", gold());
-		bank.put("Silver", silver());
-		bank.put("Copper", copper());
-		bank.put("Estate", estate());
-		bank.put("Duchy",  duchy());
-		bank.put("Province", province());
+		addCard("Gold", gold(), 50);
+		addCard("Silver", silver(), 100);
+		addCard("Copper", copper(), 200);
+		addCard("Estate", estate(), 30);
+		addCard("Duchy",  duchy(), 20);
+		addCard("Province", province(), 12);
 		
-		bank.put("Village",  village());
-		bank.put("Smithy", smithy());
-		bank.put("Chapel", chapel());
-		bank.put("Throne Room", throneroom());
-		bank.put("Workshop", workshop());
-		bank.put("Mine", mine());
-		bank.put("Cellar", cellar());
-		bank.put("Militia", militia());
-		bank.put("Market", market());
+		addCard("Village",  village(), 10);
+		addCard("Smithy", smithy(), 10);
+		addCard("Chapel", chapel(), 10);
+		addCard("Throne Room", throneroom(), 10);
+		addCard("Workshop", workshop(), 10);
+		addCard("Mine", mine(), 10);
+		addCard("Cellar", cellar(), 10);
+		addCard("Militia", militia(), 10);
+		addCard("Market", market(), 10);
 	}
 	
 	public Bank(List<String> cardNames) {
-		bank.put("Gold", gold());
-		bank.put("Silver", silver());
-		bank.put("Copper", copper());
-		bank.put("Estate", estate());
-		bank.put("Duchy",  duchy());
-		bank.put("Province", province());
-		bank.put("Curse", curse());
+		addCard("Gold", gold(), 50);
+		addCard("Silver", silver(), 100);
+		addCard("Copper", copper(), 200);
+		addCard("Estate", estate(), 30);
+		addCard("Duchy",  duchy(), 20);
+		addCard("Province", province(), 12);
+		addCard("Curse", curse(), 30);
 		
 		for (String s : cardNames) {
 			switch(s) {
-			case "Village": bank.put(s, village()); break;
-			case "Smithy": bank.put(s, smithy()); break;
-			case "Chapel": bank.put(s, chapel()); break;
-			case "Throne Room": bank.put(s, throneroom()); break;
-			case "Workshop": bank.put(s, workshop()); break;
-			case "Laboratory": bank.put(s, laboratory()); break;
-			case "Woodcutter": bank.put(s, woodcutter()); break;
-			case "Adventurer": bank.put(s, adventurer()); break;
-			case "Bureaucrat": bank.put(s, bureaucrat()); break;
-			case "Cellar": bank.put(s, cellar()); break;
-			case "Chancellor": bank.put(s, chancellor()); break;
-			case "Council Room": bank.put(s, councilroom()); break;
-			case "Feast": bank.put(s, feast()); break;
-			case "Festival": bank.put(s, festival()); break;
-			case "Library": bank.put(s, library()); break;
-			case "Market": bank.put(s, market()); break;
-			case "Militia": bank.put(s, militia()); break;
-			case "Mine": bank.put(s, mine()); break;
-			case "Moneylender": bank.put(s, moneylender()); break;
-			case "Remodel": bank.put(s, remodel()); break;
-			case "Spy": bank.put(s, spy()); break;
-			case "Witch": bank.put(s, witch()); break;
+			case "Village": addCard(s, village(), 10); break;
+			case "Smithy": addCard(s, smithy(), 10); break;
+			case "Chapel": addCard(s, chapel(), 10); break;
+			case "Throne Room": addCard(s, throneroom(), 10); break;
+			case "Workshop": addCard(s, workshop(), 10); break;
+			case "Laboratory": addCard(s, laboratory(), 10); break;
+			case "Woodcutter": addCard(s, woodcutter(), 10); break;
+			case "Adventurer": addCard(s, adventurer(), 10); break;
+			case "Bureaucrat": addCard(s, bureaucrat(), 10); break;
+			case "Cellar": addCard(s, cellar(), 10); break;
+			case "Chancellor": addCard(s, chancellor(), 10); break;
+			case "Council Room": addCard(s, councilroom(), 10); break;
+			case "Feast": addCard(s, feast(), 10); break;
+			case "Festival": addCard(s, festival(), 10); break;
+			case "Library": addCard(s, library(), 10); break;
+			case "Market": addCard(s, market(), 10); break;
+			case "Militia": addCard(s, militia(), 10); break;
+			case "Mine": addCard(s, mine(), 10); break;
+			case "Moneylender": addCard(s, moneylender(), 10); break;
+			case "Remodel": addCard(s, remodel(), 10); break;
+			case "Spy": addCard(s, spy(), 10); break;
+			case "Witch": addCard(s, witch(), 10); break;
 			
 			}
 		}
@@ -79,28 +84,54 @@ public class Bank {
 	public List<Card> newDeck(){
 		List<Card> newDeck = new ArrayList<>();
 		for (int i=0; i<3; i++) {
-			newDeck.add(bank.get("Estate"));
+			newDeck.add(bank.get("Estate").getCard());
 		}
 		for (int i=0; i<7; i++) {
-			newDeck.add(bank.get("Copper"));
+			newDeck.add(bank.get("Copper").getCard());
 		}
 		return newDeck;
 	}
 	
+	public boolean isGameOver() {
+		if (bank.get("Province").getQuantity() == 0) {
+			return true;
+		}
+		
+		int emptyKingdomCards = 0;
+		for(String s : bank.keySet()) {
+			Card c = bank.get(s).getCard();
+			//TODO: account for multiple types
+			if (c.getType() == Card.CardType.ACTION) {
+				if (bank.get(s).getQuantity() == 0) {
+					emptyKingdomCards++;
+				}
+			}
+		}
+		
+		return emptyKingdomCards >= 3;
+	}
+	
 	public Card tryToBuy(String name, int treasureAvailable) {
-		Card c = bank.get(name);
+		Card c = bank.get(name).getCard();
+		
+		if (bank.get(name).getQuantity() <= 0) {
+			throw new RuntimeException("the bank has run out of this card");
+		}
 		
 		if (c == null) {
 			throw new RuntimeException("no card found in bank with this name");
 		}
 		
+		//TODO: review atomicity
 		if (c.getCost() <= treasureAvailable) {
+			bank.get(name).setQuantity(bank.get(name).getQuantity() - 1);
 			return c;
 		}
 		
 		throw new RuntimeException("not enough money to buy this card");
 	}
 	
+	//TODO: rename to "gain" or something
 	public Card getByName(String cardName) {
 		if (!StringUtils.hasText(cardName)) {
 			throw new RuntimeException("no card name was passed to getByName");
@@ -110,14 +141,21 @@ public class Bank {
 			throw new RuntimeException("this card does not exist in the bank");
 		}
 		
-		return bank.get(cardName);
+		//TODO: review atomicity
+		if (bank.get(cardName).getQuantity() > 0) {
+			bank.get(cardName).setQuantity(bank.get(cardName).getQuantity() - 1);
+			return bank.get(cardName).getCard();
+		}
+		else {
+			throw new RuntimeException("the bank has run out of this card");
+		}
 	}
 	
 	public List<String> getNamesByMaxCost(int cost) {
 		List<String> cardNames = new ArrayList<String>();
-		for (Card c : bank.values()) {
-			if (c.getCost() <= cost) {
-				cardNames.add(c.getName());
+		for (BankCard bc : bank.values()) {
+			if (bc.getCard().getCost() <= cost) {
+				cardNames.add(bc.getCard().getName());
 			}
 		}
 		return cardNames;
@@ -125,9 +163,9 @@ public class Bank {
 	
 	public List<String> getNamesByTypeAndMaxCost(Card.CardType type, int cost) {
 		List<String> cardNames = new ArrayList<String>();
-		for (Card c : bank.values()) {
-			if (c.getType() == type && c.getCost() <= cost) {
-				cardNames.add(c.getName());
+		for (BankCard bc : bank.values()) {
+			if (bc.getCard().getType() == type && bc.getCard().getCost() <= cost) {
+				cardNames.add(bc.getCard().getName());
 			}
 		}
 		return cardNames;
@@ -247,7 +285,7 @@ public class Bank {
 			public void execute(Player player) {
 				for(Player p : player.getGame().getOtherPlayers(player)) {
 					if (!p.hasCard("Moat")) {
-						p.getDiscard().add(bank.get("Curse"));
+						p.getDiscard().add(bank.get("Curse").getCard());
 					}
 				}
 			}

@@ -53,10 +53,16 @@ public class Player {
 		bought.clear();
 		currentChoice = null;
 		
-		deck = game.getBank().newDeck();		
+		temporaryTreasure = 0;
+		temporaryBuys = 0;
+		temporaryActions = 1;
+		
+		deck = game.getBank().newDeck();
+//		deck = shuffle(deck);
 		for (int i=0; i<5; i++) {
 			draw();
 		}
+		
 	}
 	
 	public Card reveal() {
@@ -80,13 +86,24 @@ public class Player {
 		return privateDraw();
 	}
 	
+	public List<Card> shuffle(List<Card> input) {
+		List<Card> output = new ArrayList<>();
+		Random r = new Random();
+		while (input.size() > 0) {
+			int i = r.nextInt(input.size());
+			output.add(input.remove(i));
+		}
+		
+		return output;
+	}
+	
 	private Card privateDraw() {
 		if (deck.size() == 0) {
 			if (discard.size() == 0) {
 				throw new RuntimeException("no cards to draw in deck");
 			}
 			else {
-				deck.addAll(discard);
+				deck.addAll(shuffle(discard));
 				discard.clear();
 			}
 		}
@@ -97,39 +114,24 @@ public class Player {
 		return newCard;
 	}
 	
+	@JsonGetter(value = "numberOfActions")
+	public int numberOfActions() {
+		
+		return temporaryActions;
+	}
+	
 	@JsonGetter(value = "hasActions")
 	public boolean hasActions() {
 		if (played.size() == 0) return true;
 		
-		int actionsAvailable = 1 + temporaryActions;
-		
-		for (int cardIndex=0; cardIndex < played.size(); cardIndex++) {
-			Card c = played.get(cardIndex);
-			//TODO: this ultimately needs to handle multiple types
-			if (Card.CardType.ACTION.equals(c.getType())) {
-				actionsAvailable--;
-			}					
-		}
-		
-		return actionsAvailable > 0;
-	}
-	
-	//NOTE: this only applies to the throne room right now
-	public void play(Card cardToPlay) {
-		temporaryTreasure += cardToPlay.getTreasure();
-		temporaryBuys += cardToPlay.getAdditionalBuys();
-		temporaryActions += cardToPlay.getAdditionalActions();
-		
-		for (int i=0; i<cardToPlay.getAdditionalCards(); i++) {
-			draw();
-		}
-		
-		if (cardToPlay.getSpecialAction() != null) {
-			cardToPlay.getSpecialAction().execute(this);
-		}
+		return numberOfActions() > 0;
 	}
 	
 	public void play(String name) {
+		play(name, false);
+	}
+		
+	public void play(String name, boolean isThroneRoom) {
 		log.info("calling play");
 		if (hand.size() == 0) {
 			throw new RuntimeException("no cards to play in hand");
@@ -152,19 +154,28 @@ public class Player {
 			throw new RuntimeException("no card found matching name");
 		}
 		
-		if (cardToPlay.getType() == Card.CardType.ACTION && !hasActions()) {
-			throw new RuntimeException("no actions left to play");
+		if (!isThroneRoom) {
+			if (cardToPlay.getType() == Card.CardType.ACTION && !hasActions()) {
+				throw new RuntimeException("no actions left to play");
+			}
+			
+			if (cardToPlay.getType() == Card.CardType.ACTION) {
+				temporaryActions--;
+			}
 		}
 		
 		hand.remove(cardToPlay);
 		played.add(cardToPlay);
 		
+		doCard(cardToPlay);
+	}
+	
+	public void doCard(Card cardToPlay) {
 		temporaryTreasure += cardToPlay.getTreasure();
 		temporaryBuys += cardToPlay.getAdditionalBuys();
 		temporaryActions += cardToPlay.getAdditionalActions();
 		
 		for (int i=0; i<cardToPlay.getAdditionalCards(); i++) {
-			log.info("drawing card");
 			draw();
 		}
 		
@@ -184,8 +195,7 @@ public class Player {
 			
 			Card c = throneRoomActions.pop();
 			if (c != null) {
-				play(c);
-				temporaryActions--;
+				doCard(c);
 			}
 		}
 		
@@ -203,8 +213,10 @@ public class Player {
 		Card newCard = game.getBank().tryToBuy(name, treasureAvailable());
 		
 		bought.add(newCard);
+		
+		game.testGameOver();
 	}
-	
+		
 	public void cleanup() {
 		discard.addAll(bought);
 		bought.clear();
@@ -218,7 +230,7 @@ public class Player {
 		currentChoice = null;
 		temporaryTreasure = 0;
 		temporaryBuys = 0;
-		temporaryActions = 0;
+		temporaryActions = 1;
 		throneRoomActions.clear();
 		
 		for (int i=0; i<5; i++) {
@@ -230,9 +242,15 @@ public class Player {
 	
 	@JsonGetter(value = "hasBuys")
 	public boolean hasBuys() {
-		return 1 + temporaryBuys - bought.size() > 0;
+		return numberOfBuys() > 0;
 	}
 	
+	@JsonGetter(value = "numberOfBuys")
+	public int numberOfBuys() {
+		return 1 + temporaryBuys - bought.size();
+	}
+	
+	@JsonGetter(value = "treasureAvailable")
 	public int treasureAvailable() {
 		int spent = 0;
 		
@@ -250,5 +268,24 @@ public class Player {
 			}
 		}
 		return false;
+	}
+	
+	public int getPoints() {
+		List<Card> allCards = new ArrayList<>();
+		allCards.addAll(deck);
+		allCards.addAll(hand);
+		allCards.addAll(played);
+		allCards.addAll(bought);
+		allCards.addAll(discard);
+		
+		int points = 0;
+		for(Card c : allCards) {
+			// TODO: account for multiple types
+			if (c.getType() == Card.CardType.VICTORY) {
+				points += c.getVictoryPoints();
+			}
+		}
+		
+		return points;
 	}
 }

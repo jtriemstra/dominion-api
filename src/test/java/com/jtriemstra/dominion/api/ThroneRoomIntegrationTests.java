@@ -35,7 +35,7 @@ public class ThroneRoomIntegrationTests {
 		player.play("Throne Room");
 		player.finishAction(Arrays.asList("Village"));
 		
-		assertEquals(4, player.getTemporaryActions());
+		assertEquals(4, player.numberOfActions());
 		assertEquals(5, player.getHand().size());
 		assertEquals(true, player.hasBuys());
 		assertEquals(true, player.hasActions());
