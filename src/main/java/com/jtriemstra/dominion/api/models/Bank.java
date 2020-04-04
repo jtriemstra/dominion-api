@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import org.springframework.util.StringUtils;
@@ -25,22 +26,48 @@ public class Bank {
 	}
 	
 	public Bank() {
-		addCard("Gold", gold(), 50);
-		addCard("Silver", silver(), 100);
-		addCard("Copper", copper(), 200);
-		addCard("Estate", estate(), 30);
-		addCard("Duchy",  duchy(), 20);
-		addCard("Province", province(), 12);
-		
-		addCard("Village",  village(), 10);
-		addCard("Smithy", smithy(), 10);
-		addCard("Chapel", chapel(), 10);
-		addCard("Throne Room", throneroom(), 10);
-		addCard("Workshop", workshop(), 10);
-		addCard("Mine", mine(), 10);
-		addCard("Cellar", cellar(), 10);
-		addCard("Militia", militia(), 10);
-		addCard("Market", market(), 10);
+		this(false);
+	}
+	
+	public Bank(boolean isRandom) {
+		if (!isRandom) {
+			addCard("Gold", gold(), 50);
+			addCard("Silver", silver(), 100);
+			addCard("Copper", copper(), 200);
+			addCard("Estate", estate(), 30);
+			addCard("Duchy",  duchy(), 20);
+			addCard("Province", province(), 12);
+			addCard("Curse", curse(), 30);
+			
+			addCard("Village",  village(), 10);
+			addCard("Smithy", smithy(), 10);
+			addCard("Chapel", chapel(), 10);
+			addCard("Throne Room", throneroom(), 10);
+			addCard("Workshop", workshop(), 10);
+			addCard("Mine", mine(), 10);
+			addCard("Cellar", cellar(), 10);
+			addCard("Militia", militia(), 10);
+			addCard("Market", market(), 10);
+			addCard("Moat", moat(), 10);
+		}
+		else {
+			addCard("Gold", gold(), 50);
+			addCard("Silver", silver(), 100);
+			addCard("Copper", copper(), 200);
+			addCard("Estate", estate(), 30);
+			addCard("Duchy",  duchy(), 20);
+			addCard("Province", province(), 12);
+			addCard("Curse", curse(), 30);
+			
+			List<String> names = new ArrayList<String>(Arrays.asList("Village", "Smithy", "Chapel", "Throne Room", "Workshop", "Laboratory", "Woodcutter", "Adventurer", "Bureaucrat", 
+					"Cellar", "Chancellor", "Council Room", "Feast", "Festival", "Library", "Market", "Militia", "Mine", "Moneylender", "Remodel", 
+					"Spy", "Witch"));
+			Random indexGenerator = new Random();
+			for(int i=0; i<10; i++) {
+				int cardIndex = indexGenerator.nextInt(names.size());
+				addCardByName(names.remove(cardIndex));
+			}
+		}
 	}
 	
 	public Bank(List<String> cardNames) {
@@ -53,31 +80,35 @@ public class Bank {
 		addCard("Curse", curse(), 30);
 		
 		for (String s : cardNames) {
-			switch(s) {
-			case "Village": addCard(s, village(), 10); break;
-			case "Smithy": addCard(s, smithy(), 10); break;
-			case "Chapel": addCard(s, chapel(), 10); break;
-			case "Throne Room": addCard(s, throneroom(), 10); break;
-			case "Workshop": addCard(s, workshop(), 10); break;
-			case "Laboratory": addCard(s, laboratory(), 10); break;
-			case "Woodcutter": addCard(s, woodcutter(), 10); break;
-			case "Adventurer": addCard(s, adventurer(), 10); break;
-			case "Bureaucrat": addCard(s, bureaucrat(), 10); break;
-			case "Cellar": addCard(s, cellar(), 10); break;
-			case "Chancellor": addCard(s, chancellor(), 10); break;
-			case "Council Room": addCard(s, councilroom(), 10); break;
-			case "Feast": addCard(s, feast(), 10); break;
-			case "Festival": addCard(s, festival(), 10); break;
-			case "Library": addCard(s, library(), 10); break;
-			case "Market": addCard(s, market(), 10); break;
-			case "Militia": addCard(s, militia(), 10); break;
-			case "Mine": addCard(s, mine(), 10); break;
-			case "Moneylender": addCard(s, moneylender(), 10); break;
-			case "Remodel": addCard(s, remodel(), 10); break;
-			case "Spy": addCard(s, spy(), 10); break;
-			case "Witch": addCard(s, witch(), 10); break;
-			
-			}
+			addCardByName(s);
+		}
+	}
+	
+	private void addCardByName(String s) {
+		switch(s) {
+		case "Village": addCard(s, village(), 10); break;
+		case "Smithy": addCard(s, smithy(), 10); break;
+		case "Chapel": addCard(s, chapel(), 10); break;
+		case "Throne Room": addCard(s, throneroom(), 10); break;
+		case "Workshop": addCard(s, workshop(), 10); break;
+		case "Laboratory": addCard(s, laboratory(), 10); break;
+		case "Woodcutter": addCard(s, woodcutter(), 10); break;
+		case "Adventurer": addCard(s, adventurer(), 10); break;
+		case "Bureaucrat": addCard(s, bureaucrat(), 10); break;
+		case "Cellar": addCard(s, cellar(), 10); break;
+		case "Chancellor": addCard(s, chancellor(), 10); break;
+		case "Council Room": addCard(s, councilroom(), 10); break;
+		case "Feast": addCard(s, feast(), 10); break;
+		case "Festival": addCard(s, festival(), 10); break;
+		case "Library": addCard(s, library(), 10); break;
+		case "Market": addCard(s, market(), 10); break;
+		case "Militia": addCard(s, militia(), 10); break;
+		case "Mine": addCard(s, mine(), 10); break;
+		case "Moneylender": addCard(s, moneylender(), 10); break;
+		case "Remodel": addCard(s, remodel(), 10); break;
+		case "Spy": addCard(s, spy(), 10); break;
+		case "Witch": addCard(s, witch(), 10); break;
+		
 		}
 	}
 	

@@ -27,6 +27,8 @@ public class SpyAction extends CardAction {
 			@Override
 			public void doOptions(Player player, List<String> options) {
 				//TODO: finish
+				
+				player.setCurrentChoice(null);
 			}
 			
 		});

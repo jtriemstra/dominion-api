@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jtriemstra.dominion.api.dto.PlayerGameState;
+import com.jtriemstra.dominion.api.models.Bank;
 import com.jtriemstra.dominion.api.models.BankCard;
 import com.jtriemstra.dominion.api.models.Card;
 import com.jtriemstra.dominion.api.models.Game;
@@ -30,11 +31,24 @@ public class MainController {
 	}
 
 	@CrossOrigin(origins = "http://localhost:8001")
-	@RequestMapping("/start")
-	public PlayerGameState init(String playerName, HttpServletRequest request) {
+	@RequestMapping("/join")
+	public PlayerGameState join(String playerName, HttpServletRequest request) {
 		if (game.getPlayerCount() >= 4) {
 			throw new RuntimeException("game is full");
 		}
+		
+		Player newPlayer = new Player(playerName);
+		game.addPlayer(newPlayer);
+		newPlayer.init(game);
+		
+		return new PlayerGameState(newPlayer, game.getPlayerNames(), game.getCurrentPlayerIndex());
+	}
+	
+	@CrossOrigin(origins = "http://localhost:8001")
+	@RequestMapping("/start")
+	public PlayerGameState init(String playerName, HttpServletRequest request, boolean randomCards) {
+		Bank bank = new Bank(randomCards);
+		game = new Game(bank);
 		
 		Player newPlayer = new Player(playerName);
 		game.addPlayer(newPlayer);
@@ -96,6 +110,13 @@ public class MainController {
 		//TODO: return an array like the properties of the Player object, so UI code is consistent
 		
 		return game.getBank().getBankCards();
+	}
+	
+	@CrossOrigin(origins = "http://localhost:8001")
+	@RequestMapping("/end")
+	public void end() {
+		
+		game = new Game();
 	}
 	
 	private void validateCurrentPlayer(String playerName) {
