@@ -30,7 +30,7 @@ public class MainController {
 
 	}
 
-	@CrossOrigin(origins = "http://localhost:8001")
+	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net"})
 	@RequestMapping("/join")
 	public PlayerGameState join(String playerName, HttpServletRequest request) {
 		if (game.getPlayerCount() >= 4) {
@@ -44,7 +44,7 @@ public class MainController {
 		return new PlayerGameState(newPlayer, game.getPlayerNames(), game.getCurrentPlayerIndex());
 	}
 	
-	@CrossOrigin(origins = "http://localhost:8001")
+	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net"})
 	@RequestMapping("/start")
 	public PlayerGameState init(String playerName, HttpServletRequest request, boolean randomCards) {
 		Bank bank = new Bank(randomCards);
@@ -57,7 +57,7 @@ public class MainController {
 		return new PlayerGameState(newPlayer, game.getPlayerNames(), game.getCurrentPlayerIndex());
 	}
 	
-	@CrossOrigin(origins = "http://localhost:8001")
+	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net"})
 	@RequestMapping("/play")
 	public PlayerGameState play(String card, String playerName) {
 		validateCurrentPlayer(playerName);
@@ -67,7 +67,7 @@ public class MainController {
 		return new PlayerGameState(game.getPlayer(playerName), game.getPlayerNames(), game.getCurrentPlayerIndex());
 	}
 	
-	@CrossOrigin(origins = "http://localhost:8001")
+	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net"})
 	@RequestMapping("/buy")
 	public PlayerGameState buy(String card, String playerName) {
 		validateCurrentPlayer(playerName);
@@ -77,7 +77,7 @@ public class MainController {
 		return new PlayerGameState(game.getPlayer(playerName), game.getPlayerNames(), game.getCurrentPlayerIndex());
 	}
 	
-	@CrossOrigin(origins = "http://localhost:8001")
+	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net"})
 	@RequestMapping("/action")
 	public PlayerGameState action(String[] options, String playerName) {
 		List<String> optionsList = options == null ? new ArrayList<String>() : Arrays.asList(options);
@@ -87,7 +87,7 @@ public class MainController {
 		return new PlayerGameState(game.getPlayer(playerName), game.getPlayerNames(), game.getCurrentPlayerIndex());
 	}
 	
-	@CrossOrigin(origins = "http://localhost:8001")
+	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net"})
 	@RequestMapping("/cleanup")
 	public PlayerGameState cleanup(String playerName) {
 		validateCurrentPlayer(playerName);
@@ -97,14 +97,14 @@ public class MainController {
 		return new PlayerGameState(game.getPlayer(playerName), game.getPlayerNames(), game.getCurrentPlayerIndex());
 	}
 	
-	@CrossOrigin(origins = "http://localhost:8001")
+	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net"})
 	@RequestMapping("/refresh")
 	public PlayerGameState refresh(String playerName) {
 		
 		return new PlayerGameState(game.getPlayer(playerName), game.getPlayerNames(), game.getCurrentPlayerIndex());
 	}
 	
-	@CrossOrigin(origins = "http://localhost:8001")
+	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net"})
 	@RequestMapping("/bank")
 	public HashMap<String, BankCard> bank() {
 		//TODO: return an array like the properties of the Player object, so UI code is consistent
@@ -112,7 +112,7 @@ public class MainController {
 		return game.getBank().getBankCards();
 	}
 	
-	@CrossOrigin(origins = "http://localhost:8001")
+	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net"})
 	@RequestMapping("/end")
 	public void end() {
 		
