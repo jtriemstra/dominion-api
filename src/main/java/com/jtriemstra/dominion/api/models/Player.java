@@ -286,6 +286,12 @@ public class Player {
 			}
 		}
 		
+		for(Card c : allCards) {
+			if (c.getVictoryFunction() != null) {
+				points += c.getVictoryFunction().getPoints(allCards);
+			}
+		}
+		
 		return points;
 	}
 }

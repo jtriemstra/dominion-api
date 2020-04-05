@@ -46,8 +46,14 @@ public class MainController {
 	
 	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net"})
 	@RequestMapping("/start")
-	public PlayerGameState init(String playerName, HttpServletRequest request, boolean randomCards) {
-		Bank bank = new Bank(randomCards);
+	public PlayerGameState init(String playerName, HttpServletRequest request, boolean randomCards, List<String> cardNames) {
+		Bank bank;
+		if (cardNames != null && cardNames.size() > 0) {
+			bank = new Bank(cardNames);
+		}
+		else {
+			bank = new Bank(randomCards);
+		}
 		game = new Game(bank);
 		
 		Player newPlayer = new Player(playerName);

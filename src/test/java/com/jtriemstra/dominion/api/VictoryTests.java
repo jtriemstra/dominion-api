@@ -1,0 +1,27 @@
+package com.jtriemstra.dominion.api;
+
+import  java.util.Arrays;
+import org.junit.jupiter.api.Test;
+
+import com.jtriemstra.dominion.api.models.Bank;
+import com.jtriemstra.dominion.api.models.Player;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class VictoryTests {
+	@Test                                                                                         
+    public void gardensCountProperly() {
+		Player p = new Player("test");
+		Bank b = new Bank(Arrays.asList("Gardens", "Smithy"));
+		p.getBought().add(b.province());
+		for (int i=0; i<5; i++) p.getHand().add(b.gold());
+		p.getPlayed().add(b.smithy());
+		for (int i=0;i<5;i++) {
+			p.getDiscard().add(b.gardens());
+		}
+		
+		int points = p.getPoints();
+		assertEquals(points, 11);
+	}
+	
+	
+}

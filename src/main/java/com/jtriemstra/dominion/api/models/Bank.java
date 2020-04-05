@@ -61,7 +61,7 @@ public class Bank {
 			
 			List<String> names = new ArrayList<String>(Arrays.asList("Village", "Smithy", "Chapel", "Throne Room", "Workshop", "Laboratory", "Woodcutter", "Adventurer", "Bureaucrat", 
 					"Cellar", "Chancellor", "Council Room", "Feast", "Festival", "Library", "Market", "Militia", "Mine", "Moneylender", "Remodel", 
-					"Spy", "Witch"));
+					/*"Spy",*/ "Witch"));
 			Random indexGenerator = new Random();
 			for(int i=0; i<10; i++) {
 				int cardIndex = indexGenerator.nextInt(names.size());
@@ -244,6 +244,11 @@ public class Bank {
 	public  Card moat() {
 		return new Card(2, "Moat", 0, 0, Card.CardType.ACTION, 0, 0, 2);
 	}
+	public Card gardens() {
+		Card c = new Card(4, "Gardens", 0, 0, Card.CardType.VICTORY, 0, 0, 0);
+		c.setVictoryFunction(new GardensVictory());
+		return c;
+	}
 	public  Card adventurer() {
 		Card c = new Card(6, "Adventurer", 0, 0, Card.CardType.ACTION, 0, 0, 0);
 		c.setSpecialAction(new AdventurerAction());
@@ -334,4 +339,5 @@ public class Bank {
 		c.setSpecialAction(new SpyAction());
 		return c;
 	}
+
 }

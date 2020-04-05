@@ -20,6 +20,7 @@ public class Card {
 	@NonNull private int additionalCards;
 	
 	@JsonIgnore private CardAction specialAction;
+	@JsonIgnore private VictoryFunction victoryFunction;
 	
 	public String toString() {
 		return name;
