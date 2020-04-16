@@ -3,10 +3,10 @@ package com.jtriemstra.dominion.api.models;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RemodelAction extends CardAction {
+public class TraderAction extends CardAction {
 	private Bank bank;
 	
-	public RemodelAction(Bank bank) {
+	public TraderAction(Bank bank) {
 		this.bank = bank;
 	}
 	
@@ -46,32 +46,14 @@ public class RemodelAction extends CardAction {
 					throw new RuntimeException("selected card not found in hand");
 				}
 				
+				player.setCurrentChoice(null);
+				
 				int trashedCost = cardToTrash.getCost();
 				player.getHand().remove(cardToTrash);
 				
-				player.setCurrentChoice( new ActionChoice() {
-					@Override
-					public String getPrompt() { 
-						return "Choose a card to gain";
-					}
-					
-					@Override
-					public List<String> getOptions(){
-						return bank.getNamesByMaxCost(trashedCost + 2);
-					}
-					
-					@Override
-					public void doOptions(Player player, List<String> options){
-						if (options.size() != 1) {
-							throw new RuntimeException("One and only one option can be chosen");
-						}
-						
-						player.setCurrentChoice(null);
-								
-						player.gainTo(bank.getByName(options.get(0)), player.getBought());
-					}							
-				});
-				
+				for (int i=0; i<trashedCost; i++) {
+					player.gainTo(bank.getByName("Silver"), player.getBought());
+				}
 			}
 		});
 	}

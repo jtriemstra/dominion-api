@@ -22,8 +22,9 @@ public class Player {
 	private List<Card> played = new ArrayList<>();
 	private List<Card> discard = new ArrayList<>();
 	private List<Card> bought = new ArrayList<>();
+	private List<Card> liminal = new ArrayList<>();
 	@JsonIgnore private int numberOfBuysMade;
-	private ActionChoice currentChoice;
+	private List<ActionChoice> currentChoice = new ArrayList<>();
 	@JsonIgnore private int temporaryTreasure; 
 	@JsonIgnore private int temporaryBuys;
 	@JsonIgnore private int temporaryActions;
@@ -51,7 +52,8 @@ public class Player {
 		played.clear();
 		discard.clear();
 		bought.clear();
-		currentChoice = null;
+		liminal.clear();
+		currentChoice.clear();
 		
 		temporaryTreasure = 0;
 		temporaryBuys = 0;
@@ -64,17 +66,20 @@ public class Player {
 		}
 		
 	}
-	
-	public Card reveal() {
-		return deck.remove(0);
-	}
-	
-	public void discardFromTemp(Card c) {
-		discard.add(c);
+		
+	public void discardFromLiminal(Card c) {
+		discardFrom(c, liminal);
 	}
 	
 	public void discardFromHand(Card c) {
-		hand.remove(c);
+		discardFrom(c, hand);
+	}
+	
+	private void discardFrom(Card c, List<Card> source) {
+		if (c.getDiscardAction() != null) {
+			c.getDiscardAction().execute(this);
+		}
+		source.remove(c);
 		discard.add(c);
 	}
 	
@@ -83,7 +88,15 @@ public class Player {
 	}
 	
 	public Card draw() {
-		return privateDraw();
+		return privateDraw(hand);
+	}
+	
+	public List<Card> lookAt(int count){
+		for (int i=0; i<count; i++) {
+			privateDraw(liminal);
+		}
+		
+		return liminal;
 	}
 	
 	public List<Card> shuffle(List<Card> input) {
@@ -96,8 +109,8 @@ public class Player {
 		
 		return output;
 	}
-	
-	private Card privateDraw() {
+		
+	private Card privateDraw(List<Card> destination) {
 		if (deck.size() == 0) {
 			if (discard.size() == 0) {
 				throw new RuntimeException("no cards to draw in deck");
@@ -109,7 +122,7 @@ public class Player {
 		}
 		
 		Card newCard = deck.remove(0);
-		hand.add(newCard);
+		destination.add(newCard);
 		
 		return newCard;
 	}
@@ -132,7 +145,6 @@ public class Player {
 	}
 		
 	public void play(String name, boolean isThroneRoom) {
-		log.info("calling play");
 		if (hand.size() == 0) {
 			throw new RuntimeException("no cards to play in hand");
 		}
@@ -171,7 +183,13 @@ public class Player {
 	}
 	
 	public void doCard(Card cardToPlay) {
-		temporaryTreasure += cardToPlay.getTreasure();
+		if (cardToPlay.getTreasureFunction() == null) {
+			temporaryTreasure += cardToPlay.getTreasure();
+		}
+		else {
+			temporaryTreasure += cardToPlay.getTreasureFunction().getTreasure(this);
+		}
+		
 		temporaryBuys += cardToPlay.getAdditionalBuys();
 		temporaryActions += cardToPlay.getAdditionalActions();
 		
@@ -185,20 +203,40 @@ public class Player {
 	}
 	
 	public void finishAction(List<String> options) {
-		if (currentChoice == null) {
+		if (currentChoice.size() == 0) {
 			throw new RuntimeException("player does not currently have an action choice waiting");
 		}
 		
-		currentChoice.doOptions(this, options);
+		currentChoice.get(0).doOptions(this, options);
 		
-		if (currentChoice == null && throneRoomActions.size() > 0) {
+		if (currentChoice.size() == 0 && throneRoomActions.size() > 0) {
 			
 			Card c = throneRoomActions.pop();
 			if (c != null) {
 				doCard(c);
 			}
 		}
-		
+	}
+	
+	public void setCurrentChoice(ActionChoice a) {
+		if (currentChoice.size() > 0) {
+			currentChoice.remove(0);
+		}
+		if (a != null) {
+			currentChoice.add(a);
+		}
+	}
+	
+	public void addCurrentChoice(ActionChoice a) {
+		currentChoice.add(a);
+	}
+	
+	@JsonGetter(value="currentChoice")
+	public ActionChoice getCurrentChoice() {
+		if (currentChoice.size() > 0) {
+			return currentChoice.get(0);
+		}
+		return null;
 	}
 	
 	public void buy(String name) {
@@ -211,13 +249,86 @@ public class Player {
 		}
 		
 		Card newCard = game.getBank().tryToBuy(name, treasureAvailable());
+		temporaryTreasure -= newCard.getCost();
+		temporaryBuys -= 1;
 		
-		bought.add(newCard);
+		if (newCard.getBuyDestination() == null) {
+			gainTo(newCard, bought);
+		}
+		else {
+			switch(newCard.getBuyDestination().getBuyDestination()) {
+			case DECK: gainTo(newCard, deck); break;
+			case HAND: gainTo(newCard, hand); break;
+			case PLAYED: gainTo(newCard, played); break;
+			case BOUGHT: gainTo(newCard, bought); break;
+			case DISCARD: gainTo(newCard, discard); break;
+			}
+		}
 		
-		game.testGameOver();
+		if (newCard.getBuyAction() != null) {
+			newCard.getBuyAction().execute(this);
+		}
+		
+		//TODO: move Haggler code out of here
+		for(Card c : played) {
+			if (c.getName().equals("Haggler")) {
+				(new HagglerAction(this.getGame().getBank(), newCard.getCost())).execute(this);
+			}
+		}
+	}
+	
+	public void gainTo(Card c, List<Card> destination) {
+		//TODO: move card-specific code elsewhere
+		boolean traderFound = false;
+		for (Card c1 : hand) {
+			if (c1.getName().equals("Trader")) {
+				traderFound = true;
+				break;
+			}
+		}
+		if (traderFound) {
+			(new TraderReaction(getGame().getBank(), destination, c)).execute(this);
+		}
+		else {
+			finishGain(c, destination);
+		}
+	}
+	
+	public void finishGain(Card c, List<Card> destination) {
+		destination.add(c);
+		
+		//TODO: move card-specific code elsewhere
+		for(Player p : game.getOtherPlayers(this)) {
+			for (Card c1 : p.getDeck()) {
+				if (c1.getName().equals("Fools Gold") && c.getName().equals("Province")) {
+					(new FoolsGoldAction(game.getBank())).execute(p);
+				}
+			}
+		}
+
+		if (c.getGainAction() != null) {
+			c.getGainAction().execute(this);
+		}		
 	}
 		
+	public void startCleanup() {
+		//TODO: remove card-specific logic
+		boolean foundScheme = false;
+		for (Card c : played) {
+			if (c.getName().equals("Scheme")) {
+				foundScheme = true;
+				(new SchemeAction()).execute(this);
+				break;
+			}
+		}
+		
+		if (!foundScheme) {
+			cleanup();
+		}
+	}
+	
 	public void cleanup() {
+		
 		discard.addAll(bought);
 		bought.clear();
 		
@@ -227,7 +338,10 @@ public class Player {
 		discard.addAll(hand);
 		hand.clear();
 		
-		currentChoice = null;
+		//TODO: there may be other situations that could take teh Highway or Haggler out of play that need to be accounted for
+		game.clearCardModifiers();
+				
+		currentChoice.clear();
 		temporaryTreasure = 0;
 		temporaryBuys = 0;
 		temporaryActions = 1;
@@ -238,6 +352,9 @@ public class Player {
 		}
 		
 		game.moveToNextPlayer();
+		
+		game.testGameOver();
+		
 	}
 	
 	@JsonGetter(value = "hasBuys")
@@ -247,18 +364,32 @@ public class Player {
 	
 	@JsonGetter(value = "numberOfBuys")
 	public int numberOfBuys() {
-		return 1 + temporaryBuys - bought.size();
+		return 1 + temporaryBuys;
 	}
 	
 	@JsonGetter(value = "treasureAvailable")
 	public int treasureAvailable() {
-		int spent = 0;
-		
-		for (Card c : bought) {
-			spent += c.getCost();
+		return temporaryTreasure;
+	}
+	
+	@JsonGetter(value = "hand")
+	public List<Card> getHand() {
+		ArrayList<Card> sortedHand = new ArrayList<>();
+		for (Card c : hand) {
+			if (c.getType() == Card.CardType.TREASURE) {
+				sortedHand.add(c);
+			}
+		}
+		for (Card c : hand) {
+			if (c.getType() == Card.CardType.ACTION) {
+				sortedHand.add(0, c);
+			}
+			else if (c.getType() != Card.CardType.TREASURE) {
+				sortedHand.add(c);
+			}
 		}
 		
-		return temporaryTreasure - spent;
+		return sortedHand;
 	}
 		
 	public boolean hasCard(String name) {
@@ -293,5 +424,13 @@ public class Player {
 		}
 		
 		return points;
+	}
+	
+	public enum CardSet{
+		DECK,
+		HAND,
+		PLAYED,
+		BOUGHT,
+		DISCARD
 	}
 }

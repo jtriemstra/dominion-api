@@ -9,13 +9,18 @@ public class Game {
 	private List<Player> players = new ArrayList<>();
 	private Bank bank;
 	private int currentPlayer;
+	private List<String> cardModifiers = new ArrayList<>();
+	
+	private static Game currentInstance;
 	
 	public Game() {
 		bank = new Bank();
+		currentInstance = this;
 	}
 	
 	public Game(Bank bank) {
 		this.bank = bank;
+		currentInstance = this;
 	}
 	
 	public List<Player> getOtherPlayers(Player thisPlayer){
@@ -98,5 +103,18 @@ public class Game {
 		if (bank.isGameOver()) {
 			currentPlayer = -1;
 		}
+	}
+	
+	public void addCardModifier(String s) {
+		cardModifiers.add(s);
+	}
+	
+	public void clearCardModifiers() {
+		cardModifiers.clear();
+	}
+	
+	public static List<String> currentModifiers(){
+		// TODO: this whole static access pattern is pretty klugey
+		return currentInstance.cardModifiers;
 	}
 }

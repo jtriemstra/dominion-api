@@ -61,7 +61,9 @@ public class Bank {
 			
 			List<String> names = new ArrayList<String>(Arrays.asList("Village", "Smithy", "Chapel", "Throne Room", "Workshop", "Laboratory", "Woodcutter", "Adventurer", "Bureaucrat", 
 					"Cellar", "Chancellor", "Council Room", "Feast", "Festival", "Library", "Market", "Militia", "Mine", "Moneylender", "Remodel", 
-					/*"Spy",*/ "Witch"));
+					/*"Spy",*/ "Witch", "Cartographer", "Oracle", "Highway", "Noble Brigand", "Jack of All Trades", "Inn", "Farmland", "Mandarin",
+					"Scheme", "Haggler", "Fools Gold", "Tunnel", "Margrave", "Ill-Gotten Gains", "Cache", "Embassy", "Nomad Camp", "Border Village",
+					"Develop", "Silk Road", "Stables", "Margrave", "Spice Merchant", "Oasis", "Crossroads"));
 			Random indexGenerator = new Random();
 			for(int i=0; i<10; i++) {
 				int cardIndex = indexGenerator.nextInt(names.size());
@@ -108,7 +110,30 @@ public class Bank {
 		case "Remodel": addCard(s, remodel(), 10); break;
 		case "Spy": addCard(s, spy(), 10); break;
 		case "Witch": addCard(s, witch(), 10); break;
-		
+		case "Oasis": addCard(s, oasis(), 10); break;
+		case "Stables": addCard(s, stables(), 10); break;
+		case "Silk Road": addCard(s, silkroad(), 10); break;
+		case "Develop": addCard(s, develop(), 10); break;
+		case "Crossroads": addCard(s, crossroads(), 10); break;
+		case "Spice Merchant": addCard(s, spicemerchant(), 10); break;
+		case "Margrave": addCard(s, margrave(), 10); break;
+		case "Moat": addCard(s, moat(), 10); break;
+		case "Embassy": addCard(s, embassy(), 10); break;
+		case "Cache": addCard(s, cache(), 10); break;
+		case "Nomad Camp": addCard(s, nomadcamp(), 10); break;
+		case "Border Village": addCard(s, bordervillage(), 10); break;
+		case "Ill-Gotten Gains": addCard(s, illgottengains(), 10); break;
+		case "Farmland": addCard(s, farmland(), 10); break;
+		case "Mandarin": addCard(s, mandarin(), 10); break;
+		case "Inn": addCard(s, inn(), 10); break;
+		case "Cartographer": addCard(s, cartographer(), 10); break;
+		case "Jack of All Trades": addCard(s, jackofalltrades(), 10); break;
+		case "Noble Brigand": addCard(s, noblebrigand(), 10); break;
+		case "Tunnel": addCard(s, tunnel(), 10); break;
+		case "Haggler": addCard(s, haggler(), 10); break;
+		case "Fools Gold": addCard(s, foolsgold(), 10); break;
+		case "Scheme": addCard(s, scheme(), 10); break;
+		case "Trader": addCard(s, trader(), 10); break;
 		}
 	}
 	
@@ -182,6 +207,10 @@ public class Bank {
 		}
 	}
 	
+	public void returnCard(String cardName) {
+		bank.get(cardName).setQuantity(bank.get(cardName).getQuantity() + 1);
+	}
+	
 	public List<String> getNamesByMaxCost(int cost) {
 		List<String> cardNames = new ArrayList<String>();
 		for (BankCard bc : bank.values()) {
@@ -192,10 +221,30 @@ public class Bank {
 		return cardNames;
 	}
 	
+	public List<String> getNamesByExactCost(int cost) {
+		List<String> cardNames = new ArrayList<String>();
+		for (BankCard bc : bank.values()) {
+			if (bc.getCard().getCost() == cost) {
+				cardNames.add(bc.getCard().getName());
+			}
+		}
+		return cardNames;
+	}
+	
 	public List<String> getNamesByTypeAndMaxCost(Card.CardType type, int cost) {
 		List<String> cardNames = new ArrayList<String>();
 		for (BankCard bc : bank.values()) {
 			if (bc.getCard().getType() == type && bc.getCard().getCost() <= cost) {
+				cardNames.add(bc.getCard().getName());
+			}
+		}
+		return cardNames;
+	}
+	
+	public List<String> getNamesByNonTypeAndMaxCost(Card.CardType type, int cost) {
+		List<String> cardNames = new ArrayList<String>();
+		for (BankCard bc : bank.values()) {
+			if (bc.getCard().getType() != type && bc.getCard().getCost() <= cost) {
 				cardNames.add(bc.getCard().getName());
 			}
 		}
@@ -321,7 +370,7 @@ public class Bank {
 			public void execute(Player player) {
 				for(Player p : player.getGame().getOtherPlayers(player)) {
 					if (!p.hasCard("Moat")) {
-						p.getDiscard().add(bank.get("Curse").getCard());
+						p.gainTo(getByName("Curse"), p.getDiscard());
 					}
 				}
 			}
@@ -339,5 +388,158 @@ public class Bank {
 		c.setSpecialAction(new SpyAction());
 		return c;
 	}
-
+	
+	
+	
+	public Card oasis() {
+		Card c = new Card(3, "Oasis", 0, 1, Card.CardType.ACTION, 0, 1, 1);
+		c.setSpecialAction(new OasisAction());
+		return c;
+	}
+	public Card margrave() {
+		Card c = new Card(5, "Margrave", 0, 0, Card.CardType.ACTION, 1, 0, 3);
+		c.setSpecialAction(new MargraveAction());
+		return c;
+	}
+	public Card stables() {
+		Card c = new Card(5, "Stables", 0, 0, Card.CardType.ACTION, 0, 0, 0);
+		c.setSpecialAction(new StablesAction());
+		return c;
+	}
+	public Card silkroad() {
+		Card c = new Card(4, "Silk Road", 0, 0, Card.CardType.VICTORY, 0, 0, 0);
+		c.setVictoryFunction(new SilkRoadVictory());
+		return c;
+	}
+	public Card develop() {
+		Card c = new Card(3, "Develop", 0, 0, Card.CardType.ACTION, 0, 0, 0);
+		c.setSpecialAction(new DevelopAction(this));
+		return c;
+	}
+	public Card crossroads() {
+		Card c = new Card(2, "Crossroads", 0, 0, Card.CardType.ACTION, 0, 0, 0);
+		c.setSpecialAction(new CrossroadsAction());
+		return c;
+	}
+	public Card cartographer() {
+		Card c = new Card(5, "Cartographer", 0, 1, Card.CardType.ACTION, 0, 0, 1);
+		c.setSpecialAction(new CartographerAction());
+		return c;
+	}
+	public Card spicemerchant() {
+		Card c = new Card(4, "Spice Merchant", 0, 0, Card.CardType.ACTION, 0, 0, 0);
+		c.setSpecialAction(new SpiceMerchantAction());
+		return c;
+	}
+	public Card nomadcamp() {
+		Card c = new Card(4, "Nomad Camp", 0, 0, Card.CardType.ACTION, 1, 2, 0);
+		c.setBuyDestination(() -> Player.CardSet.DECK);
+		return c;
+	}
+	public Card bordervillage() {
+		Card c = new Card(6, "Border Village", 0, 2, Card.CardType.ACTION, 0, 0, 1);
+		c.setGainAction(new BorderVillageGainAction(this));
+		return c;
+	}
+	public Card cache() {
+		Card c = new Card(5, "Cache", 0, 0, Card.CardType.TREASURE, 0, 3, 0);
+		c.setGainAction(new EventAction() {
+			@Override
+			public void execute(Player player) {
+				player.gainTo(getByName("Copper"), player.getBought());
+				player.gainTo(getByName("Copper"), player.getBought());
+			}
+		});
+		return c;
+	}
+	public Card embassy() {
+		Card c = new Card(5, "Embassy", 0, 0, Card.CardType.ACTION, 0, 0, 5);
+		c.setGainAction(new EventAction() {
+			@Override
+			public void execute(Player player) {
+				for(Player p : player.getGame().getOtherPlayers(player)) {
+					p.gainTo(getByName("Silver"), p.getDiscard());
+				}
+			}
+			
+		});
+		c.setSpecialAction(new EmbassyAction());
+		return c;
+	}
+	public Card illgottengains() {
+		Card c = new Card(5, "Ill-Gotten Gains", 0, 0, Card.CardType.TREASURE, 0, 1, 0);
+		c.setGainAction(new EventAction() {
+			@Override
+			public void execute(Player player) {
+				for(Player p : player.getGame().getOtherPlayers(player)) {
+					p.gainTo(getByName("Curse"), p.getDiscard());
+				}
+			}
+		});
+		c.setSpecialAction(new IllGottenGainsAction(this));
+		return c;
+	}
+	public Card farmland() {
+		Card c = new Card(6, "Farmland", 2, 0, Card.CardType.VICTORY, 0, 0, 0);
+		c.setBuyAction(new FarmlandBuyAction(this));
+		return c;
+	}
+	public Card mandarin() {
+		Card c = new Card(5, "Mandarin", 0, 0, Card.CardType.ACTION, 0, 3, 0);
+		c.setSpecialAction(new MandarinAction());
+		c.setGainAction(new MandarinGainAction());
+		return c;
+	}
+	public Card inn() {
+		Card c = new Card(5, "Inn", 0, 2, Card.CardType.ACTION, 0, 0, 2);
+		c.setSpecialAction(new InnAction());
+		c.setGainAction(new InnGainAction());
+		return c;
+	}
+	public Card highway() {
+		Card c = new Card(5, "Highway", 0, 1, Card.CardType.ACTION, 0, 0, 1);
+		c.setSpecialAction(new CardAction() {
+			@Override
+			public void execute(Player player) {
+				player.getGame().addCardModifier("Highway");
+			}
+		});
+		return c;
+	}
+	public Card jackofalltrades() {
+		Card c = new Card(4, "Jack of All Trades", 0, 0, Card.CardType.ACTION, 0, 0, 0);
+		c.setSpecialAction(new JackOfAllTradesAction(this));
+		return c;
+	}
+	public Card noblebrigand() {
+		Card c = new Card(4, "Noble Brigand", 0, 0, Card.CardType.ACTION, 0, 1, 0);
+		c.setSpecialAction(new NobleBrigandAction(this));
+		return c;
+	}
+	public Card tunnel() {
+		Card c = new Card(3, "Tunnel", 2, 0, Card.CardType.VICTORY, 0, 0, 0);
+		c.setDiscardAction(new TunnelDiscardAction(this));
+		return c;
+	}
+	public Card haggler() {
+		return new Card(5, "Haggler", 0, 0, Card.CardType.ACTION, 0, 2, 0);
+	}
+	public Card foolsgold() {
+		Card c = new Card(2, "Fools Gold", 0, 0, Card.CardType.TREASURE, 0, 0, 0);
+		c.setTreasureFunction(new FoolsGoldTreasureFunction());
+		return c;
+	}
+	public Card scheme() {
+		return new Card(3, "Scheme", 0, 1, Card.CardType.ACTION, 0, 0, 1);
+	}
+	public Card trader() {
+		Card c = new Card(4, "Trader", 0, 0, Card.CardType.ACTION, 0, 0, 0);
+		c.setSpecialAction(new TraderAction(this));
+		return c;
+	}
+	public Card oracle() {
+		Card c = new Card(3, "Oracle", 0, 0, Card.CardType.ACTION, 0, 0, 0);
+		c.setSpecialAction(new OracleAction());
+		return c;
+	}
 }

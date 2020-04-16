@@ -116,6 +116,20 @@ public class BasicCucumberTests extends CucumberTestBase{
         
         assertEquals(true, foundCard);
     }
+    
+    @Then("I should have a {} in my discard")
+    public void i_should_have_discard(String cardName) {
+    	boolean foundCard = false;
+    	
+        for(Card c : getPlayer().getDiscard()) {
+        	if (cardName.equals(c.getName())) {
+        		foundCard = true;
+        	}
+        }
+        
+        assertEquals(true, foundCard);
+    }
+    
     @Then("I should have {} cards in my {}")
     public void i_should_have_cards(int cardCount, String source) {
         switch(source) {
@@ -130,6 +144,9 @@ public class BasicCucumberTests extends CucumberTestBase{
         	break;
         case "deck":
         	assertEquals(cardCount, getPlayer().getDeck().size());
+        	break;
+        case "bought":
+        	assertEquals(cardCount, getPlayer().getBought().size());
         	break;
         default:
         	throw new RuntimeException("invalid source");
@@ -156,6 +173,13 @@ public class BasicCucumberTests extends CucumberTestBase{
     	String[] multipleCardNames = cardNames.split(",");
     	for (int i=0; i<multipleCardNames.length - 1; i++) {
     		assertEquals(multipleCardNames[i], getPlayer().getDeck().get(i).getName());
+    	}
+    }
+    @Given("my deck starts with {}")
+    public void my_deck_starts_with(String cardNames) {
+    	String[] multipleCardNames = cardNames.split(",");
+    	for (int i=0; i<multipleCardNames.length - 1; i++) {
+    		getPlayer().getDeck().add(i, getBank().getByName(multipleCardNames[i]));
     	}
     }
 }

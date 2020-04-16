@@ -27,6 +27,18 @@ public class ThroneRoomCucumberTests extends CucumberTestBase{
         assertEquals(optionPrompt, state.player.getCurrentChoice().getPrompt());
     }
 	
+	@Then("options should include {}")
+    public void options_should_include(String options) {
+		String[] multipleOptions = options.split(",");
+		for (String s : state.player.getCurrentChoice().getOptions()) {
+			System.out.println(s);
+		}
+		for (String s : multipleOptions) {
+			System.out.println(s);
+			assertTrue(state.player.getCurrentChoice().getOptions().contains(s));
+		}
+    }
+	
 	@When("I opt for the {}")
     public void i_opt_for(String optionName) {
 		assertNotNull(getPlayer().getCurrentChoice());

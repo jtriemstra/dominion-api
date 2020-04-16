@@ -3,14 +3,14 @@ package com.jtriemstra.dominion.api.models;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CellarAction extends CardAction {
+public class MandarinAction extends CardAction {
 
 	@Override
 	public void execute(Player player) {
 		player.setCurrentChoice( new ActionChoice() {
 			@Override
 			public String getPrompt() { 
-				return "Which cards would you like to discard?";
+				return "Choose a card to put back on your deck";
 			}
 			
 			@Override
@@ -24,19 +24,34 @@ public class CellarAction extends CardAction {
 
 			@Override
 			public void doOptions(Player player, List<String> options) {
-				player.setCurrentChoice(null);
+				if (options.size() > 1) {
+					throw new RuntimeException("You can only choose 1 card");
+				}
 				
+				if (options.size() == 0 && player.getHand().size() > 0){
+					throw new RuntimeException("You must place a card on your deck");
+				}
+				
+				Card cardToMove = null;
+						
 				for(String cardName : options) {
 					for (Card c : player.getHand()) {
 						if (cardName.equals(c.getName())) {
-							player.discardFromHand(c);
-							player.draw();
+							cardToMove = c;
 							break;
 						}
 					}
-				}				
+				}
+				
+				player.getHand().remove(cardToMove);
+				player.getDeck().add(0, cardToMove);
+
+				
+				player.setCurrentChoice(null);
 			}
 		});
+
+
 	}
 
 }

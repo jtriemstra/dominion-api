@@ -3,24 +3,28 @@ package com.jtriemstra.dominion.api.models;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WorkshopAction extends CardAction {
+public class HagglerAction extends CardAction {
 	private Bank bank;
+	private int boughtCardCost;
 	
-	public WorkshopAction(Bank bank) {
+	public HagglerAction(Bank bank, int boughtCardCost) {
 		this.bank = bank;
+		this.boughtCardCost = boughtCardCost;
 	}
 	
 	@Override
 	public void execute(Player player) {
-		player.setCurrentChoice( new ActionChoice() {
+		player.addCurrentChoice( new ActionChoice() {
 			@Override
 			public String getPrompt() { 
-				return "Choose a card costing up to 4";
+				return "Choose a card to gain";
 			}
 			
 			@Override
 			public List<String> getOptions(){
-				return bank.getNamesByMaxCost(4);
+				List<String> cardNames = bank.getNamesByNonTypeAndMaxCost(Card.CardType.VICTORY, boughtCardCost - 1);
+				
+				return cardNames;
 			}
 
 			@Override
@@ -29,11 +33,13 @@ public class WorkshopAction extends CardAction {
 					throw new RuntimeException("One and only one option can be chosen");
 				}
 				
-				player.gainTo(bank.getByName(options.get(0)), player.getDiscard());
-
 				player.setCurrentChoice(null);
+				
+				player.gainTo(bank.getByName(options.get(0)), player.getBought());
+				
 			}
 		});
 	}
+
 
 }

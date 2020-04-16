@@ -1,12 +1,14 @@
 package com.jtriemstra.dominion.api.models;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class RemodelAction extends CardAction {
+public class FarmlandBuyAction extends EventAction {
+	
 	private Bank bank;
 	
-	public RemodelAction(Bank bank) {
+	public FarmlandBuyAction(Bank bank) {
 		this.bank = bank;
 	}
 	
@@ -22,7 +24,7 @@ public class RemodelAction extends CardAction {
 			public List<String> getOptions(){
 				List<String> cardNames = new ArrayList<String>();
 				for (Card c : player.getHand()) {
-					cardNames.add(c.getName());							
+					cardNames.add(c.getName());
 				}
 				return cardNames;
 			}
@@ -34,7 +36,6 @@ public class RemodelAction extends CardAction {
 				}
 				
 				Card cardToTrash = null;
-				
 				for (Card c : player.getHand()) {
 					if (c.getName().equals(options.get(0))) {
 						cardToTrash = c;
@@ -57,7 +58,7 @@ public class RemodelAction extends CardAction {
 					
 					@Override
 					public List<String> getOptions(){
-						return bank.getNamesByMaxCost(trashedCost + 2);
+						return bank.getNamesByExactCost(trashedCost + 2);
 					}
 					
 					@Override
@@ -67,8 +68,11 @@ public class RemodelAction extends CardAction {
 						}
 						
 						player.setCurrentChoice(null);
-								
+						
+						//TODO: validate choice
+						
 						player.gainTo(bank.getByName(options.get(0)), player.getBought());
+						
 					}							
 				});
 				
@@ -76,5 +80,5 @@ public class RemodelAction extends CardAction {
 		});
 	}
 
-
+	
 }

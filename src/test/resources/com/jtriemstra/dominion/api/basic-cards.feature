@@ -66,7 +66,7 @@ Feature: Basic cards
     And I opt for the Estate
     Then I should have 3 cards in my hand
     And I should have 0 actions available
-    And I should have 1 cards in my discard  
+    And I should have 1 cards in my bought  
     
   Scenario: Playing a library
     Given I have a Library
@@ -142,3 +142,10 @@ Feature: Basic cards
     Then I should have 0 cards in my deck
     And I should have 5 cards in my discard
     And I should have 4 cards in my hand
+    
+  Scenario: Playing a moneylender
+    Given I have a Moneylender
+    And I have a Copper
+    When I play the Moneylender
+    Then I should have 3 cards in my hand
+    And I should have 3 treasure available

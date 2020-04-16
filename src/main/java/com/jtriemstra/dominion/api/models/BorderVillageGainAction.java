@@ -3,10 +3,10 @@ package com.jtriemstra.dominion.api.models;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WorkshopAction extends CardAction {
+public class BorderVillageGainAction extends EventAction {
 	private Bank bank;
 	
-	public WorkshopAction(Bank bank) {
+	public BorderVillageGainAction(Bank bank) {
 		this.bank = bank;
 	}
 	
@@ -15,12 +15,12 @@ public class WorkshopAction extends CardAction {
 		player.setCurrentChoice( new ActionChoice() {
 			@Override
 			public String getPrompt() { 
-				return "Choose a card costing up to 4";
+				return "Choose an extra card to gain";
 			}
 			
 			@Override
 			public List<String> getOptions(){
-				return bank.getNamesByMaxCost(4);
+				return bank.getNamesByMaxCost(5);
 			}
 
 			@Override
@@ -29,11 +29,12 @@ public class WorkshopAction extends CardAction {
 					throw new RuntimeException("One and only one option can be chosen");
 				}
 				
-				player.gainTo(bank.getByName(options.get(0)), player.getDiscard());
-
 				player.setCurrentChoice(null);
+				
+				player.gainTo(bank.getByName(options.get(0)), player.getBought());				
 			}
 		});
 	}
+
 
 }

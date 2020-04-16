@@ -3,7 +3,7 @@ package com.jtriemstra.dominion.api.models;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CellarAction extends CardAction {
+public class EmbassyAction extends CardAction {
 
 	@Override
 	public void execute(Player player) {
@@ -24,13 +24,20 @@ public class CellarAction extends CardAction {
 
 			@Override
 			public void doOptions(Player player, List<String> options) {
+				if (options.size() > 3) {
+					throw new RuntimeException("You can only discard 3 cards");
+				}
+				
+				if (options.size() < 3 && player.getHand().size() >= 3){
+					throw new RuntimeException("You must discard 3 cards");
+				}
+				
 				player.setCurrentChoice(null);
 				
 				for(String cardName : options) {
 					for (Card c : player.getHand()) {
 						if (cardName.equals(c.getName())) {
 							player.discardFromHand(c);
-							player.draw();
 							break;
 						}
 					}
