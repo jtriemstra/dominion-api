@@ -295,7 +295,7 @@ public class Player {
 	}
 	
 	public void finishGain(Card c, List<Card> destination) {
-		destination.add(c);
+		destination.add(0, c);
 		
 		//TODO: move card-specific code elsewhere
 		for(Player p : game.getOtherPlayers(this)) {
