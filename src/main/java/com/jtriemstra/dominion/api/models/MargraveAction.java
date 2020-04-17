@@ -3,6 +3,9 @@ package com.jtriemstra.dominion.api.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class MargraveAction extends CardAction {
 
 	@Override
@@ -35,6 +38,8 @@ public class MargraveAction extends CardAction {
 							throw new RuntimeException("You must discard down to three cards in your hand");
 						}
 						
+						player.setCurrentChoice(null);
+						
 						for (String cardName : options) {
 							for (Card c : player.getHand()) {
 								if (c.getName().equals(cardName)) {
@@ -42,9 +47,7 @@ public class MargraveAction extends CardAction {
 									break;
 								}
 							}
-						}
-						
-						player.setCurrentChoice(null);
+						}						
 					}
 					
 				});

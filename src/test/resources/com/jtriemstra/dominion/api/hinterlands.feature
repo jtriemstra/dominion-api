@@ -104,6 +104,13 @@ Feature: Basic cards
     And I should have 2 buys available
     And the other player should have 6 cards in hand   
 
+  Scenario: Playing a margrave 2
+    Given my hand is Margrave,Copper,Copper,Copper,Copper
+    And the other players hand is Copper,Copper,Copper,Copper,Copper
+    When I play the Margrave
+    And the other player opts for the Copper,Copper,Copper
+    Then the other player should have 3 cards in hand
+    
 #TODO finish the attack  
 
   Scenario: Playing a embassy

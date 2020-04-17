@@ -60,7 +60,7 @@ public class Player {
 		temporaryActions = 1;
 		
 		deck = game.getBank().newDeck();
-		deck = shuffle(deck);
+//		deck = shuffle(deck);
 		for (int i=0; i<5; i++) {
 			draw();
 		}
@@ -388,8 +388,8 @@ public class Player {
 				sortedHand.add(c);
 			}
 		}
-		
-		return sortedHand;
+		hand = sortedHand;
+		return hand;
 	}
 		
 	public boolean hasCard(String name) {

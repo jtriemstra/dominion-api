@@ -21,6 +21,9 @@ import com.jtriemstra.dominion.api.models.Card;
 import com.jtriemstra.dominion.api.models.Game;
 import com.jtriemstra.dominion.api.models.Player;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 public class MainController {
 	
@@ -88,7 +91,6 @@ public class MainController {
 	@RequestMapping("/action")
 	public PlayerGameState action(String[] options, String playerName) {
 		List<String> optionsList = options == null ? new ArrayList<String>() : Arrays.asList(options);
-		
 		game.getPlayer(playerName).finishAction(optionsList);
 		
 		return new PlayerGameState(game.getPlayer(playerName), game.getPlayerNames(), game.getCurrentPlayerIndex());
