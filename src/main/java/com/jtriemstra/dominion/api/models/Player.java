@@ -22,6 +22,7 @@ public class Player {
 	private List<Card> played = new ArrayList<>();
 	private List<Card> discard = new ArrayList<>();
 	private List<Card> bought = new ArrayList<>();
+	//TODO: rename this to "revealed"
 	private List<Card> liminal = new ArrayList<>();
 	@JsonIgnore private int numberOfBuysMade;
 	private List<ActionChoice> currentChoice = new ArrayList<>();
@@ -60,7 +61,7 @@ public class Player {
 		temporaryActions = 1;
 		
 		deck = game.getBank().newDeck();
-//		deck = shuffle(deck);
+		deck = shuffle(deck);
 		for (int i=0; i<5; i++) {
 			draw();
 		}
@@ -220,10 +221,30 @@ public class Player {
 	
 	public void setCurrentChoice(ActionChoice a) {
 		if (currentChoice.size() > 0) {
-			currentChoice.remove(0);
+			//currentChoice.remove(0);
 		}
 		if (a != null) {
 			currentChoice.add(a);
+		}
+		else {
+			currentChoice.remove(0);
+		}
+	}
+	
+	public void setCurrentChoice(ActionChoice a, boolean frontOfLine) {
+		if (currentChoice.size() > 0) {
+			//currentChoice.remove(0);
+		}
+		if (a != null) {
+			if (frontOfLine) {
+				currentChoice.add(0,a);
+			}
+			else {
+				currentChoice.add(a);
+			}
+		}
+		else {
+			currentChoice.remove(0);
 		}
 	}
 	
@@ -252,6 +273,11 @@ public class Player {
 		temporaryTreasure -= newCard.getCost();
 		temporaryBuys -= 1;
 		
+		if (newCard.getBuyAction() != null) {
+			newCard.getBuyAction().execute(this);
+		}
+		
+		log.info("Calling gain from buy");
 		if (newCard.getBuyDestination() == null) {
 			gainTo(newCard, bought);
 		}
@@ -264,11 +290,7 @@ public class Player {
 			case DISCARD: gainTo(newCard, discard); break;
 			}
 		}
-		
-		if (newCard.getBuyAction() != null) {
-			newCard.getBuyAction().execute(this);
-		}
-		
+				
 		//TODO: move Haggler code out of here
 		for(Card c : played) {
 			if (c.getName().equals("Haggler")) {
@@ -299,11 +321,15 @@ public class Player {
 		
 		//TODO: move card-specific code elsewhere
 		for(Player p : game.getOtherPlayers(this)) {
-			for (Card c1 : p.getDeck()) {
+			for (Card c1 : p.getHand()) {
 				if (c1.getName().equals("Fools Gold") && c.getName().equals("Province")) {
 					(new FoolsGoldAction(game.getBank())).execute(p);
 				}
 			}
+		}
+		
+		if (game.getBank().hasCard("Duchess") && c.getName().equals("Duchy")) {
+			(new DuchessGainAction(game.getBank())).execute(this);
 		}
 
 		if (c.getGainAction() != null) {

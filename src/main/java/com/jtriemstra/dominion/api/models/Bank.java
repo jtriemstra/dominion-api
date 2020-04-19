@@ -134,6 +134,7 @@ public class Bank {
 		case "Fools Gold": addCard(s, foolsgold(), 10); break;
 		case "Scheme": addCard(s, scheme(), 10); break;
 		case "Trader": addCard(s, trader(), 10); break;
+		case "Duchess": addCard(s, duchess(), 10); break;
 		}
 	}
 	
@@ -249,6 +250,10 @@ public class Bank {
 			}
 		}
 		return cardNames;
+	}
+	
+	public boolean hasCard(String cardName) {
+		return bank.containsKey(cardName);
 	}
 	
 	public  Card gold() {
@@ -446,6 +451,7 @@ public class Bank {
 		c.setGainAction(new EventAction() {
 			@Override
 			public void execute(Player player) {
+				log.info("Calling gain from Cache");
 				player.gainTo(getByName("Copper"), player.getBought());
 				player.gainTo(getByName("Copper"), player.getBought());
 			}
@@ -540,6 +546,11 @@ public class Bank {
 	public Card oracle() {
 		Card c = new Card(3, "Oracle", 0, 0, Card.CardType.ACTION, 0, 0, 0);
 		c.setSpecialAction(new OracleAction());
+		return c;
+	}
+	public Card duchess() {
+		Card c = new Card(2, "Duchess", 0, 0, Card.CardType.ACTION, 0, 2, 0);
+		c.setSpecialAction(new DuchessAction());
 		return c;
 	}
 }

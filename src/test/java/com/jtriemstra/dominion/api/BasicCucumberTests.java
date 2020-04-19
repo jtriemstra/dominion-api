@@ -7,6 +7,7 @@ import io.cucumber.java.en.When;
 import lombok.extern.slf4j.Slf4j;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -22,6 +23,16 @@ import com.jtriemstra.dominion.api.models.Player;
 
 @Slf4j
 public class BasicCucumberTests extends CucumberTestBase{
+	
+	private Player mockPlayer(String name, Game game) {
+		Player realPlayer = new Player(name);
+		Player player = spy(realPlayer);
+		when(player.shuffle(anyList())).thenAnswer(i -> i.getArguments()[0]);
+		player.init(game);
+		game.addPlayer(player);
+		
+		return player;
+	}
 	
 	@Before
 	public void setup() {
@@ -44,9 +55,7 @@ public class BasicCucumberTests extends CucumberTestBase{
 			
 			when(CucumberState.mockBank.newDeck()).thenReturn(x);
 			
-			Player p = new Player("test" + i);
-			p.init(getGame());
-			getGame().addPlayer(p);
+			Player p = mockPlayer("test" + i, getGame());
 		}
 	}
 	
@@ -58,8 +67,7 @@ public class BasicCucumberTests extends CucumberTestBase{
 		
 		when(CucumberState.mockBank.newDeck()).thenReturn(x);
 		
-		CucumberState.player = new Player("test");
-		CucumberState.player.init(CucumberState.game);		
+		CucumberState.player = mockPlayer("test", CucumberState.game);	
 	}
 	
 	@Given("my hand is {}")

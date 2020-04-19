@@ -4,18 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
-public class TraderReaction extends CardAction {
+public class DuchessGainAction extends CardAction {
 	private Bank bank;
-	private List<Card> gainDestination;
-	private Card cardToBeGained;
 	
-	public TraderReaction(Bank bank, List<Card> gainDestination, Card cardToBeGained) {
+	public DuchessGainAction(Bank bank) {
 		this.bank = bank;
-		this.gainDestination = gainDestination;
-		this.cardToBeGained = cardToBeGained;
 	}
 	
 	@Override
@@ -23,7 +16,7 @@ public class TraderReaction extends CardAction {
 		player.setCurrentChoice( new ActionChoice() {
 			@Override
 			public String getPrompt() { 
-				return "Would you like to gain a silver instead of the regular card " + cardToBeGained.getName();
+				return "Would you like to gain a Duchess";
 			}
 			
 			@Override
@@ -40,14 +33,10 @@ public class TraderReaction extends CardAction {
 				player.setCurrentChoice(null);
 				
 				if (options.get(0).equals("Yes")) {
-					player.finishGain(bank.getByName("Silver"), gainDestination);
-					bank.returnCard(cardToBeGained.getName());
-				}
-				else {
-					player.finishGain(cardToBeGained, gainDestination);
+					player.gainTo(bank.getByName("Duchess"), player.getBought());
 				}
 			}
-		});		
+		});
 	}
 
 

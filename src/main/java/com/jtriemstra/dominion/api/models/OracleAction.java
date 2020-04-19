@@ -9,7 +9,13 @@ public class OracleAction extends CardAction  {
 	
 	@Override
 	public void execute(Player player) {
+		player.lookAt(2);
+		for (Player p : player.getGame().getOtherPlayers(player)) {
+			p.lookAt(2);
+		}
+		
 		player.setCurrentChoice( new ActionChoice() {
+			
 			@Override
 			public String getPrompt() { 
 				return "Choose cards to discard:";
@@ -18,16 +24,13 @@ public class OracleAction extends CardAction  {
 			@Override
 			public List<String> getOptions(){
 				List<String> options = new ArrayList<>();
-				
-				List<Card> lookingAt = player.lookAt(2);
-				for(Card c : lookingAt) {
+				 
+				for(Card c : player.getLiminal()) {
 					options.add(player.getName() + " : " + c.getName());
 				}
 				
 				for (Player p : player.getGame().getOtherPlayers(player)) {
-					lookingAt = p.lookAt(2);
-					
-					for(Card c : lookingAt) {
+					for(Card c : p.getLiminal()) {
 						options.add(p.getName() + " : " + c.getName());
 					}	
 				}
@@ -48,22 +51,24 @@ public class OracleAction extends CardAction  {
 					String[] tokens = s.split(" : ");
 					for (Player p : allPlayers) {
 						if (tokens[0].equals(p.getName())) {
-							List<Card> cardsToDiscard = new ArrayList<>();
+							Card cardToDiscard = null;
 														
 							for (Card c : p.getLiminal()) {
 								if (c.getName().equals(tokens[1])) {
-									cardsToDiscard.add(c);
+									cardToDiscard = c;
+									break;
 								}
 							}
 							
-							for (Card c : cardsToDiscard) {
-								p.discardFromLiminal(c);
-							}
-							
-							//TODO: choose order of return
-							p.getDeck().addAll(0, p.getLiminal());
+							p.discardFromLiminal(cardToDiscard);							
 						}
 					}					
+				}
+				
+				for (Player p : allPlayers) {
+					//TODO: choose order of return
+					p.getDeck().addAll(0, p.getLiminal());
+					p.getLiminal().clear();
 				}
 				
 				player.draw();

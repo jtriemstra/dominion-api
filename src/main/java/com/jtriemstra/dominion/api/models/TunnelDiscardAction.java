@@ -32,7 +32,7 @@ public class TunnelDiscardAction extends EventAction {
 				player.setCurrentChoice(null);
 				
 				if (options.get(0).equals("Yes")) {
-					player.gainTo(bank.getByName("Gold"), player.getDiscard());
+					player.gainTo(bank.getByName("Gold"), player.getBought());
 				}
 			}
 		});

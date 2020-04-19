@@ -3,6 +3,9 @@ package com.jtriemstra.dominion.api.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class HagglerAction extends CardAction {
 	private Bank bank;
 	private int boughtCardCost;
@@ -17,7 +20,7 @@ public class HagglerAction extends CardAction {
 		player.addCurrentChoice( new ActionChoice() {
 			@Override
 			public String getPrompt() { 
-				return "Choose a card to gain";
+				return "Choose a card to gain from Haggler";
 			}
 			
 			@Override
@@ -35,6 +38,7 @@ public class HagglerAction extends CardAction {
 				
 				player.setCurrentChoice(null);
 				
+				log.info("Calling gain from Haggler");
 				player.gainTo(bank.getByName(options.get(0)), player.getBought());
 				
 			}

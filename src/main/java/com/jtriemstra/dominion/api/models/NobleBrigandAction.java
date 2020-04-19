@@ -13,6 +13,10 @@ public class NobleBrigandAction extends CardAction  {
 	
 	@Override
 	public void execute(Player player) {
+		for (Player p : player.getGame().getOtherPlayers(player)) {
+			p.lookAt(2);
+		}
+			
 		player.setCurrentChoice( new ActionChoice() {
 			@Override
 			public String getPrompt() { 
@@ -23,10 +27,9 @@ public class NobleBrigandAction extends CardAction  {
 			public List<String> getOptions(){
 				List<String> options = new ArrayList<>();
 				
+				//TODO: only show silver/gold?
 				for (Player p : player.getGame().getOtherPlayers(player)) {
-					List<Card> lookingAt = p.lookAt(2);
-					
-					for(Card c : lookingAt) {
+					for(Card c : p.getLiminal()) {
 						options.add(p.getName() + " : " + c.getName());
 					}	
 				}

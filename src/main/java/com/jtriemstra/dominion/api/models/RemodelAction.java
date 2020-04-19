@@ -49,6 +49,7 @@ public class RemodelAction extends CardAction {
 				int trashedCost = cardToTrash.getCost();
 				player.getHand().remove(cardToTrash);
 				
+				player.setCurrentChoice(null);
 				player.setCurrentChoice( new ActionChoice() {
 					@Override
 					public String getPrompt() { 

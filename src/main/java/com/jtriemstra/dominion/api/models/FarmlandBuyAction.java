@@ -17,7 +17,7 @@ public class FarmlandBuyAction extends EventAction {
 		player.setCurrentChoice( new ActionChoice() {
 			@Override
 			public String getPrompt() { 
-				return "Choose a card to trash";
+				return "Choose a card to trash (Farmland)";
 			}
 			
 			@Override
@@ -50,10 +50,11 @@ public class FarmlandBuyAction extends EventAction {
 				int trashedCost = cardToTrash.getCost();
 				player.getHand().remove(cardToTrash);
 				
+				player.setCurrentChoice(null);
 				player.setCurrentChoice( new ActionChoice() {
 					@Override
 					public String getPrompt() { 
-						return "Choose a card to gain";
+						return "Choose a card to gain from Farmland";
 					}
 					
 					@Override
@@ -74,7 +75,7 @@ public class FarmlandBuyAction extends EventAction {
 						player.gainTo(bank.getByName(options.get(0)), player.getBought());
 						
 					}							
-				});
+				}, true);
 				
 			}
 		});

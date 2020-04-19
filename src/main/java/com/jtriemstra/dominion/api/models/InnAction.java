@@ -10,7 +10,7 @@ public class InnAction extends CardAction {
 		player.setCurrentChoice( new ActionChoice() {
 			@Override
 			public String getPrompt() { 
-				return "Which cards would you like to discard?";
+				return "Which 2 cards would you like to discard?";
 			}
 			
 			@Override

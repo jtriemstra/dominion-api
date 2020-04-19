@@ -42,6 +42,7 @@ public class SpiceMerchantAction extends CardAction {
 
 				player.getHand().remove(cardToTrash);
 				
+				player.setCurrentChoice(null);
 				player.setCurrentChoice( new ActionChoice() {
 					@Override
 					public String getPrompt() { 

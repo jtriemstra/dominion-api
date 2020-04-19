@@ -48,6 +48,7 @@ public class JackOfAllTradesAction extends CardAction  {
 					player.draw();
 				}
 				
+				player.setCurrentChoice(null);
 				player.setCurrentChoice(new ActionChoice() {
 					@Override
 					public String getPrompt() { 

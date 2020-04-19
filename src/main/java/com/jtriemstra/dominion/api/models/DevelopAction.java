@@ -55,6 +55,7 @@ public class DevelopAction extends CardAction {
 				int trashedCost = cardToTrash.getCost();
 				player.getHand().remove(cardToTrash);			
 				
+				player.setCurrentChoice(null);
 				player.setCurrentChoice( new ActionChoice() {
 					@Override
 					public String getPrompt() { 
@@ -84,6 +85,7 @@ public class DevelopAction extends CardAction {
 						int nextCost = newCard.getCost() == trashedCost + 1 ? trashedCost - 1 : trashedCost + 1;
 						player.gainTo(newCard, player.getDeck());
 						
+						player.setCurrentChoice(null);
 						player.setCurrentChoice( new ActionChoice() {
 							@Override
 							public String getPrompt() { 
