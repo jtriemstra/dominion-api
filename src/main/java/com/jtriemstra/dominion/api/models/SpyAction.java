@@ -18,6 +18,7 @@ public class SpyAction extends CardAction {
 			public List<String> getOptions() {
 				List<String> cardNames = new ArrayList<>();
 				for (Player p : player.getGame().getOtherPlayers(player)) {
+					//TODO: it's possible the deck will have no cards in it
 					cardNames.add(p.getDeck().get(0).getName());
 				}
 				

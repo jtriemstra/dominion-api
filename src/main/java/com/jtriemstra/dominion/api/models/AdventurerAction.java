@@ -5,13 +5,14 @@ public class AdventurerAction extends CardAction  {
 	public void execute(Player player) {
 		int treasureCardsFound = 0;
 		while (treasureCardsFound < 2) {
-			Card c = player.reveal();
+			//TODO: this could return null
+			Card c = player.lookAt(1).get(0);
 			if (c.getType() == Card.CardType.TREASURE) {
 				treasureCardsFound++;
 				player.addToHand(c);
 			}
 			else {
-				player.discardFromTemp(c);
+				player.discardFromLiminal(c);
 			}
 		}
 	}

@@ -20,8 +20,23 @@ public class VictoryTests {
 		}
 		
 		int points = p.getPoints();
-		assertEquals(points, 11);
+		assertEquals(11, points);
 	}
 	
-	
+	@Test                                                                                         
+    public void silkRoadCountProperly() {
+		Player p = new Player("test");
+		Bank b = new Bank(Arrays.asList("Silk Road", "Smithy"));
+		p.getBought().add(b.province());
+		for (int i=0; i<5; i++) p.getHand().add(b.gold());
+		p.getPlayed().add(b.smithy());
+		p.getDeck().add(b.silkroad());
+		p.getDeck().add(b.silkroad());
+		for (int i=0;i<5;i++) {
+			p.getDiscard().add(b.estate());
+		}
+		
+		int points = p.getPoints();
+		assertEquals(15, points);
+	}
 }

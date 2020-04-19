@@ -26,12 +26,12 @@ public class LibraryAction extends CardAction {
 						if (options.size() != 1) {
 							throw new RuntimeException("One and only one option can be chosen");
 						}
+
+						player.setCurrentChoice(null);
 						
 						if (options.get(0).equals("Yes")) {
 							player.discardFromHand(newCard);
 						}
-
-						player.setCurrentChoice(null);
 						
 						LibraryAction recursiveCall = new LibraryAction();
 						recursiveCall.execute(player);

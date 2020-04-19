@@ -34,7 +34,7 @@ public class FeastAction extends CardAction {
 					throw new RuntimeException("One and only one option can be chosen");
 				}
 				
-				player.getDiscard().add(bank.getByName(options.get(0)));
+				player.gainTo(bank.getByName(options.get(0)), player.getDiscard());
 				
 				player.setCurrentChoice(null);
 			}

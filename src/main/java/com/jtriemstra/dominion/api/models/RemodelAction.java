@@ -49,6 +49,7 @@ public class RemodelAction extends CardAction {
 				int trashedCost = cardToTrash.getCost();
 				player.getHand().remove(cardToTrash);
 				
+				player.setCurrentChoice(null);
 				player.setCurrentChoice( new ActionChoice() {
 					@Override
 					public String getPrompt() { 
@@ -65,8 +66,10 @@ public class RemodelAction extends CardAction {
 						if (options.size() != 1) {
 							throw new RuntimeException("One and only one option can be chosen");
 						}
+						
+						player.setCurrentChoice(null);
 								
-						player.discardFromTemp(bank.getByName(options.get(0)));
+						player.gainTo(bank.getByName(options.get(0)), player.getBought());
 					}							
 				});
 				

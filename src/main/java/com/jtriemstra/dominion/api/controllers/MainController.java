@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jtriemstra.dominion.api.dto.PlayerGameState;
@@ -20,6 +21,9 @@ import com.jtriemstra.dominion.api.models.Card;
 import com.jtriemstra.dominion.api.models.Game;
 import com.jtriemstra.dominion.api.models.Player;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 public class MainController {
 	
@@ -46,9 +50,9 @@ public class MainController {
 	
 	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net"})
 	@RequestMapping("/start")
-	public PlayerGameState init(String playerName, HttpServletRequest request, boolean randomCards, List<String> cardNames) {
+	public PlayerGameState init(String playerName, HttpServletRequest request, boolean randomCards, @RequestParam(required=false) List<String> cardNames) {
 		Bank bank;
-		if (cardNames != null && cardNames.size() > 0) {
+		if (cardNames != null && cardNames.size() > 0) {			
 			bank = new Bank(cardNames);
 		}
 		else {
@@ -87,7 +91,6 @@ public class MainController {
 	@RequestMapping("/action")
 	public PlayerGameState action(String[] options, String playerName) {
 		List<String> optionsList = options == null ? new ArrayList<String>() : Arrays.asList(options);
-		
 		game.getPlayer(playerName).finishAction(optionsList);
 		
 		return new PlayerGameState(game.getPlayer(playerName), game.getPlayerNames(), game.getCurrentPlayerIndex());
@@ -98,7 +101,7 @@ public class MainController {
 	public PlayerGameState cleanup(String playerName) {
 		validateCurrentPlayer(playerName);
 		
-		game.getPlayer(playerName).cleanup();
+		game.getPlayer(playerName).startCleanup();
 		
 		return new PlayerGameState(game.getPlayer(playerName), game.getPlayerNames(), game.getCurrentPlayerIndex());
 	}
