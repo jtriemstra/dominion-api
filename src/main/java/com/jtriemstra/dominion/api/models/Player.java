@@ -437,6 +437,7 @@ public class Player {
 		
 		int points = 0;
 		for(Card c : allCards) {
+			
 			// TODO: account for multiple types
 			if (c.getType() == Card.CardType.VICTORY) {
 				points += c.getVictoryPoints();

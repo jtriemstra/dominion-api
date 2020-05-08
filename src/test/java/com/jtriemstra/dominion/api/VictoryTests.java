@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class VictoryTests {
 	@Test                                                                                         
-    public void gardensCountProperly() {
+    public void when_gardens_in_deck_score_correctly() {
 		Player p = new Player("test");
 		Bank b = new Bank(Arrays.asList("Gardens", "Smithy"));
 		p.getBought().add(b.province());
@@ -24,7 +24,7 @@ public class VictoryTests {
 	}
 	
 	@Test                                                                                         
-    public void silkRoadCountProperly() {
+    public void when_silkroad_in_deck_score_correctly() {
 		Player p = new Player("test");
 		Bank b = new Bank(Arrays.asList("Silk Road", "Smithy"));
 		p.getBought().add(b.province());

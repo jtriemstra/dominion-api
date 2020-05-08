@@ -1,6 +1,7 @@
 package com.jtriemstra.dominion.api;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
 
@@ -43,13 +44,23 @@ public class AttackCucumberSteps extends CucumberTestBase{
 		assertEquals(numberOfCards, otherPlayer.getHand().size());
 	}
 	
+	@Then("the other player should have {} cards in discard")
+	public void other_player_should_have_n_discard(int numberOfCards) {
+		Player otherPlayer = getGame().getOtherPlayers(getPlayer()).get(0);
+		assertEquals(numberOfCards, otherPlayer.getDiscard().size());
+	}
+	
 	@When("the other player opts for the {}")
 	public void other_player_action(String cardNames) {
 		Player otherPlayer = getGame().getOtherPlayers(getPlayer()).get(0);
 		String[] multipleCardNames = cardNames.split(",");
 		
 		otherPlayer.finishAction(new ArrayList( Arrays.asList( multipleCardNames) ));
-		
-		
+	}
+	
+	@Then("the other player should have no active choice")
+	public void other_player_should_have_no_active_choice() {
+		Player otherPlayer = getGame().getOtherPlayers(getPlayer()).get(0);
+		assertNull(otherPlayer.getCurrentChoice());
 	}
 }
