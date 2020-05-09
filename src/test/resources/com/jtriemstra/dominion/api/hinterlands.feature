@@ -17,6 +17,7 @@ Feature: Basic cards
     When I play the Oasis
     And I opt for the Copper
     Then I should have 4 cards in my hand
+    And I should have 4 cards in my deck
     And I should have a Oasis in my played
     And I should have a Copper in my discard
     And I should have 1 actions available
@@ -67,6 +68,8 @@ Feature: Basic cards
     When I play the Stables
     And I opt for the Copper
     Then I should have 6 cards in my hand
+    And I should have 1 cards in my discard
+    And I should have 2 cards in my deck
     And I should have 1 actions available
     
   Scenario: Playing a spice merchant
@@ -110,6 +113,7 @@ Feature: Basic cards
     When I play the Margrave
     And the other player opts for the Copper,Copper,Copper
     Then the other player should have 3 cards in hand
+    And the other player should have 3 cards in discard
     
 #TODO finish the attack  
 

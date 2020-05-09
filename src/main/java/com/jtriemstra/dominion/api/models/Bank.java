@@ -17,8 +17,33 @@ public class Bank {
 	
 	private HashMap<String, BankCard> bank = new LinkedHashMap<>();
 	
-	public HashMap<String, BankCard> getBankCards() {
-		return bank;
+	public List<BankCard> getBankCards() {
+		List<BankCard> result = new ArrayList<>();
+		for (BankCard b : bank.values()) {
+			if (b.getCard().getName().equals("Gold") ||
+				b.getCard().getName().equals("Silver") ||
+				b.getCard().getName().equals("Copper") ||
+				b.getCard().getName().equals("Estate") ||
+				b.getCard().getName().equals("Duchy") ||
+				b.getCard().getName().equals("Province") ||
+				b.getCard().getName().equals("Curse")) {				
+			}
+			else {
+				result.add(b);
+			}			
+		}
+		
+		result.sort((c1, c2) -> c1.getCard().getCost() - c2.getCard().getCost());
+		
+		result.add(0, bank.get("Copper"));
+		result.add(0, bank.get("Silver"));
+		result.add(0, bank.get("Gold"));
+		result.add(bank.get("Estate"));
+		result.add(bank.get("Duchy"));
+		result.add(bank.get("Province"));
+		result.add(bank.get("Curse"));
+		
+		return result;
 	}
 	
 	private void addCard(String name, Card card, int quantity) {
@@ -31,11 +56,11 @@ public class Bank {
 	
 	public Bank(boolean isRandom) {
 		if (!isRandom) {
-			addCard("Gold", gold(), 50);
-			addCard("Silver", silver(), 100);
-			addCard("Copper", copper(), 200);
-			addCard("Estate", estate(), 30);
-			addCard("Duchy",  duchy(), 20);
+			addCard("Gold", gold(), 30);
+			addCard("Silver", silver(), 40);
+			addCard("Copper", copper(), 60);
+			addCard("Estate", estate(), 24);
+			addCard("Duchy",  duchy(), 12);
 			addCard("Province", province(), 12);
 			addCard("Curse", curse(), 30);
 			
@@ -51,16 +76,16 @@ public class Bank {
 			addCard("Moat", moat(), 10);
 		}
 		else {
-			addCard("Gold", gold(), 50);
-			addCard("Silver", silver(), 100);
-			addCard("Copper", copper(), 200);
-			addCard("Estate", estate(), 30);
-			addCard("Duchy",  duchy(), 20);
+			addCard("Gold", gold(), 30);
+			addCard("Silver", silver(), 40);
+			addCard("Copper", copper(), 60);
+			addCard("Estate", estate(), 24);
+			addCard("Duchy",  duchy(), 12);
 			addCard("Province", province(), 12);
 			addCard("Curse", curse(), 30);
 			
 			List<String> names = new ArrayList<String>(Arrays.asList("Village", "Smithy", "Chapel", "Throne Room", "Workshop", "Laboratory", "Woodcutter", "Adventurer", "Bureaucrat", 
-					"Cellar", "Chancellor", "Council Room", "Feast", "Festival", "Library", "Market", "Militia", "Mine", "Moneylender", "Remodel", 
+					"Cellar", "Chancellor", "Council Room", "Feast", "Festival", "Library", "Market", "Militia", "Mine", "Moneylender", "Remodel", "Thief", "Gardens",
 					/*"Spy",*/ "Witch", "Cartographer", "Oracle", "Highway", "Noble Brigand", "Jack of All Trades", "Inn", "Farmland", "Mandarin",
 					"Scheme", "Haggler", "Fools Gold", "Tunnel", "Margrave", "Ill-Gotten Gains", "Cache", "Embassy", "Nomad Camp", "Border Village",
 					"Develop", "Silk Road", "Stables", "Margrave", "Spice Merchant", "Oasis", "Crossroads"));
@@ -73,11 +98,11 @@ public class Bank {
 	}
 	
 	public Bank(List<String> cardNames) {
-		addCard("Gold", gold(), 50);
-		addCard("Silver", silver(), 100);
-		addCard("Copper", copper(), 200);
-		addCard("Estate", estate(), 30);
-		addCard("Duchy",  duchy(), 20);
+		addCard("Gold", gold(), 30);
+		addCard("Silver", silver(), 40);
+		addCard("Copper", copper(), 60);
+		addCard("Estate", estate(), 24);
+		addCard("Duchy",  duchy(), 12);
 		addCard("Province", province(), 12);
 		addCard("Curse", curse(), 30);
 		
@@ -135,6 +160,8 @@ public class Bank {
 		case "Scheme": addCard(s, scheme(), 10); break;
 		case "Trader": addCard(s, trader(), 10); break;
 		case "Duchess": addCard(s, duchess(), 10); break;
+		case "Thief": addCard(s, thief(), 10); break;
+		case "Gardens": addCard(s, gardens(), 10); break;
 		}
 	}
 	
@@ -551,6 +578,11 @@ public class Bank {
 	public Card duchess() {
 		Card c = new Card(2, "Duchess", 0, 0, Card.CardType.ACTION, 0, 2, 0);
 		c.setSpecialAction(new DuchessAction());
+		return c;
+	}
+	public Card thief() {
+		Card c = new Card(4, "Thief", 0, 0, Card.CardType.ACTION, 0, 0, 0);
+		c.setSpecialAction(new ThiefAction());
 		return c;
 	}
 }

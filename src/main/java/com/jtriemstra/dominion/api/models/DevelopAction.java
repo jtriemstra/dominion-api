@@ -76,6 +76,8 @@ public class DevelopAction extends CardAction {
 							throw new RuntimeException("At most one option can be chosen");
 						}
 						
+						player.setCurrentChoice(null);
+						
 						if (options.size() == 0) {
 							// TODO: only allow if there are no options to start with
 							return;
@@ -85,7 +87,6 @@ public class DevelopAction extends CardAction {
 						int nextCost = newCard.getCost() == trashedCost + 1 ? trashedCost - 1 : trashedCost + 1;
 						player.gainTo(newCard, player.getDeck());
 						
-						player.setCurrentChoice(null);
 						player.setCurrentChoice( new ActionChoice() {
 							@Override
 							public String getPrompt() { 

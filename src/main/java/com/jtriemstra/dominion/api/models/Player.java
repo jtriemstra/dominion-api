@@ -277,7 +277,6 @@ public class Player {
 			newCard.getBuyAction().execute(this);
 		}
 		
-		log.info("Calling gain from buy");
 		if (newCard.getBuyDestination() == null) {
 			gainTo(newCard, bought);
 		}
@@ -399,7 +398,7 @@ public class Player {
 	}
 	
 	@JsonGetter(value = "hand")
-	public List<Card> getHand() {
+	public List<Card> getHandForJson() {
 		ArrayList<Card> sortedHand = new ArrayList<>();
 		for (Card c : hand) {
 			if (c.getType() == Card.CardType.TREASURE) {
@@ -414,8 +413,8 @@ public class Player {
 				sortedHand.add(c);
 			}
 		}
-		hand = sortedHand;
-		return hand;
+		
+		return sortedHand;
 	}
 		
 	public boolean hasCard(String name) {

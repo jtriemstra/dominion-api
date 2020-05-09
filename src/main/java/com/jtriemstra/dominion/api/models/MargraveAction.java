@@ -44,6 +44,7 @@ public class MargraveAction extends CardAction {
 							for (Card c : player.getHand()) {
 								if (c.getName().equals(cardName)) {
 									player.getHand().remove(c);
+									player.getDiscard().add(c);
 									break;
 								}
 							}

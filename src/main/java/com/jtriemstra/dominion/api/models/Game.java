@@ -52,6 +52,10 @@ public class Game {
 		}
 	}
 	
+	public List<Player> getPlayers(){
+		return players;
+	}
+	
 	public Player getPlayer(String name) {
 		for (Player p : players) {
 			if (name.equals(p.getName())) {

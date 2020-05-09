@@ -426,13 +426,13 @@ public class HinterlandsGainTests {
 		player.play("Ill-Gotten Gains");
 		assertEquals("Would you like to gain a Copper?", player.getCurrentChoice().getPrompt());
 		player.finishAction(Arrays.asList("Yes"));
-		
+				
 		assertEquals("Would you like to gain a silver instead of the regular card Copper", player.getCurrentChoice().getPrompt());
 		player.finishAction(Arrays.asList("Yes"));
 		
 		assertEquals(0, player.getBought().size());
 		assertEquals(5, player.getHand().size());
-		assertEquals("Silver", player.getHand().get(1).getName());
+		assertEquals(true, player.getHand().stream().anyMatch(c -> c.getName().equals("Silver")));
 				
 		assertNull(player.getCurrentChoice());
 	}

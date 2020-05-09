@@ -14,6 +14,7 @@ public class JackOfAllTradesAction extends CardAction  {
 	@Override
 	public void execute(Player player) {
 		player.gainTo(bank.getByName("Silver"), player.getBought());
+		List<Card> lookingAt = player.lookAt(1);
 		
 		player.setCurrentChoice( new ActionChoice() {
 			@Override
@@ -23,7 +24,7 @@ public class JackOfAllTradesAction extends CardAction  {
 			
 			@Override
 			public List<String> getOptions(){
-				List<Card> lookingAt = player.lookAt(1);
+				
 				List<String> options = new ArrayList<>();
 				for(Card c : lookingAt) {
 					options.add(c.getName());
@@ -42,6 +43,10 @@ public class JackOfAllTradesAction extends CardAction  {
 				}
 				if (options.size() == 1) {
 					player.discardFromLiminal((player.getLiminal().get(0)));
+				}
+				else {
+					player.getDeck().addAll(0, player.getLiminal());
+					player.getLiminal().clear();
 				}
 				
 				while(player.getHand().size() < 5) {

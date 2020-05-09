@@ -27,6 +27,11 @@ public class SpiceMerchantAction extends CardAction {
 
 			@Override
 			public void doOptions(Player player, List<String> options) {
+				if (options == null || options.size() == 0) {
+					player.setCurrentChoice(null);
+					return;
+				}
+				
 				Card cardToTrash = null;
 				//TODO: validate is treasure card - introduce validation function?
 				for (Card c : player.getHand()) {

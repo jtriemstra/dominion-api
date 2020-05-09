@@ -453,7 +453,7 @@ public class HinterlandsTests {
 	}
 	
 	@Test                                                                                         
-    public void when_playing_jackofalltrades_action_correct() {
+    public void when_playing_jackofalltrades_no_discard_no_trash_correct() {
 		Bank realBank = new Bank(Arrays.asList("Jack of All Trades"));
 		Bank mockBank = spy(realBank);
 		List<Card> x = new ArrayList<>();
@@ -474,14 +474,159 @@ public class HinterlandsTests {
 		player.play("Jack of All Trades");
 		assertEquals("Silver", player.getBought().get(0).getName());
 		assertEquals("Would you like to discard:", player.getCurrentChoice().getPrompt());
+		assertEquals(4, player.getDeck().size());
+		assertEquals(1, player.getLiminal().size());
 		
 		player.finishAction(new ArrayList<String>());
 		
+		assertEquals(0, player.getLiminal().size());
 		assertEquals(5, player.getHand().size());
+		assertEquals(2, player.getDeck().size());
 		assertEquals("Would you like to trash one:", player.getCurrentChoice().getPrompt());
 		assertEquals(1, player.getCurrentChoice().getOptions().size());
 		player.finishAction(new ArrayList<String>());
-		assertNull(player.getCurrentChoice());		
+		assertNull(player.getCurrentChoice());
+		assertEquals(2, player.getDeck().size());
+		assertEquals(5, player.getHand().size());
+	}
+	
+	@Test                                                                                         
+    public void when_playing_multiple_jackofalltrades_liminal_correct() {
+		Bank realBank = new Bank(Arrays.asList("Jack of All Trades", "Crossroads"));
+		Bank mockBank = spy(realBank);
+		List<Card> x = new ArrayList<>();
+		x.add(mockBank.jackofalltrades());
+		x.add(mockBank.jackofalltrades());
+		x.add(mockBank.crossroads());
+		for (int i=0; i<6; i++) { x.add(mockBank.copper());}
+		x.add(mockBank.estate());
+		
+		when(mockBank.newDeck()).thenReturn(x);
+		
+		Game game = new Game(mockBank);
+		
+		Player player = mockPlayer("test", game);
+		
+		player.play("Crossroads");
+		
+		player.play("Jack of All Trades");
+		assertEquals("Silver", player.getBought().get(0).getName());
+		assertEquals("Would you like to discard:", player.getCurrentChoice().getPrompt());
+		assertEquals(4, player.getDeck().size());
+		assertEquals(1, player.getLiminal().size());
+		
+		player.finishAction(new ArrayList<String>());
+		
+		assertEquals(0, player.getLiminal().size());
+		assertEquals(5, player.getHand().size());
+		assertEquals(3, player.getDeck().size());
+		assertEquals("Would you like to trash one:", player.getCurrentChoice().getPrompt());
+		assertEquals(1, player.getCurrentChoice().getOptions().size());
+		player.finishAction(new ArrayList<String>());
+		assertNull(player.getCurrentChoice());
+		assertEquals(3, player.getDeck().size());
+		assertEquals(5, player.getHand().size());
+		
+		player.play("Jack of All Trades");
+		assertEquals("Silver", player.getBought().get(1).getName());
+		assertEquals("Would you like to discard:", player.getCurrentChoice().getPrompt());
+		assertEquals(2, player.getDeck().size());
+		assertEquals(1, player.getLiminal().size());
+		
+		player.finishAction(new ArrayList<String>());
+		
+		assertEquals(0, player.getLiminal().size());
+		assertEquals(5, player.getHand().size());
+		assertEquals(2, player.getDeck().size());
+		assertEquals("Would you like to trash one:", player.getCurrentChoice().getPrompt());
+		assertEquals(0, player.getCurrentChoice().getOptions().size());
+		player.finishAction(new ArrayList<String>());
+		assertNull(player.getCurrentChoice());
+		assertEquals(2, player.getDeck().size());
+		assertEquals(5, player.getHand().size());
+		
+	}
+	
+	@Test                                                                                         
+    public void when_playing_jackofalltrades_with_discard_counts_match() {
+		Bank realBank = new Bank(Arrays.asList("Jack of All Trades"));
+		Bank mockBank = spy(realBank);
+		List<Card> x = new ArrayList<>();
+		x.add(mockBank.jackofalltrades());
+		for (int i=0; i<6; i++) { x.add(mockBank.copper());}
+		x.add(mockBank.estate());
+		x.add(mockBank.estate());
+		x.add(mockBank.estate());
+		
+		when(mockBank.newDeck()).thenReturn(x);
+		
+		Game game = new Game(mockBank);
+		
+		Player player = mockPlayer("test", game);
+		
+		player.play("Copper");
+		player.play("Copper");
+		player.play("Jack of All Trades");
+		assertEquals("Silver", player.getBought().get(0).getName());
+		assertEquals("Would you like to discard:", player.getCurrentChoice().getPrompt());
+		assertEquals(4, player.getDeck().size());
+		assertEquals(1, player.getLiminal().size());
+		
+		List<String> options = new ArrayList<String>();
+		options.add("Estate");
+		player.finishAction(options);
+		
+		assertEquals(5, player.getHand().size());
+		assertEquals(1, player.getDeck().size());
+		assertEquals(1, player.getDiscard().size());
+		assertEquals("Would you like to trash one:", player.getCurrentChoice().getPrompt());
+		assertEquals(2, player.getCurrentChoice().getOptions().size());
+		player.finishAction(new ArrayList<String>());
+		assertNull(player.getCurrentChoice());
+		assertEquals(1, player.getDeck().size());
+		assertEquals(5, player.getHand().size());
+	}
+	
+	@Test                                                                                         
+    public void when_playing_jackofalltrades_with_discard_and_trash_counts_match() {
+		Bank realBank = new Bank(Arrays.asList("Jack of All Trades"));
+		Bank mockBank = spy(realBank);
+		List<Card> x = new ArrayList<>();
+		x.add(mockBank.jackofalltrades());
+		for (int i=0; i<6; i++) { x.add(mockBank.copper());}
+		x.add(mockBank.estate());
+		x.add(mockBank.estate());
+		x.add(mockBank.estate());
+		
+		when(mockBank.newDeck()).thenReturn(x);
+		
+		Game game = new Game(mockBank);
+		
+		Player player = mockPlayer("test", game);
+		
+		player.play("Copper");
+		player.play("Copper");
+		player.play("Jack of All Trades");
+		assertEquals("Silver", player.getBought().get(0).getName());
+		assertEquals("Would you like to discard:", player.getCurrentChoice().getPrompt());
+		assertEquals(4, player.getDeck().size());
+		assertEquals(1, player.getLiminal().size());
+		
+		List<String> options = new ArrayList<String>();
+		options.add("Estate");
+		player.finishAction(options);
+		
+		assertEquals(5, player.getHand().size());
+		assertEquals(1, player.getDeck().size());
+		assertEquals(1, player.getDiscard().size());
+		assertEquals("Would you like to trash one:", player.getCurrentChoice().getPrompt());
+		assertEquals(2, player.getCurrentChoice().getOptions().size());
+		
+		player.finishAction(options);
+		
+		assertNull(player.getCurrentChoice());
+		assertEquals(1, player.getDeck().size());
+		assertEquals(4, player.getHand().size());
 	}
 	
 	@Test                                                                                         

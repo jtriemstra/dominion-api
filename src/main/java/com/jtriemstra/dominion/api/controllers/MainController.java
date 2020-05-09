@@ -91,7 +91,12 @@ public class MainController {
 	@RequestMapping("/action")
 	public PlayerGameState action(String[] options, String playerName) {
 		List<String> optionsList = options == null ? new ArrayList<String>() : Arrays.asList(options);
+		log.info("Player " + playerName + ": " + game.getPlayer(playerName).getCurrentChoice().toString());
+		log.info("Player " + playerName + ": " + game.getPlayer(playerName).getPoints());
+		
 		game.getPlayer(playerName).finishAction(optionsList);
+		
+		log.info("Player " + playerName + ": " + game.getPlayer(playerName).getPoints());
 		
 		return new PlayerGameState(game.getPlayer(playerName), game.getPlayerNames(), game.getCurrentPlayerIndex());
 	}
@@ -115,9 +120,9 @@ public class MainController {
 	
 	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net"})
 	@RequestMapping("/bank")
-	public HashMap<String, BankCard> bank() {
+	public List<BankCard> bank() {
 		//TODO: return an array like the properties of the Player object, so UI code is consistent
-		
+		log.info("bank called");
 		return game.getBank().getBankCards();
 	}
 	
