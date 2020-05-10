@@ -475,7 +475,7 @@ public class Bank {
 	}
 	public Card cache() {
 		Card c = new Card(5, "Cache", 0, 0, Card.CardType.TREASURE, 0, 3, 0);
-		c.setGainAction(new EventAction() {
+		c.setGainAction(new CardAction() {
 			@Override
 			public void execute(Player player) {
 				log.info("Calling gain from Cache");
@@ -487,7 +487,7 @@ public class Bank {
 	}
 	public Card embassy() {
 		Card c = new Card(5, "Embassy", 0, 0, Card.CardType.ACTION, 0, 0, 5);
-		c.setGainAction(new EventAction() {
+		c.setGainAction(new CardAction() {
 			@Override
 			public void execute(Player player) {
 				for(Player p : player.getGame().getOtherPlayers(player)) {
@@ -501,7 +501,7 @@ public class Bank {
 	}
 	public Card illgottengains() {
 		Card c = new Card(5, "Ill-Gotten Gains", 0, 0, Card.CardType.TREASURE, 0, 1, 0);
-		c.setGainAction(new EventAction() {
+		c.setGainAction(new CardAction() {
 			@Override
 			public void execute(Player player) {
 				for(Player p : player.getGame().getOtherPlayers(player)) {
@@ -547,6 +547,7 @@ public class Bank {
 	public Card noblebrigand() {
 		Card c = new Card(4, "Noble Brigand", 0, 0, Card.CardType.ACTION, 0, 1, 0);
 		c.setSpecialAction(new NobleBrigandAction(this));
+		c.setBuyAction(new NobleBrigandAction(this));
 		return c;
 	}
 	public Card tunnel() {

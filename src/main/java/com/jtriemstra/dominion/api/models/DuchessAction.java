@@ -43,6 +43,7 @@ public class DuchessAction extends CardAction  {
 					}
 					else {
 						player.getDeck().add(0, player.getLiminal().get(0));
+						player.getLiminal().clear();
 					}
 				}
 			});

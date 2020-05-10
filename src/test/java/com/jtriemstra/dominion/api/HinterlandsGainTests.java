@@ -228,6 +228,35 @@ public class HinterlandsGainTests {
 	}
 	
 	@Test                                                                                         
+    public void when_buy_farmland_with_empty_hand_no_choice_required() {
+		Bank realBank = new Bank(Arrays.asList("Farmland"));
+		Bank mockBank = spy(realBank);
+		List<Card> x = new ArrayList<>();
+		x.add(mockBank.silver());
+		for (int i=0; i<9; i++) { x.add(mockBank.copper());}
+		when(mockBank.newDeck()).thenReturn(x);
+		
+		Game game = new Game(mockBank);
+		
+		Player player = mockPlayer("test", game);
+		
+		player.play("Silver");
+		player.play("Copper");
+		player.play("Copper");
+		player.play("Copper");
+		player.play("Copper");
+		player.buy("Farmland");
+		
+		assertEquals(5, player.getPlayed().size());		
+		assertEquals("Choose a card to trash (Farmland)", player.getCurrentChoice().getPrompt());
+		assertEquals(0, player.getCurrentChoice().getOptions().size());
+		
+		player.finishAction(new ArrayList<String>());
+		
+		assertNull(player.getCurrentChoice());
+	}
+	
+	@Test                                                                                         
     public void farmlandWithHighway() {
 		Bank realBank = new Bank(Arrays.asList("Farmland", "Nomad Camp", "Border Village", "Highway"));
 		Bank mockBank = spy(realBank);

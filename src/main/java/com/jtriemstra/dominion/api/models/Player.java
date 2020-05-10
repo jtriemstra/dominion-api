@@ -353,6 +353,9 @@ public class Player {
 	}
 	
 	public void cleanup() {
+		if (liminal.size() > 0) {
+			throw new RuntimeException("Revealed cards were not properly cleaned up");
+		}
 		
 		discard.addAll(bought);
 		bought.clear();

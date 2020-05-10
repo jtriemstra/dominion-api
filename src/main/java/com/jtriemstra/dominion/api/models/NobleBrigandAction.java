@@ -47,11 +47,12 @@ public class NobleBrigandAction extends CardAction  {
 					for (Player p : player.getGame().getOtherPlayers(player)) {
 						if (tokens[0].equals(p.getName())) {
 							Card cardToSteal = null;
+							
 							for (Card c : p.getLiminal()) {
 								if (c.getName().equals(tokens[1]) && (c.getName() == "Silver" || c.getName() == "Gold")) {
 									cardToSteal = c;
 									break;
-								}
+								}								
 							}
 							
 							if (cardToSteal != null) {
@@ -63,18 +64,21 @@ public class NobleBrigandAction extends CardAction  {
 				}
 
 				for (Player p : player.getGame().getOtherPlayers(player)) {
-					boolean treasureFound = false;
-					for (Card c : p.getLiminal()) {
-						if (c.getType() == Card.CardType.TREASURE) {
-							treasureFound = true;
-						}
-					}
+					boolean treasureFound = p.getLiminal().size() < 2;
 					
 					if (!treasureFound) {
+						for (Card c : p.getLiminal()) {
+							if (c.getType() == Card.CardType.TREASURE) {
+								treasureFound = true;
+							}
+						}
+					}
+					if (!treasureFound){
 						p.gainTo(bank.getByName("Copper"), p.getDiscard());
 					}
 					
 					List<Card> cardsToDiscard = new ArrayList<>();
+					
 					cardsToDiscard.addAll(p.getLiminal());
 					
 					for (Card c : cardsToDiscard) {

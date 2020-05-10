@@ -24,10 +24,10 @@ public class Card {
 	
 	@JsonIgnore private CardAction specialAction;
 	@JsonIgnore private VictoryFunction victoryFunction;
-	@JsonIgnore private EventAction gainAction;
-	@JsonIgnore private EventAction buyAction;
+	@JsonIgnore private CardAction gainAction;
+	@JsonIgnore private CardAction buyAction;
 	@JsonIgnore private BuyDestination buyDestination;
-	@JsonIgnore private EventAction discardAction;
+	@JsonIgnore private CardAction discardAction;
 	@JsonIgnore private TreasureFunction treasureFunction;
 
 	@JsonGetter(value="cost")

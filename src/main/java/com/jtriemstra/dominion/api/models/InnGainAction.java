@@ -3,7 +3,7 @@ package com.jtriemstra.dominion.api.models;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InnGainAction extends EventAction {
+public class InnGainAction extends CardAction {
 
 	@Override
 	public void execute(Player player) {

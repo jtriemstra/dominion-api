@@ -3,7 +3,7 @@ package com.jtriemstra.dominion.api.models;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BorderVillageGainAction extends EventAction {
+public class BorderVillageGainAction extends CardAction {
 	private Bank bank;
 	
 	public BorderVillageGainAction(Bank bank) {

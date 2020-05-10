@@ -88,7 +88,8 @@ public class HinterlandsTests {
 		List<Card> y = new ArrayList<>();
 		for (int i=0; i<5; i++) { y.add(mockBank.copper());}
 		y.add(mockBank.silver());
-		for (int i=0; i<4; i++) { y.add(mockBank.copper());}
+		y.add(mockBank.estate());
+		for (int i=0; i<3; i++) { y.add(mockBank.copper());}
 		
 		when(mockBank.newDeck()).thenReturn(x, y);
 		
@@ -109,6 +110,7 @@ public class HinterlandsTests {
 		assertEquals(1, player.getTemporaryTreasure());
 		
 		assertEquals(1, player2.getDiscard().size());
+		assertContains("Estate", player2.getDiscard());
 		assertEquals(3, player2.getDeck().size());
 		
 		assertNull(player.getCurrentChoice());	
@@ -159,8 +161,7 @@ public class HinterlandsTests {
 		Bank mockBank = spy(realBank);
 		List<Card> x = new ArrayList<>();
 		x.add(mockBank.cartographer());
-		for (int i=0; i<6; i++) { x.add(mockBank.copper());}
-		x.add(mockBank.estate());
+		for (int i=0; i<7; i++) { x.add(mockBank.copper());}
 		x.add(mockBank.estate());
 		x.add(mockBank.estate());
 		
@@ -173,13 +174,16 @@ public class HinterlandsTests {
 		player.play("Cartographer");
 		assertEquals(5, player.getHand().size());
 		assertEquals(1, player.getTemporaryActions());
+		assertEquals(0, player.getDeck().size());
+		assertEquals(4, player.getLiminal().size());
 		assertEquals("Choose cards from the deck to discard", player.getCurrentChoice().getPrompt());
 		assertEquals(4, player.getCurrentChoice().getOptions().size());
 		assertEquals(0, player.getDeck().size());
 		
-		player.finishAction(Arrays.asList("Estate","Estate","Estate"));
-		assertEquals(1, player.getDeck().size());
-		assertEquals(3, player.getDiscard().size());
+		player.finishAction(Arrays.asList("Estate","Copper"));
+		assertEquals(2, player.getDeck().size());
+		assertEquals(2, player.getDiscard().size());
+		assertEquals(0, player.getLiminal().size());
 		assertNull(player.getCurrentChoice());
 	}
 

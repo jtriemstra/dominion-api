@@ -3,7 +3,7 @@ package com.jtriemstra.dominion.api.models;
 import java.util.Arrays;
 import java.util.List;
 
-public class TunnelDiscardAction extends EventAction {
+public class TunnelDiscardAction extends CardAction {
 	private Bank bank;
 	
 	public TunnelDiscardAction(Bank bank) {

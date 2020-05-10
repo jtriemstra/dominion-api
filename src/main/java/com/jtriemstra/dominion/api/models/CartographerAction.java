@@ -7,6 +7,8 @@ import java.util.List;
 public class CartographerAction extends CardAction  {
 	@Override
 	public void execute(Player player) {
+		List<Card> lookingAt = player.lookAt(4);
+		
 		player.setCurrentChoice( new ActionChoice() {
 			@Override
 			public String getPrompt() { 
@@ -15,7 +17,6 @@ public class CartographerAction extends CardAction  {
 			
 			@Override
 			public List<String> getOptions(){
-				List<Card> lookingAt = player.lookAt(4);
 				List<String> options = new ArrayList<>();
 				for(Card c : lookingAt) {
 					options.add(c.getName());
@@ -31,12 +32,12 @@ public class CartographerAction extends CardAction  {
 				List<Card> cardsToDiscard = new ArrayList<>();
 				List<Card> cardsToTopDeck = new ArrayList<>();
 				
-				for (Card c : player.getLiminal()) {
-					if (options.contains(c.getName())) {
-						cardsToDiscard.add(c);
-					}
-					else {
-						cardsToTopDeck.add(c);
+				for (String s : options) {
+					for (Card c : player.getLiminal()) {
+						if (s.equals(c.getName())) {
+							cardsToDiscard.add(c);
+							break;
+						}
 					}
 				}
 				
@@ -45,10 +46,11 @@ public class CartographerAction extends CardAction  {
 				}
 				
 				// TODO: allow player to set the order of these
-				for (Card c : cardsToTopDeck) {
-					player.getLiminal().remove(c);
+				for (Card c : player.getLiminal()) {
 					player.getDeck().add(0, c);
-				}				
+				}	
+				
+				player.getLiminal().clear();
 			}
 		});
 	}

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class FarmlandBuyAction extends EventAction {
+public class FarmlandBuyAction extends CardAction {
 	
 	private Bank bank;
 	
@@ -31,8 +31,18 @@ public class FarmlandBuyAction extends EventAction {
 
 			@Override
 			public void doOptions(Player player, List<String> options) {
-				if (options.size() != 1) {
-					throw new RuntimeException("One and only one option can be chosen");
+				if (options.size() > 1) {
+					throw new RuntimeException("Only one option can be chosen");
+				}
+				
+				if (options.size() == 0 && player.getHand().size() > 0) {
+					throw new RuntimeException("You must trash a card");
+				}
+				
+				player.setCurrentChoice(null);
+				
+				if (options.size() == 0) {
+					return;
 				}
 				
 				Card cardToTrash = null;
@@ -50,7 +60,6 @@ public class FarmlandBuyAction extends EventAction {
 				int trashedCost = cardToTrash.getCost();
 				player.getHand().remove(cardToTrash);
 				
-				player.setCurrentChoice(null);
 				player.setCurrentChoice( new ActionChoice() {
 					@Override
 					public String getPrompt() { 
