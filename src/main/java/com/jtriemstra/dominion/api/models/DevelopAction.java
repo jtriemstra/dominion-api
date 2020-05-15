@@ -28,13 +28,26 @@ public class DevelopAction extends CardAction {
 			}
 
 			@Override
+			public int getMinOptions() {
+				return 0;
+			}
+
+			@Override
+			public int getMaxOptions() {
+				return 1;
+			}
+
+			@Override
 			public void doOptions(Player player, List<String> options) {
 				if (options.size() > 1) {
 					throw new RuntimeException("At most one option can be chosen");
 				}
 				
+				if (options.size() == 0 && player.getHand().size() > 0) {
+					throw new RuntimeException("You must trash a card");
+				}
+				
 				if (options.size() == 0) {
-					// TODO: only allow if there are no cards in hand
 					player.setCurrentChoice(null);
 					return;
 				}
@@ -69,6 +82,18 @@ public class DevelopAction extends CardAction {
 						cardNames.addAll(bank.getNamesByExactCost(trashedCost - 1));
 						return cardNames;
 					}
+
+					@Override
+					public int getMinOptions() {
+						// TODO Auto-generated method stub
+						return 0;
+					}
+
+					@Override
+					public int getMaxOptions() {
+						// TODO Auto-generated method stub
+						return 0;
+					}
 					
 					@Override
 					public void doOptions(Player player, List<String> options){
@@ -98,6 +123,18 @@ public class DevelopAction extends CardAction {
 								List<String> cardNames = new ArrayList<>();
 								cardNames.addAll(bank.getNamesByExactCost(nextCost));
 								return cardNames;
+							}
+
+							@Override
+							public int getMinOptions() {
+								// TODO Auto-generated method stub
+								return 0;
+							}
+
+							@Override
+							public int getMaxOptions() {
+								// TODO Auto-generated method stub
+								return 0;
 							}
 							
 							@Override

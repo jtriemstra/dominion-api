@@ -28,6 +28,16 @@ public class MilitiaAction extends CardAction {
 					}
 
 					@Override
+					public int getMinOptions() {
+						return 0;
+					}
+
+					@Override
+					public int getMaxOptions() {
+						return 1000;
+					}
+
+					@Override
 					public void doOptions(Player player, List<String> options) {
 						if (player.getHand().size() - options.size() != 3) {
 							throw new RuntimeException("You must discard down to three cards in your hand");

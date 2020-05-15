@@ -26,6 +26,16 @@ public class CartographerAction extends CardAction  {
 			}
 			
 			@Override
+			public int getMinOptions() {
+				return 0;
+			}
+
+			@Override
+			public int getMaxOptions() {
+				return 4;
+			}
+			
+			@Override
 			public void doOptions(Player player, List<String> options) {
 				player.setCurrentChoice(null);
 				

@@ -26,6 +26,16 @@ public class SpyAction extends CardAction {
 			}
 
 			@Override
+			public int getMinOptions() {
+				return 0;
+			}
+
+			@Override
+			public int getMaxOptions() {
+				return 1000;
+			}
+
+			@Override
 			public void doOptions(Player player, List<String> options) {
 				//TODO: finish
 				

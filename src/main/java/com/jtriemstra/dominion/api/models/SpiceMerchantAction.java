@@ -26,6 +26,16 @@ public class SpiceMerchantAction extends CardAction {
 			}
 
 			@Override
+			public int getMinOptions() {
+				return 0;
+			}
+
+			@Override
+			public int getMaxOptions() {
+				return 1;
+			}
+
+			@Override
 			public void doOptions(Player player, List<String> options) {
 				if (options == null || options.size() == 0) {
 					player.setCurrentChoice(null);
@@ -58,17 +68,25 @@ public class SpiceMerchantAction extends CardAction {
 					public List<String> getOptions(){
 						return Arrays.asList("2 Cards; 1 Action", "1 Buy; 2 Treasure");
 					}
+
+					@Override
+					public int getMinOptions() {
+						return 1;
+					}
+
+					@Override
+					public int getMaxOptions() {
+						return 1;
+					}
 					
 					@Override
 					public void doOptions(Player player, List<String> options){
-						if (options.size() > 1) {
-							throw new RuntimeException("At most one option can be chosen");
+						if (options.size() != 1) {
+							throw new RuntimeException("One and only one option can be chosen");
 						}
 						
-						if (options.size() == 0) {
-							return;
-						}
-						System.out.println(options.get(0));
+						player.setCurrentChoice(null);
+						
 						if (options.get(0).equals("2 Cards; 1 Action")) {
 							player.draw();
 							player.draw();
@@ -78,8 +96,6 @@ public class SpiceMerchantAction extends CardAction {
 							player.setTemporaryBuys(player.getTemporaryBuys() + 1);
 							player.setTemporaryTreasure(player.getTemporaryTreasure() + 2);
 						}
-						
-						player.setCurrentChoice(null);
 					}							
 				});
 			}

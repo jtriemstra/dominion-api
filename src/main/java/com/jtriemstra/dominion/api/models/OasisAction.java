@@ -23,6 +23,16 @@ public class OasisAction extends CardAction {
 			}
 
 			@Override
+			public int getMinOptions() {
+				return 0;
+			}
+
+			@Override
+			public int getMaxOptions() {
+				return 1;
+			}
+
+			@Override
 			public void doOptions(Player player, List<String> options) {
 				if (options.size() > 1) {
 					throw new RuntimeException("At most one option can be chosen");

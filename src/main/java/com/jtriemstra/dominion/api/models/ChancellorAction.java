@@ -17,7 +17,16 @@ public class ChancellorAction extends CardAction {
 			public List<String> getOptions(){
 				return Arrays.asList("Yes", "No");
 			}
-			
+						
+			@Override
+			public int getMinOptions() {
+				return 1;
+			}
+
+			@Override
+			public int getMaxOptions() {
+				return 1;
+			}
 			@Override
 			public void doOptions(Player player, List<String> options) {
 				if (options.size() != 1) {

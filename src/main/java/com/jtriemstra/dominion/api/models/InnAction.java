@@ -23,6 +23,16 @@ public class InnAction extends CardAction {
 			}
 
 			@Override
+			public int getMinOptions() {
+				return 0;
+			}
+
+			@Override
+			public int getMaxOptions() {
+				return 2;
+			}
+
+			@Override
 			public void doOptions(Player player, List<String> options) {
 				if (options.size() > 2) {
 					throw new RuntimeException("You can only discard 2 cards");

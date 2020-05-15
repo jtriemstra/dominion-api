@@ -754,4 +754,25 @@ public class HinterlandsTests {
 		
 		assertNull(player.getCurrentChoice());
 	}
+	
+	@Test                                                                                         
+    public void when_playing_highway_bank_is_cheaper() {
+		Bank realBank = new Bank(Arrays.asList("Highway"));
+		Bank mockBank = spy(realBank);
+		List<Card> x = new ArrayList<>();
+		x.add(mockBank.highway());
+		x.add(mockBank.estate());
+		x.add(mockBank.estate());
+		for (int i=0; i<7; i++) { x.add(mockBank.copper());}
+		
+		when(mockBank.newDeck()).thenReturn(x);
+		
+		Game game = new Game(mockBank);
+		
+		Player player = mockPlayer("test", game);
+		
+		player.play("Highway");
+				
+		assertEquals(5, game.getBank().getBankCards().stream().filter(c -> c.getCard().getName().equals("Gold")).findFirst().get().getCard().getCost());
+	}
 }

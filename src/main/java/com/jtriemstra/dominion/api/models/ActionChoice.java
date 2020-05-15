@@ -6,5 +6,6 @@ public abstract class ActionChoice {
 	public abstract String getPrompt();
 	public abstract List<String> getOptions();
 	public abstract void doOptions(Player player, List<String> options);
-	//TODO: max and min choice settings?
+	public abstract int getMinOptions();
+	public abstract int getMaxOptions();
 }

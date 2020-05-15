@@ -28,10 +28,26 @@ public class RemodelAction extends CardAction {
 			}
 
 			@Override
+			public int getMinOptions() {
+				return 0;
+			}
+
+			@Override
+			public int getMaxOptions() {
+				return 1;
+			}
+
+			@Override
 			public void doOptions(Player player, List<String> options) {
 				if (options.size() != 1) {
 					throw new RuntimeException("One and only one option can be chosen");
 				}
+				
+				if (options.size() == 0 && player.getHand().size() > 0) {
+					throw new RuntimeException("One and only one option can be chosen");
+				}
+				
+				player.setCurrentChoice(null);
 				
 				Card cardToTrash = null;
 				
@@ -49,7 +65,6 @@ public class RemodelAction extends CardAction {
 				int trashedCost = cardToTrash.getCost();
 				player.getHand().remove(cardToTrash);
 				
-				player.setCurrentChoice(null);
 				player.setCurrentChoice( new ActionChoice() {
 					@Override
 					public String getPrompt() { 
@@ -59,6 +74,16 @@ public class RemodelAction extends CardAction {
 					@Override
 					public List<String> getOptions(){
 						return bank.getNamesByMaxCost(trashedCost + 2);
+					}
+
+					@Override
+					public int getMinOptions() {
+						return 1;
+					}
+
+					@Override
+					public int getMaxOptions() {
+						return 1;
 					}
 					
 					@Override

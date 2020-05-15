@@ -23,6 +23,16 @@ public class EmbassyAction extends CardAction {
 			}
 
 			@Override
+			public int getMinOptions() {
+				return 0;
+			}
+
+			@Override
+			public int getMaxOptions() {
+				return 3;
+			}
+
+			@Override
 			public void doOptions(Player player, List<String> options) {
 				if (options.size() > 3) {
 					throw new RuntimeException("You can only discard 3 cards");

@@ -32,6 +32,16 @@ public class JackOfAllTradesAction extends CardAction  {
 				
 				return options;
 			}
+
+			@Override
+			public int getMinOptions() {
+				return 0;
+			}
+
+			@Override
+			public int getMaxOptions() {
+				return 1;
+			}
 			
 			@Override
 			public void doOptions(Player player, List<String> options) {
@@ -70,6 +80,16 @@ public class JackOfAllTradesAction extends CardAction  {
 						}
 						
 						return options;
+					}
+
+					@Override
+					public int getMinOptions() {
+						return 0;
+					}
+
+					@Override
+					public int getMaxOptions() {
+						return 1;
 					}
 					
 					@Override

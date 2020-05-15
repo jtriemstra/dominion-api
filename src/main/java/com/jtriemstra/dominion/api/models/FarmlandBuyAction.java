@@ -30,6 +30,16 @@ public class FarmlandBuyAction extends CardAction {
 			}
 
 			@Override
+			public int getMinOptions() {
+				return 0;
+			}
+
+			@Override
+			public int getMaxOptions() {
+				return 1;
+			}
+
+			@Override
 			public void doOptions(Player player, List<String> options) {
 				if (options.size() > 1) {
 					throw new RuntimeException("Only one option can be chosen");
@@ -69,6 +79,16 @@ public class FarmlandBuyAction extends CardAction {
 					@Override
 					public List<String> getOptions(){
 						return bank.getNamesByExactCost(trashedCost + 2);
+					}
+
+					@Override
+					public int getMinOptions() {
+						return 1;
+					}
+
+					@Override
+					public int getMaxOptions() {
+						return 1;
 					}
 					
 					@Override

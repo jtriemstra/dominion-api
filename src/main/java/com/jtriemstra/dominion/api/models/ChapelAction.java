@@ -23,7 +23,23 @@ public class ChapelAction extends CardAction {
 			}
 
 			@Override
+			public int getMinOptions() {
+				return 0;
+			}
+
+			@Override
+			public int getMaxOptions() {
+				return 4;
+			}
+
+			@Override
 			public void doOptions(Player player, List<String> options) {
+				if (options.size() > 4) {
+					throw new RuntimeException("You can only discard 4 cards");
+				}
+				
+				player.setCurrentChoice(null);
+				
 				for(String cardName : options) {
 					for (Card c : player.getHand()) {
 						if (cardName.equals(c.getName())) {
@@ -31,9 +47,7 @@ public class ChapelAction extends CardAction {
 							break;
 						}
 					}
-				}
-				
-				player.setCurrentChoice(null);
+				}				
 			}
 		});
 	}
