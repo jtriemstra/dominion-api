@@ -11,7 +11,9 @@ public class OracleAction extends CardAction  {
 	public void execute(Player player) {
 		player.lookAt(2);
 		for (Player p : player.getGame().getOtherPlayers(player)) {
-			p.lookAt(2);
+			if (!p.hasCard("Moat")) {
+				p.lookAt(2);
+			}			
 		}
 		
 		player.setCurrentChoice( new ActionChoice() {

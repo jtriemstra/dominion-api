@@ -6,7 +6,18 @@ import java.util.List;
 public class SpyAction extends CardAction {
 	@Override
 	public void execute(Player player) {
-		//TODO: account for Moat
+		
+		List<String> cardNames = new ArrayList<>();
+		List<Card> cards = player.lookAt(1);
+		cardNames.add(player.getName() + " : " + cards.get(0).getName());
+		
+		for (Player p : player.getGame().getOtherPlayers(player)) {
+			if (!p.hasCard("Moat")) {
+				cards = p.lookAt(1);
+				cardNames.add(p.getName() + " : " + cards.get(0).getName());
+			}					
+		}
+
 		player.setCurrentChoice(new ActionChoice() {
 			
 			@Override
@@ -16,12 +27,6 @@ public class SpyAction extends CardAction {
 
 			@Override
 			public List<String> getOptions() {
-				List<String> cardNames = new ArrayList<>();
-				for (Player p : player.getGame().getOtherPlayers(player)) {
-					//TODO: it's possible the deck will have no cards in it
-					cardNames.add(p.getDeck().get(0).getName());
-				}
-				
 				return cardNames;
 			}
 
@@ -37,9 +42,37 @@ public class SpyAction extends CardAction {
 
 			@Override
 			public void doOptions(Player player, List<String> options) {
-				//TODO: finish
 				
 				player.setCurrentChoice(null);
+				
+				// TODO: validation
+				
+				List<Player> allPlayers = new ArrayList<>();
+				allPlayers.add(player);
+				allPlayers.addAll(player.getGame().getOtherPlayers(player));
+				
+				for (String s : options) {
+					String[] tokens = s.split(" : ");
+					for (Player p : allPlayers) {
+						if (tokens[0].equals(p.getName())) {
+							Card cardToDiscard = null;
+														
+							for (Card c : p.getLiminal()) {
+								if (c.getName().equals(tokens[1])) {
+									cardToDiscard = c;
+									break;
+								}
+							}
+							
+							p.discardFromLiminal(cardToDiscard);							
+						}
+					}					
+				}
+				
+				for (Player p : allPlayers) {
+					p.getDeck().addAll(0, p.getLiminal());
+					p.getLiminal().clear();
+				}
 			}
 			
 		});

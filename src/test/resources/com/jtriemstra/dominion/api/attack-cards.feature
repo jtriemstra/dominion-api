@@ -38,4 +38,5 @@ Feature: Attack cards
     When I play the Militia
     Then the other player should have no active choice
     And the other player should have 5 cards in hand
+      
     
