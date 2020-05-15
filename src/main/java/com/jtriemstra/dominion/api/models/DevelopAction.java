@@ -85,14 +85,12 @@ public class DevelopAction extends CardAction {
 
 					@Override
 					public int getMinOptions() {
-						// TODO Auto-generated method stub
 						return 0;
 					}
 
 					@Override
 					public int getMaxOptions() {
-						// TODO Auto-generated method stub
-						return 0;
+						return 1;
 					}
 					
 					@Override
@@ -127,14 +125,12 @@ public class DevelopAction extends CardAction {
 
 							@Override
 							public int getMinOptions() {
-								// TODO Auto-generated method stub
 								return 0;
 							}
 
 							@Override
 							public int getMaxOptions() {
-								// TODO Auto-generated method stub
-								return 0;
+								return 1;
 							}
 							
 							@Override
