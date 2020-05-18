@@ -775,4 +775,43 @@ public class HinterlandsTests {
 				
 		assertEquals(5, game.getBank().getBankCards().stream().filter(c -> c.getCard().getName().equals("Gold")).findFirst().get().getCard().getCost());
 	}
+	
+	@Test                                                                                         
+    public void reproduce_jeffs_crossroads_issue() {
+		Bank realBank = new Bank(Arrays.asList("Spice Merchant", "Crossroads"));
+		Bank mockBank = spy(realBank);
+		List<Card> x = new ArrayList<>();
+		x.add(mockBank.spicemerchant());
+		x.add(mockBank.spicemerchant());
+		x.add(mockBank.estate());
+		for (int i=0; i<2; i++) { x.add(mockBank.copper());}
+		x.add(mockBank.estate());
+		x.add(mockBank.crossroads());
+		x.add(mockBank.crossroads());
+		x.add(mockBank.estate());
+		x.add(mockBank.crossroads());
+		for (int i=0; i<2; i++) { x.add(mockBank.copper());}
+		
+		when(mockBank.newDeck()).thenReturn(x);
+		
+		Game game = new Game(mockBank);
+		
+		Player player = mockPlayer("test", game);
+		
+		for (int i=0; i<10; i++) {
+			player.getDiscard().add(mockBank.copper());
+		}
+		
+		player.play("Spice Merchant");
+		player.finishAction(Arrays.asList("Copper"));
+		player.finishAction(Arrays.asList("2 Cards; 1 Action"));
+		player.play("Spice Merchant");
+		player.finishAction(Arrays.asList("Copper"));
+		player.finishAction(Arrays.asList("2 Cards; 1 Action"));
+		player.play("Crossroads");
+		player.play("Crossroads");
+		player.play("Crossroads");
+		
+		//assertEquals(5, game.getBank().getBankCards().stream().filter(c -> c.getCard().getName().equals("Gold")).findFirst().get().getCard().getCost());
+	}
 }

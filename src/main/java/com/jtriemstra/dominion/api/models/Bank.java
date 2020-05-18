@@ -163,6 +163,7 @@ public class Bank {
 		case "Thief": addCard(s, thief(), 10); break;
 		case "Gardens": addCard(s, gardens(), 10); break;
 		case "Highway": addCard(s, highway(), 10); break;
+		case "Oracle": addCard(s, oracle(), 10); break;
 		}
 	}
 	
