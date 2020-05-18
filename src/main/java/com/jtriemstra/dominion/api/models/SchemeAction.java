@@ -22,6 +22,11 @@ public class SchemeAction extends CardAction {
 						actionNames.add(c.getName());
 					}
 				}
+				for (Card c : player.getHand()) {
+					if (c.getType() == Card.CardType.ACTION) {
+						actionNames.add(c.getName());
+					}
+				}
 				return actionNames;
 			}
 
@@ -56,6 +61,18 @@ public class SchemeAction extends CardAction {
 						player.getPlayed().remove(cardToMove);
 						player.getDeck().add(0, cardToMove);	
 					}
+					/*else {
+						for (Card c : player.getHand()) {
+							if (c.getName().equals(options.get(0))) {
+								cardToMove = c;
+								break;
+							}
+						}
+						if (cardToMove != null) {
+							player.getHand().remove(cardToMove);
+							player.getDeck().add(0, cardToMove);	
+						}
+					}*/
 				}
 				
 				player.cleanup();

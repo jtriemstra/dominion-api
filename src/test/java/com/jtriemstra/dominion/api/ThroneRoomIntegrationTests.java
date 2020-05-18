@@ -105,7 +105,8 @@ public class ThroneRoomIntegrationTests {
 		assertEquals(true, player.hasBuys());
 		assertEquals(false, player.hasActions());
 		assertEquals(null, player.getCurrentChoice());
-		assertEquals(2, player.getDiscard().size());
+		assertEquals(2, player.getBought().size());
+		assertEquals(0, player.getDiscard().size());
 		assertEquals(2, player.getPlayed().size());
 	}
 	

@@ -100,7 +100,7 @@ public class MineAction extends CardAction {
 						
 						//TODO: validate choice
 						
-						player.addToHand(bank.getByName(options.get(0)));
+						player.gainTo(bank.getByName(options.get(0)), player.getHand());
 						
 						player.setCurrentChoice(null);
 					}							

@@ -39,7 +39,7 @@ public class WorkshopAction extends CardAction {
 					throw new RuntimeException("One and only one option can be chosen");
 				}
 				
-				player.gainTo(bank.getByName(options.get(0)), player.getDiscard());
+				player.gainTo(bank.getByName(options.get(0)), player.getBought());
 
 				player.setCurrentChoice(null);
 			}

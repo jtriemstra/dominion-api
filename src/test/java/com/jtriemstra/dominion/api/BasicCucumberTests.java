@@ -112,24 +112,32 @@ public class BasicCucumberTests extends CucumberTestBase{
     	getPlayer().play(cardName);
     }
 
-    @Then("I should have a {} in my played")
-    public void i_should_have_played(String cardName) {
-    	boolean foundCard = false;
-    	
-        for(Card c : getPlayer().getPlayed()) {
-        	if (cardName.equals(c.getName())) {
-        		foundCard = true;
-        	}
+    @Then("I should have a {} in my {}")
+    public void i_should_have_card_in(String cardName, String source) {
+    	List<Card> cards;
+    	switch(source) {
+        case "hand":
+        	cards = getPlayer().getHand();
+        	break;
+        case "played":
+        	cards = getPlayer().getPlayed();
+        	break;
+        case "discard":
+        	cards = getPlayer().getDiscard();
+        	break;
+        case "deck":
+        	cards = getPlayer().getDeck();
+        	break;
+        case "bought":
+        	cards = getPlayer().getBought();
+        	break;
+        default:
+        	throw new RuntimeException("invalid source");
         }
-        
-        assertEquals(true, foundCard);
-    }
-    
-    @Then("I should have a {} in my discard")
-    public void i_should_have_discard(String cardName) {
+    	
     	boolean foundCard = false;
     	
-        for(Card c : getPlayer().getDiscard()) {
+        for(Card c : cards) {
         	if (cardName.equals(c.getName())) {
         		foundCard = true;
         	}

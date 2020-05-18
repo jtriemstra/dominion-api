@@ -12,7 +12,7 @@ Feature: Basic cards
     And I opt for the Feast
     Then I should have 4 cards in my hand
     And I should have 0 actions available
-    And I should have a Feast in my discard
+    And I should have a Feast in my bought
 
   Scenario: Playing a woodcutter
     Given I have a Woodcutter
@@ -33,7 +33,7 @@ Feature: Basic cards
     When I play the Feast
     And I opt for the Market
     Then I should have 4 cards in my hand
-    And I should have a Market in my discard
+    And I should have a Market in my bought
     
   Scenario: Playing a market
     Given I have a Market
