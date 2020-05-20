@@ -12,7 +12,8 @@ public class MoneylenderAction extends CardAction {
 			}
 		}
 		
-		throw new RuntimeException("no coppers found in hand to trash");
+		//TODO: anything?
+		//throw new RuntimeException("no coppers found in hand to trash");
 	}
 
 }

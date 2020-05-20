@@ -1,17 +1,16 @@
 package com.jtriemstra.dominion.api.models;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+
 
 @Data
-@RequiredArgsConstructor
 public class Card {
 	@NonNull private int cost;
 	@NonNull private String name;
@@ -21,6 +20,17 @@ public class Card {
 	@NonNull private int additionalBuys;
 	@NonNull private int treasure;
 	@NonNull private int additionalCards;
+	
+	public Card(int cost, String name, int victoryPoints, int additionalActions, CardType type, int additionalBuys, int treasure, int additionalCards) {
+		this.cost = cost;
+		this.name = name;
+		this.victoryPoints = victoryPoints;
+		this.additionalActions = additionalActions;
+		this.type = type;
+		this.additionalBuys = additionalBuys;
+		this.treasure = treasure;
+		this.additionalCards = additionalCards;
+	}
 	
 	@JsonIgnore private CardAction specialAction;
 	@JsonIgnore private VictoryFunction victoryFunction;
