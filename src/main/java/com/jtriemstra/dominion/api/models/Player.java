@@ -403,23 +403,27 @@ public class Player {
 	@JsonGetter(value = "hand")
 	public List<Card> getHandForJson() {
 		ArrayList<Card> sortedHand = new ArrayList<>();
-		for (Card c : hand) {
-			if (c.getType() == Card.CardType.TREASURE) {
-				sortedHand.add(c);
-			}
-		}
-		for (Card c : hand) {
-			if (c.getType() == Card.CardType.ACTION) {
-				sortedHand.add(0, c);
-			}
-			else if (c.getType() != Card.CardType.TREASURE) {
-				sortedHand.add(c);
-			}
-		}
+		sortedHand.addAll(hand);
+		sortedHand.sort(new HandComparator());		
 		
 		return sortedHand;
 	}
+	
+	public class HandComparator implements Comparator<Card>{
+
+		@Override
+		public int compare(Card c1, Card c2) {
+			if (c1.getType() == Card.CardType.ACTION && c2.getType() != Card.CardType.ACTION) return -1;
+			if (c2.getType() == Card.CardType.ACTION && c1.getType() != Card.CardType.ACTION) return 1;
+			if (c1.getType() == Card.CardType.TREASURE && c2.getType() != Card.CardType.TREASURE) return -1;
+			if (c2.getType() == Card.CardType.TREASURE && c1.getType() != Card.CardType.TREASURE) return 1;
+			if (c1.getCost() != c2.getCost()) return c1.getCost() - c2.getCost();
+			
+			return c1.getName().compareTo(c2.getName());
+		}
 		
+	}
+	
 	public boolean hasCard(String name) {
 		for (Card c : hand) {
 			if (name.equals(c.getName())) {
