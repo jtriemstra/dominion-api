@@ -1,19 +1,31 @@
 package com.jtriemstra.dominion.api.controllers;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.WebRequest;
 
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+import com.amazonaws.services.dynamodbv2.document.DynamoDB;
+import com.amazonaws.services.dynamodbv2.document.Item;
+import com.amazonaws.services.dynamodbv2.document.PutItemOutcome;
+import com.amazonaws.services.dynamodbv2.document.Table;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jtriemstra.dominion.api.dto.PlayerGameState;
 import com.jtriemstra.dominion.api.models.Bank;
 import com.jtriemstra.dominion.api.models.BankCard;
@@ -31,8 +43,19 @@ public class MainController {
 	
 	@PostConstruct
 	public void initialize() {
-
+		
+	    
 	}
+	
+	/*@ExceptionHandler({ RuntimeException.class})
+	private void handleError(RuntimeException e, HttpServletRequest request) {
+		log.error("Handling error", e);
+		String card = request.getParameter("card");
+		String[] options = request.getParameterValues("options");
+		logResponse(request.getParameter("playerName"), request.getServletPath().substring(1), card, options, "{\"error\":\"" + e.getMessage() + "\"}");
+	}*/
+	
+	
 
 	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net", "http://jtriemstra-dominion-ui.s3-website.us-east-2.amazonaws.com"})
 	@RequestMapping("/join")
@@ -45,7 +68,9 @@ public class MainController {
 		game.addPlayer(newPlayer);
 		newPlayer.init(game);
 		
-		return new PlayerGameState(newPlayer, game.getPlayerNames(), game.getCurrentPlayerIndex());
+		PlayerGameState result = new PlayerGameState(newPlayer, game.getPlayerNames(), game.getCurrentPlayerIndex());
+		//logResponse(result, "join", null, null);
+		return result;
 	}
 	
 	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net", "http://jtriemstra-dominion-ui.s3-website.us-east-2.amazonaws.com"})
@@ -64,7 +89,9 @@ public class MainController {
 		game.addPlayer(newPlayer);
 		newPlayer.init(game);
 		
-		return new PlayerGameState(newPlayer, game.getPlayerNames(), game.getCurrentPlayerIndex());
+		PlayerGameState result = new PlayerGameState(newPlayer, game.getPlayerNames(), game.getCurrentPlayerIndex());
+		//logResponse(result, "start", null, null);
+		return result;
 	}
 	
 	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net", "http://jtriemstra-dominion-ui.s3-website.us-east-2.amazonaws.com"})
@@ -74,7 +101,9 @@ public class MainController {
 		
 		game.getPlayer(playerName).play(card);
 		
-		return new PlayerGameState(game.getPlayer(playerName), game.getPlayerNames(), game.getCurrentPlayerIndex());
+		PlayerGameState result = new PlayerGameState(game.getPlayer(playerName), game.getPlayerNames(), game.getCurrentPlayerIndex());
+		//logResponse(result, "play", card, null);
+		return result;
 	}
 	
 	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net", "http://jtriemstra-dominion-ui.s3-website.us-east-2.amazonaws.com"})
@@ -84,21 +113,21 @@ public class MainController {
 		
 		game.getPlayer(playerName).buy(card);
 		
-		return new PlayerGameState(game.getPlayer(playerName), game.getPlayerNames(), game.getCurrentPlayerIndex());
+		PlayerGameState result = new PlayerGameState(game.getPlayer(playerName), game.getPlayerNames(), game.getCurrentPlayerIndex());
+		//logResponse(result, "buy", card, null);
+		return result;
 	}
 	
 	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net", "http://jtriemstra-dominion-ui.s3-website.us-east-2.amazonaws.com"})
 	@RequestMapping("/action")
 	public PlayerGameState action(String[] options, String playerName) {
 		List<String> optionsList = options == null ? new ArrayList<String>() : Arrays.asList(options);
-		log.info("Player " + playerName + ": " + game.getPlayer(playerName).getCurrentChoice().toString());
-		log.info("Player " + playerName + ": " + game.getPlayer(playerName).getPoints());
 		
 		game.getPlayer(playerName).finishAction(optionsList);
 		
-		log.info("Player " + playerName + ": " + game.getPlayer(playerName).getPoints());
-		
-		return new PlayerGameState(game.getPlayer(playerName), game.getPlayerNames(), game.getCurrentPlayerIndex());
+		PlayerGameState result = new PlayerGameState(game.getPlayer(playerName), game.getPlayerNames(), game.getCurrentPlayerIndex());
+		//logResponse(result, "action", null, options);
+		return result;
 	}
 	
 	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net", "http://jtriemstra-dominion-ui.s3-website.us-east-2.amazonaws.com"})
@@ -108,14 +137,16 @@ public class MainController {
 		
 		game.getPlayer(playerName).startCleanup();
 		
-		return new PlayerGameState(game.getPlayer(playerName), game.getPlayerNames(), game.getCurrentPlayerIndex());
+		PlayerGameState result = new PlayerGameState(game.getPlayer(playerName), game.getPlayerNames(), game.getCurrentPlayerIndex());
+		return result;
 	}
 	
 	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net", "http://jtriemstra-dominion-ui.s3-website.us-east-2.amazonaws.com"})
 	@RequestMapping("/refresh")
 	public PlayerGameState refresh(String playerName) {
 		
-		return new PlayerGameState(game.getPlayer(playerName), game.getPlayerNames(), game.getCurrentPlayerIndex());
+		PlayerGameState result = new PlayerGameState(game.getPlayer(playerName), game.getPlayerNames(), game.getCurrentPlayerIndex());
+		return result;
 	}
 	
 	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net", "http://jtriemstra-dominion-ui.s3-website.us-east-2.amazonaws.com"})
