@@ -37,6 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
+@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net", "http://jtriemstra-dominion-ui.s3-website.us-east-2.amazonaws.com", "https://master.d1a91xjfjcbhnv.amplifyapp.com"})
 public class MainController {
 	
 	Game game = new Game();
@@ -47,17 +48,6 @@ public class MainController {
 	    
 	}
 	
-	/*@ExceptionHandler({ RuntimeException.class})
-	private void handleError(RuntimeException e, HttpServletRequest request) {
-		log.error("Handling error", e);
-		String card = request.getParameter("card");
-		String[] options = request.getParameterValues("options");
-		logResponse(request.getParameter("playerName"), request.getServletPath().substring(1), card, options, "{\"error\":\"" + e.getMessage() + "\"}");
-	}*/
-	
-	
-
-	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net", "http://jtriemstra-dominion-ui.s3-website.us-east-2.amazonaws.com", "https://master.d1a91xjfjcbhnv.amplifyapp.com"})
 	@RequestMapping("/join")
 	public PlayerGameState join(String playerName, HttpServletRequest request) {
 		if (game.getPlayerCount() >= 4) {
@@ -68,12 +58,10 @@ public class MainController {
 		game.addPlayer(newPlayer);
 		newPlayer.init(game);
 		
-		PlayerGameState result = new PlayerGameState(newPlayer, game.getPlayerNames(), game.getCurrentPlayerIndex());
-		//logResponse(result, "join", null, null);
+		PlayerGameState result = new PlayerGameState(newPlayer, game.getPlayerNames(), game.getCurrentPlayerIndex());	
 		return result;
 	}
 	
-	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net", "http://jtriemstra-dominion-ui.s3-website.us-east-2.amazonaws.com", "https://master.d1a91xjfjcbhnv.amplifyapp.com"})
 	@RequestMapping("/start")
 	public PlayerGameState init(String playerName, HttpServletRequest request, boolean randomCards, @RequestParam(required=false) List<String> cardNames) {
 		Bank bank;
@@ -90,11 +78,9 @@ public class MainController {
 		newPlayer.init(game);
 		
 		PlayerGameState result = new PlayerGameState(newPlayer, game.getPlayerNames(), game.getCurrentPlayerIndex());
-		//logResponse(result, "start", null, null);
 		return result;
 	}
 	
-	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net", "http://jtriemstra-dominion-ui.s3-website.us-east-2.amazonaws.com", "https://master.d1a91xjfjcbhnv.amplifyapp.com"})
 	@RequestMapping("/play")
 	public PlayerGameState play(String card, String playerName) {
 		validateCurrentPlayer(playerName);
@@ -102,11 +88,9 @@ public class MainController {
 		game.getPlayer(playerName).play(card);
 		
 		PlayerGameState result = new PlayerGameState(game.getPlayer(playerName), game.getPlayerNames(), game.getCurrentPlayerIndex());
-		//logResponse(result, "play", card, null);
 		return result;
 	}
 	
-	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net", "http://jtriemstra-dominion-ui.s3-website.us-east-2.amazonaws.com", "https://master.d1a91xjfjcbhnv.amplifyapp.com"})
 	@RequestMapping("/buy")
 	public PlayerGameState buy(String card, String playerName) {
 		validateCurrentPlayer(playerName);
@@ -114,11 +98,9 @@ public class MainController {
 		game.getPlayer(playerName).buy(card);
 		
 		PlayerGameState result = new PlayerGameState(game.getPlayer(playerName), game.getPlayerNames(), game.getCurrentPlayerIndex());
-		//logResponse(result, "buy", card, null);
 		return result;
 	}
 	
-	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net", "http://jtriemstra-dominion-ui.s3-website.us-east-2.amazonaws.com", "https://master.d1a91xjfjcbhnv.amplifyapp.com"})
 	@RequestMapping("/action")
 	public PlayerGameState action(String[] options, String playerName) {
 		List<String> optionsList = options == null ? new ArrayList<String>() : Arrays.asList(options);
@@ -126,11 +108,9 @@ public class MainController {
 		game.getPlayer(playerName).finishAction(optionsList);
 		
 		PlayerGameState result = new PlayerGameState(game.getPlayer(playerName), game.getPlayerNames(), game.getCurrentPlayerIndex());
-		//logResponse(result, "action", null, options);
 		return result;
 	}
 	
-	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net", "http://jtriemstra-dominion-ui.s3-website.us-east-2.amazonaws.com", "https://master.d1a91xjfjcbhnv.amplifyapp.com"})
 	@RequestMapping("/cleanup")
 	public PlayerGameState cleanup(String playerName) {
 		validateCurrentPlayer(playerName);
@@ -141,7 +121,6 @@ public class MainController {
 		return result;
 	}
 	
-	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net", "http://jtriemstra-dominion-ui.s3-website.us-east-2.amazonaws.com", "https://master.d1a91xjfjcbhnv.amplifyapp.com"})
 	@RequestMapping("/refresh")
 	public PlayerGameState refresh(String playerName) {
 		
@@ -149,7 +128,6 @@ public class MainController {
 		return result;
 	}
 	
-	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net", "http://jtriemstra-dominion-ui.s3-website.us-east-2.amazonaws.com", "https://master.d1a91xjfjcbhnv.amplifyapp.com"})
 	@RequestMapping("/bank")
 	public List<BankCard> bank() {
 		//TODO: return an array like the properties of the Player object, so UI code is consistent
@@ -157,11 +135,17 @@ public class MainController {
 		return game.getBank().getBankCards();
 	}
 	
-	@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net", "http://jtriemstra-dominion-ui.s3-website.us-east-2.amazonaws.com", "https://master.d1a91xjfjcbhnv.amplifyapp.com"})
+	
 	@RequestMapping("/end")
 	public void end() {
-		
 		game = new Game();
+	}
+	
+	@RequestMapping("/activeGame")
+	public HashMap<String, Boolean> activeGame() {
+		HashMap<String, Boolean> result = new HashMap<>();
+		result.put("activeGame", (game != null && game.getPlayers().size() > 0));
+		return result;
 	}
 	
 	private void validateCurrentPlayer(String playerName) {
