@@ -21,7 +21,7 @@ public class Player {
 	private List<Card> hand = new ArrayList<>();
 	private List<Card> played = new ArrayList<>();
 	private List<Card> discard = new ArrayList<>();
-	private List<Card> bought = new ArrayList<>();
+	private List<Card> bought = new ArrayList<>();	
 	//TODO: rename this to "revealed"
 	private List<Card> liminal = new ArrayList<>();
 	@JsonIgnore private int numberOfBuysMade;
@@ -29,6 +29,7 @@ public class Player {
 	@JsonIgnore private int temporaryTreasure; 
 	@JsonIgnore private int temporaryBuys;
 	@JsonIgnore private int temporaryActions;
+	
 	
 	@JsonIgnore
 	private Game game;
@@ -66,6 +67,7 @@ public class Player {
 			draw();
 		}
 		
+		cleanupStages.add(new CleanupAction());
 	}
 		
 	public void discardFromLiminal(Card c) {
@@ -217,8 +219,19 @@ public class Player {
 				doCard(c);
 			}
 		}
+		
+		if (currentChoice.size() == 0) {
+			//TODO: make this a more general "move through stages" idea
+			if (isCleaningUp) {
+				cleanup();
+			}
+			else if (buyStages.size() > 0) {
+				doNextBuyStage();
+			}
+		}
 	}
 	
+	//TODO: update this interface to reflect that there's a queue under here
 	public void setCurrentChoice(ActionChoice a) {
 		if (currentChoice.size() > 0) {
 			//currentChoice.remove(0);
@@ -269,121 +282,204 @@ public class Player {
 			throw new RuntimeException("no buys left");
 		}
 		
-		Card newCard = game.getBank().tryToBuy(name, treasureAvailable());
-		temporaryTreasure -= newCard.getCost();
-		temporaryBuys -= 1;
+		buyStages.add(new BuyAction(name));
 		
-		if (newCard.getBuyAction() != null) {
-			newCard.getBuyAction().execute(this);
+		doNextBuyStage();		
+	}
+	
+	public void gainTo(Card c, List<Card> destination, int quantity) {
+		for (int i=0; i<quantity; i++){
+			buyStages.add(0, new TraderCheckAction(c));
+			buyStages.add(1, new GainAction(c, destination));
 		}
 		
-		if (newCard.getBuyDestination() == null) {
-			gainTo(newCard, bought);
-		}
-		else {
-			switch(newCard.getBuyDestination().getBuyDestination()) {
-			case DECK: gainTo(newCard, deck); break;
-			case HAND: gainTo(newCard, hand); break;
-			case PLAYED: gainTo(newCard, played); break;
-			case BOUGHT: gainTo(newCard, bought); break;
-			case DISCARD: gainTo(newCard, discard); break;
-			}
-		}
-				
-		//TODO: move Haggler code out of here
-		for(Card c : played) {
-			if (c.getName().equals("Haggler")) {
-				(new HagglerAction(this.getGame().getBank(), newCard.getCost())).execute(this);
-			}
-		}
+		doNextBuyStage();
 	}
 	
 	public void gainTo(Card c, List<Card> destination) {
-		//TODO: move card-specific code elsewhere
-		boolean traderFound = false;
-		for (Card c1 : hand) {
-			if (c1.getName().equals("Trader")) {
-				traderFound = true;
-				break;
-			}
-		}
-		if (traderFound) {
-			(new TraderReaction(getGame().getBank(), destination, c)).execute(this);
-		}
-		else {
-			finishGain(c, destination);
+		gainTo(c, destination, 1);
+	}
+	
+	@JsonIgnore private List<CardAction> buyStages = new ArrayList<>();
+		
+	public void doNextBuyStage() {
+		//TODO: unify buy stages, cleanup stages, and actions
+		if (buyStages.size() > 0 ) {
+			CardAction currentAction = buyStages.remove(0);
+			currentAction.execute(this);
 		}
 	}
 	
-	public void finishGain(Card c, List<Card> destination) {
-		destination.add(0, c);
+	public class BuyAction extends CardAction {
+		public Card cardToBuy;
+		private String cardNameToBuy;
 		
-		//TODO: move card-specific code elsewhere
-		for(Player p : game.getOtherPlayers(this)) {
-			for (Card c1 : p.getHand()) {
-				if (c1.getName().equals("Fools Gold") && c.getName().equals("Province")) {
-					(new FoolsGoldAction(game.getBank())).execute(p);
+		public BuyAction(String cardName) {
+			cardNameToBuy = cardName;
+		}
+		
+		public void execute(Player p) {
+			cardToBuy = game.getBank().tryToBuy(cardNameToBuy, treasureAvailable());
+			temporaryTreasure -= cardToBuy.getCost();
+			temporaryBuys -= 1;
+			
+			if (cardToBuy.getBuyAction() != null) {
+				buyStages.add(0, cardToBuy.getBuyAction());
+			}
+			buyStages.add(new HagglerCheckAction(cardToBuy));
+			buyStages.add(new TraderCheckAction(cardToBuy));
+			buyStages.add(new GainAction(cardToBuy));
+			
+			doNextBuyStage();
+		}
+	}
+	
+	public class HagglerCheckAction extends CardAction {
+		private Card newCard;
+		
+		public HagglerCheckAction(Card c) {
+			this.newCard = c;
+		}
+		
+		public void execute(Player p) {
+			boolean hagglerFound = false;
+			for (Card c1 : played) {
+				if (c1.getName().equals("Haggler")) {
+					hagglerFound = true;
+					break;
 				}
 			}
-		}
-		
-		if (game.getBank().hasCard("Duchess") && c.getName().equals("Duchy")) {
-			(new DuchessGainAction(game.getBank())).execute(this);
-		}
-
-		if (c.getGainAction() != null) {
-			c.getGainAction().execute(this);
-		}		
-	}
-		
-	public void startCleanup() {
-		//TODO: remove card-specific logic
-		boolean foundScheme = false;
-		for (Card c : played) {
-			if (c.getName().equals("Scheme")) {
-				foundScheme = true;
-				(new SchemeAction()).execute(this);
-				break;
+			if (hagglerFound) {
+				buyStages.add(0, new HagglerAction(getGame().getBank(), newCard.getCost()));
 			}
+			
+			doNextBuyStage();
+		}
+	}
+	
+	public class TraderCheckAction extends CardAction {
+		private Card newCard;
+		
+		public TraderCheckAction(Card c) {
+			this.newCard = c;
 		}
 		
-		if (!foundScheme) {
-			cleanup();
+		public void execute(Player p) {
+			boolean traderFound = false;
+			for (Card c1 : hand) {
+				if (c1.getName().equals("Trader")) {
+					traderFound = true;
+					break;
+				}
+			}
+			if (traderFound) {
+				buyStages.add(0, new TraderReaction(getGame().getBank(), newCard));
+			}
+			
+			doNextBuyStage();
 		}
+	}
+	
+	public class GainAction extends CardAction {
+		private Card newCard;
+		
+		private List<Card> destination;
+		
+		public GainAction(Card c) {
+			this.newCard = c;
+		}
+		
+		public GainAction(Card c, List<Card> destination) {
+			this.newCard = c;
+			this.destination = destination;
+		}
+		
+		public void setNewCard(Card c) {
+			this.newCard = c;
+		}
+		
+		public void execute(Player p) {
+			if (newCard.getBuyDestination() != null) {
+				switch(newCard.getBuyDestination().getBuyDestination()) {
+				case DECK: destination = deck; break;
+				case HAND: destination = hand; break;
+				case PLAYED: destination = played; break;
+				case BOUGHT: destination = bought; break;
+				case DISCARD: destination = discard; break;
+				default: destination = bought; break;
+				}
+				
+			}
+			else {
+				if (destination == null) {
+					destination = bought;
+				}
+			}
+			
+			destination.add(0, newCard);
+			
+			if (newCard.getGainAction() != null) {
+				buyStages.add(0, newCard.getGainAction());
+			}
+			
+			doNextBuyStage();
+		}
+	}
+	
+		
+	@JsonIgnore private List<CardAction> cleanupStages = new ArrayList<>();
+	@JsonIgnore private boolean isCleaningUp = false;
+	
+	public void addCleanupStage(int index, CardAction ca) {
+		cleanupStages.add(index, ca);
 	}
 	
 	public void cleanup() {
-		if (liminal.size() > 0) {
-			throw new RuntimeException("Revealed cards were not properly cleaned up");
-		}
-		
-		discard.addAll(bought);
-		bought.clear();
-		
-		discard.addAll(played);
-		played.clear();
-		
-		discard.addAll(hand);
-		hand.clear();
-		
-		//TODO: there may be other situations that could take teh Highway or Haggler out of play that need to be accounted for
-		game.clearCardModifiers();
-				
-		currentChoice.clear();
-		temporaryTreasure = 0;
-		temporaryBuys = 0;
-		temporaryActions = 1;
-		throneRoomActions.clear();
-		
-		for (int i=0; i<5; i++) {
-			draw();
-		}
-		
-		game.moveToNextPlayer();
-		
-		game.testGameOver();
-		
+		isCleaningUp = true;
+		cleanupStages.remove(0).execute(this);
 	}
+	
+	public class CleanupAction extends CardAction {
+		//TODO: revisit this Player parameter - it's there to match the CardAction base class, but a lot of this functionality makes more sense as private to Player class
+		public void execute(Player p) {
+			if (liminal.size() > 0) {
+				throw new RuntimeException("Revealed cards were not properly cleaned up");
+			}
+			
+			discard.addAll(bought);
+			bought.clear();
+			
+			discard.addAll(played);
+			played.clear();
+			
+			discard.addAll(hand);
+			hand.clear();
+			
+			cleanupStages.clear();
+			cleanupStages.add(new CleanupAction());
+			
+			//TODO: there may be other situations that could take teh Highway or Haggler out of play that need to be accounted for
+			game.clearCardModifiers();
+					
+			currentChoice.clear();
+			temporaryTreasure = 0;
+			temporaryBuys = 0;
+			temporaryActions = 1;
+			throneRoomActions.clear();
+			
+			for (int i=0; i<5; i++) {
+				draw();
+			}
+			
+			isCleaningUp = false;
+			
+			game.moveToNextPlayer();
+			
+			game.testGameOver();			
+		}
+	}
+	
+	
 	
 	@JsonGetter(value = "hasBuys")
 	public boolean hasBuys() {

@@ -62,6 +62,7 @@ public class Bank {
 			addCard("Estate", estate(), 24);
 			addCard("Duchy",  duchy(), 12);
 			addCard("Province", province(), 12);
+			//TODO: curse counts depend on number of players
 			addCard("Curse", curse(), 30);
 			
 			addCard("Village",  village(), 10);
@@ -82,6 +83,7 @@ public class Bank {
 			addCard("Estate", estate(), 24);
 			addCard("Duchy",  duchy(), 12);
 			addCard("Province", province(), 12);
+			//TODO: curse counts depend on number of players
 			addCard("Curse", curse(), 30);
 			
 			List<String> names = new ArrayList<String>(Arrays.asList("Village", "Smithy", "Chapel", "Throne Room", "Workshop", "Laboratory", "Woodcutter", "Adventurer", "Bureaucrat", 
@@ -298,10 +300,14 @@ public class Bank {
 		return new Card(2, "Estate", 1, 0, Card.CardType.VICTORY, 0, 0, 0);
 	}
 	public  Card duchy() {
-		return new Card(5, "Duchy", 3, 0, Card.CardType.VICTORY, 0, 0, 0);
+		Card c = new Card(5, "Duchy", 3, 0, Card.CardType.VICTORY, 0, 0, 0);
+		c.setGainAction(new DuchyGainAction());
+		return c;
 	}
 	public  Card province() {
-		return new Card(8, "Province", 6, 0, Card.CardType.VICTORY, 0, 0, 0);
+		Card c = new Card(8, "Province", 6, 0, Card.CardType.VICTORY, 0, 0, 0);
+		c.setGainAction(new ProvinceGainAction());
+		return c;
 	}
 	public  Card curse() {
 		return new Card(0, "Curse", -1, 0, Card.CardType.VICTORY, 0, 0, 0);
@@ -480,9 +486,8 @@ public class Bank {
 		c.setGainAction(new CardAction() {
 			@Override
 			public void execute(Player player) {
-				log.info("Calling gain from Cache");
-				player.gainTo(getByName("Copper"), player.getBought());
-				player.gainTo(getByName("Copper"), player.getBought());
+				player.gainTo(getByName("Copper"), player.getBought(), 2);
+				//player.gainTo(getByName("Copper"), player.getBought());
 			}
 		});
 		return c;
@@ -566,7 +571,9 @@ public class Bank {
 		return c;
 	}
 	public Card scheme() {
-		return new Card(3, "Scheme", 0, 1, Card.CardType.ACTION, 0, 0, 1);
+		Card c = new Card(3, "Scheme", 0, 1, Card.CardType.ACTION, 0, 0, 1);
+		c.setSpecialAction(new SchemeAction());
+		return c;
 	}
 	public Card trader() {
 		Card c = new Card(4, "Trader", 0, 0, Card.CardType.ACTION, 0, 0, 0);

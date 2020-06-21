@@ -9,12 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TraderReaction extends CardAction {
 	private Bank bank;
-	private List<Card> gainDestination;
 	private Card cardToBeGained;
 	
-	public TraderReaction(Bank bank, List<Card> gainDestination, Card cardToBeGained) {
+	public TraderReaction(Bank bank, Card cardToBeGained) {
 		this.bank = bank;
-		this.gainDestination = gainDestination;
 		this.cardToBeGained = cardToBeGained;
 	}
 	
@@ -50,11 +48,14 @@ public class TraderReaction extends CardAction {
 				player.setCurrentChoice(null);
 				
 				if (options.get(0).equals("Yes")) {
-					player.finishGain(bank.getByName("Silver"), gainDestination);
+					if (!(player.getBuyStages().get(0) instanceof Player.GainAction)) {
+						throw new RuntimeException("Buy stages have gotten out of sync");
+					}
+					//TODO: is there a cleaner interface here?
+					//TODO: per wiki, the silver should always go to discard/bought, not to hand/deck, even if that's where the original card was going
+					Player.GainAction a = (Player.GainAction) player.getBuyStages().get(0);
+					a.setNewCard(bank.getByName("Silver"));
 					bank.returnCard(cardToBeGained.getName());
-				}
-				else {
-					player.finishGain(cardToBeGained, gainDestination);
 				}
 			}
 		});		

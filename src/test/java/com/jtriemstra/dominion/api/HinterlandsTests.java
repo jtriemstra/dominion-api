@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.anyList;
@@ -242,7 +243,7 @@ public class HinterlandsTests {
 		assertEquals(1, player.getTemporaryActions());
 		assertNull(player.getCurrentChoice());
 		
-		player.startCleanup();
+		player.cleanup();
 		
 		assertEquals("Choose an action card to put on your deck", player.getCurrentChoice().getPrompt());
 		assertEquals(1, player.getCurrentChoice().getOptions().size());
@@ -251,6 +252,62 @@ public class HinterlandsTests {
 		
 		assertEquals(0, player.getDeck().size());
 		assertEquals(5, player.getDiscard().size());		
+	}
+	
+	@Test                                                                                         
+    public void when_playing_multiple_scheme_can_put_multiple_action_on_deck() {
+		Bank realBank = new Bank(Arrays.asList("Scheme", "Village"));
+		Bank mockBank = spy(realBank);
+		List<Card> x = new ArrayList<>();
+		x.add(mockBank.scheme());
+		x.add(mockBank.scheme());
+		x.add(mockBank.village());
+		for (int i=0; i<6; i++) { x.add(mockBank.copper());}
+		x.add(mockBank.estate());
+		x.add(mockBank.estate());
+		x.add(mockBank.estate());
+		
+		when(mockBank.newDeck()).thenReturn(x);
+		
+		Game game = new Game(mockBank);
+		
+		Player player = mockPlayer("test", game);
+		
+		player.play("Scheme");
+				
+		assertEquals(5, player.getHand().size());
+		assertEquals(1, player.getTemporaryActions());
+		assertNull(player.getCurrentChoice());
+		assertEquals(6, player.getDeck().size());
+		
+		player.play("Scheme");
+		assertEquals(5, player.getHand().size());
+		assertEquals(1, player.getTemporaryActions());
+		assertNull(player.getCurrentChoice());
+		assertEquals(5, player.getDeck().size());
+
+		player.play("Village");
+		assertEquals(5, player.getHand().size());
+		assertEquals(2, player.getTemporaryActions());
+		assertNull(player.getCurrentChoice());
+		assertEquals(4, player.getDeck().size());
+		
+		player.cleanup();
+		
+		assertEquals("Choose an action card to put on your deck", player.getCurrentChoice().getPrompt());
+		assertEquals(3, player.getCurrentChoice().getOptions().size());
+		
+		player.finishAction(Arrays.asList("Scheme"));
+		
+		assertNotNull(player.getCurrentChoice());
+		assertEquals("Choose an action card to put on your deck", player.getCurrentChoice().getPrompt());
+		assertEquals(2, player.getCurrentChoice().getOptions().size());
+		
+		player.finishAction(Arrays.asList("Village"));
+		
+		
+		assertEquals(1, player.getDeck().size());
+		assertEquals(6, player.getDiscard().size());		
 	}
 	
 	@Test                                                                                         
@@ -277,7 +334,7 @@ public class HinterlandsTests {
 		assertEquals(1, player.getTemporaryActions());
 		assertNull(player.getCurrentChoice());
 		
-		player.startCleanup();
+		player.cleanup();
 		
 		assertEquals("Choose an action card to put on your deck", player.getCurrentChoice().getPrompt());
 		assertEquals(1, player.getCurrentChoice().getOptions().size());

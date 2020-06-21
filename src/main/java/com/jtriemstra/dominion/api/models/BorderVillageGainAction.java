@@ -20,6 +20,7 @@ public class BorderVillageGainAction extends CardAction {
 			
 			@Override
 			public List<String> getOptions(){
+				//TODO: this hard-coded 5 fails to take into account potential Highway cards in play
 				return bank.getNamesByMaxCost(5);
 			}
 

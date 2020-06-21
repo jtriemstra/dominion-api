@@ -115,7 +115,7 @@ public class MainController {
 	public PlayerGameState cleanup(String playerName) {
 		validateCurrentPlayer(playerName);
 		
-		game.getPlayer(playerName).startCleanup();
+		game.getPlayer(playerName).cleanup();
 		
 		PlayerGameState result = new PlayerGameState(game.getPlayer(playerName), game.getPlayerNames(), game.getCurrentPlayerIndex());
 		return result;

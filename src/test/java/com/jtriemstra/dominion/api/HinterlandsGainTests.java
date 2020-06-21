@@ -83,6 +83,7 @@ public class HinterlandsGainTests {
 		
 		player.play("Village");
 		player.cleanup();
+		
 		player.play("Copper");
 		player.play("Copper");
 		player.play("Copper");
@@ -148,7 +149,8 @@ public class HinterlandsGainTests {
 		assertTrue(!player.getCurrentChoice().getOptions().contains("Gold"));
 		player.finishAction(Arrays.asList("Nomad Camp"));
 		
-		assertEquals(2, player.getBought().size());		
+		assertEquals(1, player.getBought().size());
+		assertEquals(6, player.getDeck().size());
 	}
 	
 	@Test                                                                                         
@@ -580,26 +582,26 @@ public class HinterlandsGainTests {
 		
 		player.finishAction(Arrays.asList("Cache"));
 		
-		assertEquals("Would you like to gain a silver instead of the regular card Farmland", player.getCurrentChoice().getPrompt());
+		assertEquals("Would you like to gain a silver instead of the regular card Cache", player.getCurrentChoice().getPrompt());
 		
 		player.finishAction(Arrays.asList("No"));
 		
 		assertEquals(1, player.getBought().size());
 		
-		assertEquals("Would you like to gain a silver instead of the regular card Cache", player.getCurrentChoice().getPrompt());
+		assertEquals("Would you like to gain a silver instead of the regular card Copper", player.getCurrentChoice().getPrompt());
 		player.finishAction(Arrays.asList("No"));
 		
 		assertEquals("Would you like to gain a silver instead of the regular card Copper", player.getCurrentChoice().getPrompt());
 		player.finishAction(Arrays.asList("Yes"));
 		
-		assertEquals("Would you like to gain a silver instead of the regular card Copper", player.getCurrentChoice().getPrompt());
+		assertEquals("Would you like to gain a silver instead of the regular card Farmland", player.getCurrentChoice().getPrompt());
 		player.finishAction(Arrays.asList("No"));
 		
 		assertEquals(4, player.getBought().size());
-		assertEquals("Copper", player.getBought().get(0).getName());
+		assertEquals("Farmland", player.getBought().get(0).getName());
 		assertEquals("Silver", player.getBought().get(1).getName());
-		assertEquals("Cache", player.getBought().get(2).getName());
-		assertEquals("Farmland", player.getBought().get(3).getName());
+		assertEquals("Copper", player.getBought().get(2).getName());
+		assertEquals("Cache", player.getBought().get(3).getName());
 				
 		assertNull(player.getCurrentChoice());
 	}
@@ -637,9 +639,15 @@ public class HinterlandsGainTests {
 		assertEquals("Choose a card to gain from Farmland", player.getCurrentChoice().getPrompt());
 		player.finishAction(Arrays.asList("Cache"));
 		
-		assertEquals("Would you like to gain a silver instead of the regular card Farmland", player.getCurrentChoice().getPrompt());
+		assertEquals("Would you like to gain a silver instead of the regular card Cache", player.getCurrentChoice().getPrompt());
 		player.finishAction(Arrays.asList("No"));
 		
+		assertEquals("Would you like to gain a silver instead of the regular card Copper", player.getCurrentChoice().getPrompt());
+		player.finishAction(Arrays.asList("Yes"));
+				
+		assertEquals("Would you like to gain a silver instead of the regular card Copper", player.getCurrentChoice().getPrompt());
+		player.finishAction(Arrays.asList("Yes"));
+				
 		assertEquals("Choose a card to gain from Haggler", player.getCurrentChoice().getPrompt());
 		assertEquals(5, player.getCurrentChoice().getOptions().size());
 		player.finishAction(Arrays.asList("Cache"));
@@ -647,30 +655,23 @@ public class HinterlandsGainTests {
 		assertEquals("Would you like to gain a silver instead of the regular card Cache", player.getCurrentChoice().getPrompt());
 		player.finishAction(Arrays.asList("No"));
 		
-		assertEquals("Would you like to gain a silver instead of the regular card Cache", player.getCurrentChoice().getPrompt());
+		assertEquals("Would you like to gain a silver instead of the regular card Copper", player.getCurrentChoice().getPrompt());
+		player.finishAction(Arrays.asList("Yes"));
+				
+		assertEquals("Would you like to gain a silver instead of the regular card Copper", player.getCurrentChoice().getPrompt());
+		player.finishAction(Arrays.asList("Yes"));
+		
+		assertEquals("Would you like to gain a silver instead of the regular card Farmland", player.getCurrentChoice().getPrompt());
 		player.finishAction(Arrays.asList("No"));
 		
-		assertEquals("Would you like to gain a silver instead of the regular card Copper", player.getCurrentChoice().getPrompt());
-		player.finishAction(Arrays.asList("Yes"));
-				
-		assertEquals("Would you like to gain a silver instead of the regular card Copper", player.getCurrentChoice().getPrompt());
-		player.finishAction(Arrays.asList("Yes"));
-		
-		assertEquals("Would you like to gain a silver instead of the regular card Copper", player.getCurrentChoice().getPrompt());
-		player.finishAction(Arrays.asList("Yes"));
-				
-		assertEquals("Would you like to gain a silver instead of the regular card Copper", player.getCurrentChoice().getPrompt());
-		player.finishAction(Arrays.asList("Yes"));
-		
-		
 		assertEquals(7, player.getBought().size());
-		assertEquals("Silver", player.getBought().get(0).getName());
+		assertEquals("Farmland", player.getBought().get(0).getName());
 		assertEquals("Silver", player.getBought().get(1).getName());
 		assertEquals("Silver", player.getBought().get(2).getName());
-		assertEquals("Silver", player.getBought().get(3).getName());
-		assertEquals("Cache", player.getBought().get(4).getName());
-		assertEquals("Cache", player.getBought().get(5).getName());
-		assertEquals("Farmland", player.getBought().get(6).getName());
+		assertEquals("Cache", player.getBought().get(3).getName());
+		assertEquals("Silver", player.getBought().get(4).getName());
+		assertEquals("Silver", player.getBought().get(5).getName());
+		assertEquals("Cache", player.getBought().get(6).getName());
 				
 		assertNull(player.getCurrentChoice());
 	}
@@ -713,6 +714,10 @@ public class HinterlandsGainTests {
 		assertEquals("Choose a card to gain", player.getCurrentChoice().getPrompt());
 		assertEquals(2, player.getCurrentChoice().getOptions().size());
 		player.finishAction(Arrays.asList("Silver"));
+
+		//TODO: I'm not 100% sure this is right - it seems like the Cache's Coppers should come through before I choose the Silver for the second Develop gain. But I don't think there's much effect this way.
+		assertEquals("Would you like to gain a silver instead of the regular card Silver", player.getCurrentChoice().getPrompt());
+		player.finishAction(Arrays.asList("No"));
 		
 		assertEquals("Would you like to gain a silver instead of the regular card Copper", player.getCurrentChoice().getPrompt());
 		player.finishAction(Arrays.asList("Yes"));
@@ -720,15 +725,13 @@ public class HinterlandsGainTests {
 		assertEquals("Would you like to gain a silver instead of the regular card Copper", player.getCurrentChoice().getPrompt());
 		player.finishAction(Arrays.asList("Yes"));
 		
-		assertEquals("Would you like to gain a silver instead of the regular card Silver", player.getCurrentChoice().getPrompt());
-		player.finishAction(Arrays.asList("No"));
 		
 		assertEquals(2, player.getBought().size());
 		assertEquals("Silver", player.getBought().get(0).getName());
 		assertEquals("Silver", player.getBought().get(1).getName());
 		assertEquals(11, player.getDeck().size());
-		assertEquals("Silver", player.getDeck().get(0).getName());
-		assertEquals("Cache", player.getDeck().get(1).getName());
+		assertEquals("Cache", player.getDeck().get(0).getName());
+		assertEquals("Silver", player.getDeck().get(1).getName());
 		
 				
 		assertNull(player.getCurrentChoice());

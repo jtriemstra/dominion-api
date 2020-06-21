@@ -36,6 +36,8 @@ public class Card {
 	@JsonIgnore private VictoryFunction victoryFunction;
 	@JsonIgnore private CardAction gainAction;
 	@JsonIgnore private CardAction buyAction;
+	
+	//TODO: I think this could just be a CardSet field
 	@JsonIgnore private BuyDestination buyDestination;
 	@JsonIgnore private CardAction discardAction;
 	@JsonIgnore private TreasureFunction treasureFunction;
