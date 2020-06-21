@@ -75,7 +75,9 @@ public class SchemeAction extends CardAction {
 					}*/
 				}
 				
-				player.cleanup();
+				if (player.getCurrentChoice() == null) {
+					player.cleanup();	
+				}
 			}
 		});
 	}

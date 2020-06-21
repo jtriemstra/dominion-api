@@ -20,7 +20,8 @@ public class BorderVillageGainAction extends CardAction {
 			
 			@Override
 			public List<String> getOptions(){
-				return bank.getNamesByMaxCost(5);
+				int cost = bank.getByName("Border Village").getCost();
+				return bank.getNamesByMaxCost(cost - 1);
 			}
 
 			@Override

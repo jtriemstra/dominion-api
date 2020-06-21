@@ -343,7 +343,6 @@ public class Player {
 			if (c.getName().equals("Scheme")) {
 				foundScheme = true;
 				(new SchemeAction()).execute(this);
-				break;
 			}
 		}
 		
