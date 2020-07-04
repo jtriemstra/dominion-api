@@ -244,7 +244,7 @@ public class Bank {
 	public List<String> getNamesByMaxCost(int cost) {
 		List<String> cardNames = new ArrayList<String>();
 		for (BankCard bc : bank.values()) {
-			if (bc.getCard().getCost() <= cost) {
+			if (bc.getCard().getCost() <= cost && bc.getQuantity() > 0) {
 				cardNames.add(bc.getCard().getName());
 			}
 		}
@@ -254,7 +254,7 @@ public class Bank {
 	public List<String> getNamesByExactCost(int cost) {
 		List<String> cardNames = new ArrayList<String>();
 		for (BankCard bc : bank.values()) {
-			if (bc.getCard().getCost() == cost) {
+			if (bc.getCard().getCost() == cost && bc.getQuantity() > 0) {
 				cardNames.add(bc.getCard().getName());
 			}
 		}
@@ -264,7 +264,7 @@ public class Bank {
 	public List<String> getNamesByTypeAndMaxCost(Card.CardType type, int cost) {
 		List<String> cardNames = new ArrayList<String>();
 		for (BankCard bc : bank.values()) {
-			if (bc.getCard().getType() == type && bc.getCard().getCost() <= cost) {
+			if (bc.getCard().getType() == type && bc.getCard().getCost() <= cost && bc.getQuantity() > 0) {
 				cardNames.add(bc.getCard().getName());
 			}
 		}
@@ -274,7 +274,7 @@ public class Bank {
 	public List<String> getNamesByNonTypeAndMaxCost(Card.CardType type, int cost) {
 		List<String> cardNames = new ArrayList<String>();
 		for (BankCard bc : bank.values()) {
-			if (bc.getCard().getType() != type && bc.getCard().getCost() <= cost) {
+			if (bc.getCard().getType() != type && bc.getCard().getCost() <= cost && bc.getQuantity() > 0) {
 				cardNames.add(bc.getCard().getName());
 			}
 		}
