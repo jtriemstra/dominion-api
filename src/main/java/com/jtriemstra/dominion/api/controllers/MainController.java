@@ -131,7 +131,6 @@ public class MainController {
 	@RequestMapping("/bank")
 	public List<BankCard> bank() {
 		//TODO: return an array like the properties of the Player object, so UI code is consistent
-		log.info("bank called");
 		return game.getBank().getBankCards();
 	}
 	
