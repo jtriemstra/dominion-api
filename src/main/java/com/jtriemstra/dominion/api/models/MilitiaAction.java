@@ -39,7 +39,7 @@ public class MilitiaAction extends CardAction {
 
 					@Override
 					public void doOptions(Player player, List<String> options) {
-						if (player.getHand().size() - options.size() != 3) {
+						if (player.getHand().size() - options.size() > 3) {
 							throw new RuntimeException("You must discard down to three cards in your hand");
 						}
 						

@@ -49,8 +49,16 @@ public class MineAction extends CardAction {
 					throw new RuntimeException("One and only one option can be chosen");
 				}
 				
-				if (options.size() == 0 && player.getHand().size() > 0) {
-					throw new RuntimeException("One and only one option can be chosen");
+				if (options.size() == 0) {
+					int treasureCount = 0;
+					for (Card c : player.getHand()) {
+						if (c.getType() == Card.CardType.TREASURE) {
+							treasureCount++;
+						}
+					}
+					if (treasureCount != 0) {
+						throw new RuntimeException("One and only one option can be chosen");
+					}
 				}
 				
 				player.setCurrentChoice(null);
