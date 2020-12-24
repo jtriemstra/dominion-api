@@ -51,7 +51,7 @@ public class MainController {
 	@RequestMapping("/join")
 	public PlayerGameState join(String playerName, HttpServletRequest request) {
 		if (game.getPlayerCount() >= 4) {
-			throw new RuntimeException("game is full");
+			//throw new RuntimeException("game is full");
 		}
 		
 		Player newPlayer = new Player(playerName);
