@@ -88,6 +88,11 @@ public class Player {
 		hand.add(c);
 	}
 	
+	public void takeFromLiminal(Card c) {
+		liminal.remove(c);
+		hand.add(c);
+	}
+	
 	public Card draw() {
 		return privateDraw(hand);
 	}

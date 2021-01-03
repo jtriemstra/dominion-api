@@ -9,7 +9,7 @@ public class AdventurerAction extends CardAction  {
 			Card c = player.lookAt(1).get(0);
 			if (c.getType() == Card.CardType.TREASURE) {
 				treasureCardsFound++;
-				player.addToHand(c);
+				player.takeFromLiminal(c);
 			}
 			else {
 				player.discardFromLiminal(c);
