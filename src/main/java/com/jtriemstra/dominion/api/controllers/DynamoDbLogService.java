@@ -44,7 +44,8 @@ public class DynamoDbLogService implements ILogService {
 			    .withString("action", action)
 			    .withString("card", card == null ? "" : card)
 			    .withList("options", options == null ? new String[] {""} : options)
-			    .withJSON("actionResult", result);				
+			    .withJSON("actionResult", result)
+			    .withString("dummy", "dummy for sorting");				
 		
 		logTable.putItem(item);					
 	}
