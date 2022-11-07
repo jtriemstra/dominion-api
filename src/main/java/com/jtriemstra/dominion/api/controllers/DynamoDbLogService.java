@@ -42,6 +42,7 @@ public class DynamoDbLogService implements ILogService {
 			    .withString("timestamp", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss.SSS")))
 			    .withString("player", playerName)
 			    .withString("action", action)
+			    .withString("actionPath", action)
 			    .withString("card", card == null ? "" : card)
 			    .withList("options", options == null ? new String[] {""} : options)
 			    .withJSON("actionResult", result)
