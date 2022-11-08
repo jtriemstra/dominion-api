@@ -16,6 +16,6 @@ public class ExceptionLoggingAdvice {
 		
 		String card = request.getParameter("card");
 		String[] options = request.getParameterValues("options");
-		logService1.logResponse(request.getParameter("playerName"), request.getServletPath(), card, options, "{\"error\":\"" + e.getMessage() + "\"}");
+		logService1.logResponse(request.getParameter("playerName"), request.getServletPath(), card, options, "{\"error\":\"" + e.getMessage() + "\"}", true);
 	}
 }

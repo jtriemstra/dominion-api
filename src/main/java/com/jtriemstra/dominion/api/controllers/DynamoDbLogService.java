@@ -35,7 +35,7 @@ public class DynamoDbLogService implements ILogService {
 	}
 			
 	@Override
-	public void logResponse(String playerName, String action, String card, String[] options, String result) {
+	public void logResponse(String playerName, String action, String card, String[] options, String result, boolean isError) {
 		
 		Item item = new Item()
 			    .withPrimaryKey("rowid", UUID.randomUUID().toString())
@@ -44,6 +44,7 @@ public class DynamoDbLogService implements ILogService {
 			    .withString("action", action)
 			    .withString("nonRefreshAction", action.equals("/refresh") ? "no" : "yes")
 			    .withString("card", card == null ? "" : card)
+			    .withString("isError", Boolean.toString(isError))
 			    .withList("options", options == null ? new String[] {""} : options)
 			    .withJSON("actionResult", result)
 			    .withString("dummy", "dummy for sorting");				
@@ -56,7 +57,7 @@ public class DynamoDbLogService implements ILogService {
 		log.info("Trying to log");
 		ObjectMapper objectMapper = new ObjectMapper();
 		try {
-			logResponse(result.getThisPlayer().getName(), action, card, options, objectMapper.writeValueAsString(result));
+			logResponse(result.getThisPlayer().getName(), action, card, options, objectMapper.writeValueAsString(result), false);
 		}
 		catch (Exception e) {
 			log.error("Error logging response", e);
