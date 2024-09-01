@@ -61,7 +61,7 @@ public class Bank {
 			addCard("Copper", copper(), 60);
 			addCard("Estate", estate(), 24);
 			addCard("Duchy",  duchy(), 12);
-			addCard("Province", province(), 12);
+			addCard("Province", province(), 15);
 			addCard("Curse", curse(), 30);
 			
 			addCard("Village",  village(), 10);
@@ -81,7 +81,7 @@ public class Bank {
 			addCard("Copper", copper(), 60);
 			addCard("Estate", estate(), 24);
 			addCard("Duchy",  duchy(), 12);
-			addCard("Province", province(), 12);
+			addCard("Province", province(), 15);
 			addCard("Curse", curse(), 30);
 			
 			List<String> names = new ArrayList<String>(Arrays.asList("Village", "Smithy", "Chapel", "Throne Room", "Workshop", "Laboratory", "Woodcutter", "Adventurer", "Bureaucrat", 
@@ -103,7 +103,7 @@ public class Bank {
 		addCard("Copper", copper(), 60);
 		addCard("Estate", estate(), 24);
 		addCard("Duchy",  duchy(), 12);
-		addCard("Province", province(), 12);
+		addCard("Province", province(), 15);
 		addCard("Curse", curse(), 30);
 		
 		for (String s : cardNames) {
