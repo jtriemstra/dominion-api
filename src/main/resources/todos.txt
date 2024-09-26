@@ -1,0 +1,34 @@
+
+-on workshop, may or must gain card? eg, only copper?
+uncheck options by default
+-mine "may" trash card
+-militia appears to work if you only discard 1, probably 0 also
+
+-make workshop single select - can only gain 1 card - ditto for remodel phase 1, phase 2
+
+timing of attack cards
+
+- UI for weaver, moat
+
+- play actions before money
+
+- zero possible choices - remodel
+
+- add "looking" tp choices
+
+- three supply pile end game
+
+if cookie exists, and player isn't in active game, clear cookie
+
+-sentry peek didn't pull discard into deck
+
+-cleanup should do nothing if open actions
+
+-add card breakdown to end game json
+
+- remodel with supplies at zero
+
+handle choices with 0 max options
+bureaucrat, bandit or others with zero bank supplies
+
+council room.... should get queued up after the bureaucrat. can i combine the throne room repeat + attack queing + council room queueing in one idea?

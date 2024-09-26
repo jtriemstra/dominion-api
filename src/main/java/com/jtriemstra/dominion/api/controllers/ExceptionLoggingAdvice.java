@@ -11,7 +11,7 @@ public class ExceptionLoggingAdvice {
 	@Autowired
 	ILogService logService1;
 	
-	@ExceptionHandler({ RuntimeException.class})
+	//@ExceptionHandler({ RuntimeException.class})
 	private void handleError(RuntimeException e, HttpServletRequest request) {
 		
 		String card = request.getParameter("card");

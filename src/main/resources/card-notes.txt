@@ -1,0 +1,83 @@
+Basic: 
+Action
+  Choice * N
+Buy - deduct
+  Gain - add to "bought"/discard
+
+Gain function vs gain reaction? wrappers from different places (hand, play, game)?
+Cost function - default by state, Highway w/ discount - can be stacked/repeated
+Buy function
+Action function default by name
+get-attacked function?
+
+
+Basic: Village, Laboratory, Market, Woodcutter, Festival, Smithy = alter turn-state
+
+L1:
+	Library: repeating single-choice from deck 								|| 1) create choice 2) evaluate choice + hand 3) discard
+	Remodel: single-choice from hand, leading to choice-gain from bank		|| 1) create choice 2) gain
+	Cellar: basic + multi-choice from hand, draw N from deck				|| 1) create choice 2) draw
+	Council Room: basic + other player										|| 1) create notify
+	Workshop: single-choice gain from bank									|| 1) create choice 2) gain
+	Gardens: point function													||
+	Moneylender: conditional single choice from hand						|| 1) create choice 2) trash + change state
+	Feast: conditional gain from bank										|| 1) create choice 2) gain
+	Mine: single choice from hand, leading to choice-gain from bank to hand	|| 1) create choice 2) evaluate choice and create choice 3) evaluate choice
+	Chancellor: basic + binary choice										|| 1) create choice 2) evaluate choice
+	Chapel: multi-choice form hand											|| 1) create choice 2) evaluate choice
+	Harbinger: basic + choice from discard									|| 1) create choice 2) evaluate choice
+	Poacher: basic + multi-choice from hand									|| 1) create choice 2) evaluate choice
+	Vassal: basic + single-choice from deck									|| 1) create choice 2) evaluate choice
+	Artisan: gain from bank to hand, discard from hand to deck				|| 1) create choice 2) evaluate choice
+	Sentry: basic + multi-multi-choice from deck (trash/discard/deck - or deck1/deck2?) || look at 2, then 2 separate choices?
+										
+Moat: basic + reaction reveal												|| 1) create choice 2) cancel attack and create notification
+Thief: other player force reveal, choice from revealed - attack				|| 1) create reveal notifications 2x) create choices 3x) evaluate choices
+Witch: basic + other player gain - attack									|| 1) create notification
+Spy: basic + all player force reveal, choice from revealed - attack			|| 1) create reveal notifications 2x) create choices 3x) evaluate choices
+Militia: basic + other player force choice - attack							|| 1) create choices 2) evaluate ?) wait for them?
+Throne Room: single-choice from hand -> stack								|| 1) create choices ? 2) create action stack/queue non-defeault action wrapper function?
+Bureaucrat: gain to deck, other player force reveal - attack				|| 1) create notifications + choices 2) evaluate choices ?) wait for them?
+Adventurer: reveal ? from deck
+Bandit: force gain, other player force reveal, other player choice - attack
+Merchant: basic + alter Silver play
+
+
+
+
+
+Wheelwright: basic + single-choice from hand, leading to choice-gain from bank
+Witch's Hut: basic + multi-choice from hand, leading to other player gain
+Weaver: multi-choice, discard reaction-to-play
+Trail: basic + gain/trash/discard reaction
+Souk: basic-dynamic + multi-choice on gain
+Nomads: basic + gain/trash reaction
+Guard Dog: basic-dynamic + attack-binary-choice-reaction
+Cauldron: basic + dynamic gain reaction other player gain - attack
+Border Village: basic + single-choice dynamic gain from bank
+Cache: basic + gain reaction gain from bank
+Cartographer: basic + multi-choice from deck
+Crossroads: reveal + basic-dynamic
+Develop: single-choice from hand, single-choice from bank, single-choice from bank
+Duchess: basic + all-player single-choice from deck + reaction on duchy
+Embassy: basic + multi-choice from hand + gain reaction all-player
+Farmland: point function + single-choice from hand leading to dynamic single-choice from bank
+Fools Gold: basic-dynamic + other-player-reaction on province
+Haggler: basic + reaction-choice-gain from bank
+Highway: basic + change to all other buys
+Ill Gotten Gains: basic + single-choice + gain-reaction-other-player-gain (not attack)
+Inn: basic + multi-choice from hand + gain-reaction-multi-select
+Jack of All Trades: gain + single-choice from deck + draw + single-choice from hand
+Mandarin: basic + single-choice from hand + gain reaction
+Margrave: basic + other-player-draw + other-player-multi-choice from hand - attack
+Noble Brigand: basic + buy/play-reaction
+Nomad Camp: basic + gain-reaction?
+Oasis: basic + single-choice from hand
+Oracle: all-player reveal, player multi-choices + basic
+Scheme: basic + single-choice discard-reaction
+Spice Merchant: single-choice-from-hand + basic
+Stables: single-choice from hand + basic
+Silk Road: point function
+Trader: single-choice from hand with dynamic gain + gain-reaction single-choice reveal || gainReactions - hand - 
+Tunnel: points + discard-reaction-single-choice-reveal
+Berserker: gain + other-player multi-choice + gain reaction
