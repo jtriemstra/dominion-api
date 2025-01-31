@@ -14,7 +14,7 @@ public class AttacksState {
 	}
 	
 	public void enqueue(AttackState in) {
-		attacks.add(0, in);
+		attacks.add(in);
 	}
 	
 	public AttackState dequeue() {

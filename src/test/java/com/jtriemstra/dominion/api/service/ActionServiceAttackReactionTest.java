@@ -17,69 +17,69 @@ public class ActionServiceAttackReactionTest extends ActionServiceTestBase {
 
 	@Test
 	public void guardDogCanBePlayedOnMilitia() {
-		swapHandCards(ActionService.GUARD_DOG);
-		swapHandCards(playerState2, ActionService.MILITIA);
-		loadDeck(ActionService.GOLD, ActionService.GOLD, ActionService.GOLD);
+		swapHandCards(playerState2, ActionService.GUARD_DOG);
+		swapHandCards(ActionService.MILITIA);
+		loadDeck(playerState2, ActionService.GOLD, ActionService.GOLD, ActionService.GOLD);
 		stashGameState();
 		
-		actionService.turnPlay(gameState, "test2", ActionService.MILITIA);
+		actionService.turnPlay(gameState, "test", ActionService.MILITIA);
 		
-		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(2, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		Assertions.assertEquals(ActionService.ATTACK_REACTION, playerState.getTurn().getChoicesAvailable().get(0).getFollowUpAction());
-		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Guard Dog"));
-		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("No"));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(2, playerState2.getTurn().getChoicesAvailable().get(0).getOptions().size()));
+		Assertions.assertEquals(ActionService.ATTACK_REACTION, playerState2.getTurn().getChoicesAvailable().get(0).getFollowUpAction());
+		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().contains("Guard Dog"));
+		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().contains("No"));
 		
-		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Guard Dog")));
-		actionService.doChoice(gameState, "test");
+		playerState2.getTurn().setChoicesMade(new ArrayList<>(List.of("Guard Dog")));
+		actionService.doChoice(gameState, "test2");
 		
-		doAssertion(Checked.HAND, () -> Assertions.assertEquals(6, playerState.getHand().size()));
-		doAssertion(Checked.HAND, () -> Assertions.assertEquals(2, playerState.getHand().getCards().stream().filter(c -> c.equals("Gold")).count()));
+		doAssertion(Checked.HAND, () -> Assertions.assertEquals(6, playerState2.getHand().size()));
+		doAssertion(Checked.HAND, () -> Assertions.assertEquals(2, playerState2.getHand().getCards().stream().filter(c -> c.equals("Gold")).count()));
 	}
 
 	@Test
 	public void guardDogCanBeSkippedOnMilitia() {
-		swapHandCards(ActionService.GUARD_DOG);
-		swapHandCards(playerState2, ActionService.MILITIA);
-		loadDeck(ActionService.GOLD, ActionService.GOLD, ActionService.GOLD);
+		swapHandCards(playerState2, ActionService.GUARD_DOG);
+		swapHandCards(ActionService.MILITIA);
+		loadDeck(playerState2, ActionService.GOLD, ActionService.GOLD, ActionService.GOLD);
 		stashGameState();
 		
-		actionService.turnPlay(gameState, "test2", ActionService.MILITIA);
+		actionService.turnPlay(gameState, "test", ActionService.MILITIA);
 		
-		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("No")));
-		actionService.doChoice(gameState, "test");
+		playerState2.getTurn().setChoicesMade(new ArrayList<>(List.of("No")));
+		actionService.doChoice(gameState, "test2");
 		
-		doAssertion(Checked.HAND, () -> Assertions.assertEquals(5, playerState.getHand().size()));
-		doAssertion(Checked.HAND, () -> Assertions.assertEquals(1, playerState.getHand().getCards().stream().filter(c -> c.equals("Guard Dog")).count()));
+		doAssertion(Checked.HAND, () -> Assertions.assertEquals(5, playerState2.getHand().size()));
+		doAssertion(Checked.HAND, () -> Assertions.assertEquals(1, playerState2.getHand().getCards().stream().filter(c -> c.equals("Guard Dog")).count()));
 
-		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(5, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		Assertions.assertEquals(ActionService.MILITIA1, playerState.getTurn().getChoicesAvailable().get(0).getFollowUpAction());
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(5, playerState2.getTurn().getChoicesAvailable().get(0).getOptions().size()));
+		Assertions.assertEquals(ActionService.MILITIA1, playerState2.getTurn().getChoicesAvailable().get(0).getFollowUpAction());
 	}
 	
 	@Test
 	public void guardDogCausesMilitiaToTakeEffectOnSmallHand() {
-		swapHandCards(ActionService.GUARD_DOG);
-		playerState.getHand().getCards().remove(ActionService.COPPER);
-		playerState.getHand().getCards().remove(ActionService.COPPER);
-		swapHandCards(playerState2, ActionService.MILITIA);
-		loadDeck(ActionService.GOLD, ActionService.GOLD, ActionService.SILVER, ActionService.SILVER);
+		swapHandCards(playerState2, ActionService.GUARD_DOG);
+		playerState2.getHand().getCards().remove(ActionService.COPPER);
+		playerState2.getHand().getCards().remove(ActionService.COPPER);
+		swapHandCards(ActionService.MILITIA);
+		loadDeck(playerState2, ActionService.GOLD, ActionService.GOLD, ActionService.SILVER, ActionService.SILVER);
 		stashGameState();
 		
-		actionService.turnPlay(gameState, "test2", ActionService.MILITIA);
+		actionService.turnPlay(gameState, "test", ActionService.MILITIA);
 		
-		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(2, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		Assertions.assertEquals(ActionService.ATTACK_REACTION, playerState.getTurn().getChoicesAvailable().get(0).getFollowUpAction());
-		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Guard Dog"));
-		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("No"));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(2, playerState2.getTurn().getChoicesAvailable().get(0).getOptions().size()));
+		Assertions.assertEquals(ActionService.ATTACK_REACTION, playerState2.getTurn().getChoicesAvailable().get(0).getFollowUpAction());
+		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().contains("Guard Dog"));
+		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().contains("No"));
 		
-		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Guard Dog")));
-		actionService.doChoice(gameState, "test");
+		playerState2.getTurn().setChoicesMade(new ArrayList<>(List.of("Guard Dog")));
+		actionService.doChoice(gameState, "test2");
 		
-		doAssertion(Checked.HAND, () -> Assertions.assertEquals(6, playerState.getHand().size()));
-		doAssertion(Checked.HAND, () -> assertCardsInHand(Map.of(ActionService.COPPER, 2, ActionService.SILVER, 2, ActionService.GOLD, 2)));
+		doAssertion(Checked.HAND, () -> Assertions.assertEquals(6, playerState2.getHand().size()));
+		doAssertion(Checked.HAND, () -> assertCardsInHand(playerState2, Map.of(ActionService.COPPER, 2, ActionService.SILVER, 2, ActionService.GOLD, 2)));
 		
-		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(6, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(3, playerState.getTurn().getChoicesAvailable().get(0).getMinChoices()));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(3, playerState.getTurn().getChoicesAvailable().get(0).getMaxChoices()));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(6, playerState2.getTurn().getChoicesAvailable().get(0).getOptions().size()));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(3, playerState2.getTurn().getChoicesAvailable().get(0).getMinChoices()));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(3, playerState2.getTurn().getChoicesAvailable().get(0).getMaxChoices()));
 	}
 	
 	@Test
@@ -311,51 +311,51 @@ public class ActionServiceAttackReactionTest extends ActionServiceTestBase {
 
 	@Test
 	public void guardDogCanBePlayedOnBureaucrat() {
-		swapHandCards(ActionService.GUARD_DOG);
-		swapHandCards(playerState2, ActionService.BUREAUCRAT);
-		loadDeck(ActionService.GOLD, ActionService.ESTATE);
+		swapHandCards(playerState2, ActionService.GUARD_DOG);
+		swapHandCards(ActionService.BUREAUCRAT);
+		loadDeck(playerState2, ActionService.GOLD, ActionService.ESTATE);
 		stashGameState();
 		
-		actionService.turnPlay(gameState, "test2", ActionService.BUREAUCRAT);
+		actionService.turnPlay(gameState, "test", ActionService.BUREAUCRAT);
 		
-		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(2, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		Assertions.assertEquals(ActionService.ATTACK_REACTION, playerState.getTurn().getChoicesAvailable().get(0).getFollowUpAction());
-		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Guard Dog"));
-		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("No"));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(2, playerState2.getTurn().getChoicesAvailable().get(0).getOptions().size()));
+		Assertions.assertEquals(ActionService.ATTACK_REACTION, playerState2.getTurn().getChoicesAvailable().get(0).getFollowUpAction());
+		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().contains("Guard Dog"));
+		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().contains("No"));
 		
-		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Guard Dog")));
-		actionService.doChoice(gameState, "test");
+		playerState2.getTurn().setChoicesMade(new ArrayList<>(List.of("Guard Dog")));
+		actionService.doChoice(gameState, "test2");
 		
-		doAssertion(Checked.HAND, () -> Assertions.assertEquals(6, playerState.getHand().size()));
-		doAssertion(Checked.HAND, () -> assertCardsInHand(Map.of(ActionService.COPPER, 4, ActionService.ESTATE, 1, ActionService.GOLD, 1)));
+		doAssertion(Checked.HAND, () -> Assertions.assertEquals(6, playerState2.getHand().size()));
+		doAssertion(Checked.HAND, () -> assertCardsInHand(playerState2, Map.of(ActionService.COPPER, 4, ActionService.ESTATE, 1, ActionService.GOLD, 1)));
 
-		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(1, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(1, playerState2.getTurn().getChoicesAvailable().get(0).getOptions().size()));
 
-		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Estate")));
-		actionService.doChoice(gameState, "test");
+		playerState2.getTurn().setChoicesMade(new ArrayList<>(List.of("Estate")));
+		actionService.doChoice(gameState, "test2");
 		
-		doAssertion(Checked.HAND, () -> Assertions.assertEquals(5, playerState.getHand().size()));
-		doAssertion(Checked.HAND, () -> assertCardsInHand(Map.of(ActionService.COPPER, 4, ActionService.GOLD, 1)));
-		doAssertion(Checked.HAND, () -> Assertions.assertEquals(1, playerState.getDeck().getCards().size()));
+		doAssertion(Checked.HAND, () -> Assertions.assertEquals(5, playerState2.getHand().size()));
+		doAssertion(Checked.HAND, () -> assertCardsInHand(playerState2, Map.of(ActionService.COPPER, 4, ActionService.GOLD, 1)));
+		doAssertion(Checked.HAND, () -> Assertions.assertEquals(1, playerState2.getDeck().getCards().size()));
 	}
 
 	@Test
 	public void guardDogCanBeSkippedOnBureaucrat() {
-		swapHandCards(ActionService.GUARD_DOG, ActionService.ESTATE);
-		swapHandCards(playerState2, ActionService.BUREAUCRAT);
-		loadDeck(ActionService.GOLD, ActionService.GOLD);
+		swapHandCards(playerState2, ActionService.GUARD_DOG, ActionService.ESTATE);
+		swapHandCards(ActionService.BUREAUCRAT);
+		loadDeck(playerState2, ActionService.GOLD, ActionService.GOLD);
 		stashGameState();
 		
-		actionService.turnPlay(gameState, "test2", ActionService.BUREAUCRAT);
+		actionService.turnPlay(gameState, "test", ActionService.BUREAUCRAT);
 		
-		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("No")));
-		actionService.doChoice(gameState, "test");
+		playerState2.getTurn().setChoicesMade(new ArrayList<>(List.of("No")));
+		actionService.doChoice(gameState, "test2");
 		
-		doAssertion(Checked.HAND, () -> Assertions.assertEquals(5, playerState.getHand().size()));
-		doAssertion(Checked.HAND, () -> Assertions.assertEquals(1, playerState.getHand().getCards().stream().filter(c -> c.equals("Guard Dog")).count()));
+		doAssertion(Checked.HAND, () -> Assertions.assertEquals(5, playerState2.getHand().size()));
+		doAssertion(Checked.HAND, () -> Assertions.assertEquals(1, playerState2.getHand().getCards().stream().filter(c -> c.equals("Guard Dog")).count()));
 
-		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(1, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		Assertions.assertEquals(ActionService.BUREAUCRAT1, playerState.getTurn().getChoicesAvailable().get(0).getFollowUpAction());
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(1, playerState2.getTurn().getChoicesAvailable().get(0).getOptions().size()));
+		Assertions.assertEquals(ActionService.BUREAUCRAT1, playerState2.getTurn().getChoicesAvailable().get(0).getFollowUpAction());
 	}
 
 	@Test
@@ -408,68 +408,68 @@ public class ActionServiceAttackReactionTest extends ActionServiceTestBase {
 	
 	@Test
 	public void guardDogCanBePlayedOnMargrave() {
-		swapHandCards(ActionService.GUARD_DOG);
-		swapHandCards(playerState2, ActionService.MARGRAVE);
-		loadDeck(ActionService.GOLD, ActionService.GOLD, ActionService.GOLD);
+		swapHandCards(playerState2, ActionService.GUARD_DOG);
+		swapHandCards(ActionService.MARGRAVE);
 		loadDeck(playerState2, ActionService.GOLD, ActionService.GOLD, ActionService.GOLD);
+		loadDeck(ActionService.GOLD, ActionService.GOLD, ActionService.GOLD);
 		loadDeck(playerState3, ActionService.GOLD);
 		stashGameState();
 		
-		actionService.turnPlay(gameState, "test2", ActionService.MARGRAVE);
+		actionService.turnPlay(gameState, "test", ActionService.MARGRAVE);
 		
-		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(2, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		Assertions.assertEquals(ActionService.ATTACK_REACTION, playerState.getTurn().getChoicesAvailable().get(0).getFollowUpAction());
-		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Guard Dog"));
-		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("No"));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(2, playerState2.getTurn().getChoicesAvailable().get(0).getOptions().size()));
+		Assertions.assertEquals(ActionService.ATTACK_REACTION, playerState2.getTurn().getChoicesAvailable().get(0).getFollowUpAction());
+		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().contains("Guard Dog"));
+		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().contains("No"));
 		
-		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Guard Dog")));
-		actionService.doChoice(gameState, "test");
+		playerState2.getTurn().setChoicesMade(new ArrayList<>(List.of("Guard Dog")));
+		actionService.doChoice(gameState, "test2");
 		
-		doAssertion(Checked.HAND, () -> Assertions.assertEquals(7, playerState.getHand().size()));
-		doAssertion(Checked.HAND, () -> Assertions.assertEquals(3, playerState.getHand().getCards().stream().filter(c -> c.equals("Gold")).count()));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(7, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(4, playerState.getTurn().getChoicesAvailable().get(0).getMinChoices()));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(4, playerState.getTurn().getChoicesAvailable().get(0).getMaxChoices()));
+		doAssertion(Checked.HAND, () -> Assertions.assertEquals(7, playerState2.getHand().size()));
+		doAssertion(Checked.HAND, () -> Assertions.assertEquals(3, playerState2.getHand().getCards().stream().filter(c -> c.equals("Gold")).count()));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(7, playerState2.getTurn().getChoicesAvailable().get(0).getOptions().size()));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(4, playerState2.getTurn().getChoicesAvailable().get(0).getMinChoices()));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(4, playerState2.getTurn().getChoicesAvailable().get(0).getMaxChoices()));
 	}
 
 	@Test
 	public void guardDogCanBeSkippedOnMargrave() {
-		swapHandCards(ActionService.GUARD_DOG);
-		swapHandCards(playerState2, ActionService.MARGRAVE);
-		loadDeck(ActionService.GOLD);
-		loadDeck(playerState2, ActionService.GOLD, ActionService.GOLD, ActionService.GOLD);
+		swapHandCards(playerState2, ActionService.GUARD_DOG);
+		swapHandCards(ActionService.MARGRAVE);
+		loadDeck(playerState2, ActionService.GOLD);
+		loadDeck(ActionService.GOLD, ActionService.GOLD, ActionService.GOLD);
 		loadDeck(playerState3, ActionService.GOLD);
 		stashGameState();
 		
-		actionService.turnPlay(gameState, "test2", ActionService.MARGRAVE);
+		actionService.turnPlay(gameState, "test", ActionService.MARGRAVE);
 		
-		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("No")));
-		actionService.doChoice(gameState, "test");
+		playerState2.getTurn().setChoicesMade(new ArrayList<>(List.of("No")));
+		actionService.doChoice(gameState, "test2");
 		
-		doAssertion(Checked.HAND, () -> Assertions.assertEquals(6, playerState.getHand().size()));
-		doAssertion(Checked.HAND, () -> Assertions.assertEquals(1, playerState.getHand().getCards().stream().filter(c -> c.equals("Guard Dog")).count()));
+		doAssertion(Checked.HAND, () -> Assertions.assertEquals(6, playerState2.getHand().size()));
+		doAssertion(Checked.HAND, () -> Assertions.assertEquals(1, playerState2.getHand().getCards().stream().filter(c -> c.equals("Guard Dog")).count()));
 
-		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(6, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		Assertions.assertEquals(ActionService.MARGRAVE2, playerState.getTurn().getChoicesAvailable().get(0).getFollowUpAction());
-		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(3, playerState.getTurn().getChoicesAvailable().get(0).getMinChoices()));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(3, playerState.getTurn().getChoicesAvailable().get(0).getMaxChoices()));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(6, playerState2.getTurn().getChoicesAvailable().get(0).getOptions().size()));
+		Assertions.assertEquals(ActionService.MARGRAVE2, playerState2.getTurn().getChoicesAvailable().get(0).getFollowUpAction());
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(3, playerState2.getTurn().getChoicesAvailable().get(0).getMinChoices()));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(3, playerState2.getTurn().getChoicesAvailable().get(0).getMaxChoices()));
 	}
 	
 
 	@Test
 	public void militiaTriggersMoatOnSmallHand() {
-		swapHandCards(ActionService.MOAT);
-		playerState.getHand().getCards().remove(ActionService.COPPER);
-		playerState.getHand().getCards().remove(ActionService.COPPER);
-		swapHandCards(playerState2, ActionService.MILITIA);
+		swapHandCards(playerState2, ActionService.MOAT);
+		playerState2.getHand().getCards().remove(ActionService.COPPER);
+		playerState2.getHand().getCards().remove(ActionService.COPPER);
+		swapHandCards(ActionService.MILITIA);
 		stashGameState();
 		
-		actionService.turnPlay(gameState, "test2", ActionService.MILITIA);
+		actionService.turnPlay(gameState, "test", ActionService.MILITIA);
 		
-		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(2, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		Assertions.assertEquals(ActionService.ATTACK_REACTION, playerState.getTurn().getChoicesAvailable().get(0).getFollowUpAction());
-		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Moat"));
-		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("No"));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(2, playerState2.getTurn().getChoicesAvailable().get(0).getOptions().size()));
+		Assertions.assertEquals(ActionService.ATTACK_REACTION, playerState2.getTurn().getChoicesAvailable().get(0).getFollowUpAction());
+		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().contains("Moat"));
+		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().contains("No"));
 		
 	}
 }

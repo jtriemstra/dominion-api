@@ -79,6 +79,7 @@ public class V3Controller {
 	public V3GameState join(String playerName, HttpServletRequest request) {
 		if (game.getPlayers().size() >= 4) {
 			//throw new RuntimeException("game is full");
+			game.getBank().getSupplies().get(ActionService.PROVINCE).setCount(15);
 		}
 		
 		gameService.addPlayer(game, playerName);
@@ -200,9 +201,10 @@ public class V3Controller {
 	}
 	
 	@RequestMapping("/v3/activeGame")
-	public HashMap<String, Boolean> activeGame() {
-		HashMap<String, Boolean> result = new HashMap<>();
-		result.put("activeGame", (game != null && game.getPlayers().size() > 0));
+	public HashMap<String, String> activeGame() {
+		HashMap<String, String> result = new HashMap<>();
+		result.put("activeGame", (game != null ? game.getId().toString() : ""));
+		result.put("players", (game != null ? Integer.toString(game.getPlayers().size()) : ""));
 		return result;
 	}
 	

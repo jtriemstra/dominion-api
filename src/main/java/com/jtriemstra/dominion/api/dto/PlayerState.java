@@ -2,7 +2,9 @@ package com.jtriemstra.dominion.api.dto;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -26,6 +28,7 @@ public class PlayerState {
 	private RevealingState revealing;
 	private AttacksState attacks;
 	private int points;
+	private Set<String> buyableBankCards;
 	
 	public PlayerState(String name) {
 		this.name = name;
@@ -38,6 +41,7 @@ public class PlayerState {
 		this.aside = new AsideState();
 		this.revealing = new RevealingState();
 		this.attacks = new AttacksState();
+		this.buyableBankCards = new HashSet<>();
 	}
 	
 	@JsonGetter(value = "numberOfActions")
@@ -109,7 +113,10 @@ public class PlayerState {
 	}
 	@JsonGetter(value = "phase")
 	public String getPhase() {
-		if (!getTurn().isSkipActions() && getTurn().getActionsAvailable() > 0 && hand.getCards().stream().filter(s -> CardData.cardInfo.get(s).isAction()).count() > 0) {
+		if (!getTurn().isSkipActions() 
+				&& getTurn().getActionsAvailable() > 0 
+				&& hand.getCards().stream().filter(s -> CardData.cardInfo.get(s).isAction()).count() > 0
+				&& played.getCards().stream().filter(s -> CardData.cardInfo.get(s).isTreasure()).count() == 0){
 			return "action";
 		} else if (getTurn().getBuys() > 0) {
 			return "buy";

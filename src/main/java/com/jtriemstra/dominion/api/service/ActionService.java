@@ -1,6 +1,9 @@
 package com.jtriemstra.dominion.api.service;
 
+
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -11,6 +14,7 @@ import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.jtriemstra.dominion.api.dto.AttackState;
@@ -25,30 +29,43 @@ import com.jtriemstra.dominion.api.dto.PlayerState;
 import com.jtriemstra.dominion.api.dto.TurnState;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import lombok.AllArgsConstructor;
 
+
+@Slf4j
 @Service
 public class ActionService {
 	private Map<String, Executable> actions = new HashMap<>();
 	private PlayerService playerService;
-	private Map<String, Executable> discardEvents = new HashMap<>();
+	private NotificationService notificationService;
+	private Map<String, DiscardEvent> discardEvents = new HashMap<>();
 	private Map<String, Executable> reactions = new HashMap<>();
 	private Map<String, Executable> gainEvents = new HashMap<>();
 	private Map<String, CostFunction> costFunctions = new HashMap<>();
 	private Map<String, Executable> trashEvents = new HashMap<>();
 	private Map<String, Executable> buyEvents = new HashMap<>();
 	private Map<String, CardDestinationFunction> gainDestinationFunctions = new HashMap<>();
+	private Map<CardSources, CardSourceFunction> cardSourceFunctions = new HashMap<>();
 	private Map<String, GainReaction> gainReactions = new HashMap<>();
+	
+	public enum CardSources {
+		HAND,
+		ASIDE
+	}
 
 		
-	public ActionService(PlayerService playerService) {
+	public ActionService(PlayerService playerService, NotificationService notificationService) {
 		this.playerService = playerService;
+		this.notificationService = notificationService;
 	}
 	
 	public void init() {
 		gainDestinationFunctions.put("HAND", (g, p) -> getPlayer(g, p).getHand());
 		gainDestinationFunctions.put("DECK", (g, p) -> getPlayer(g, p).getDeck());
 		
-		
+		cardSourceFunctions.put(CardSources.HAND, (g, p) -> getPlayer(g, p).getHand());
+		cardSourceFunctions.put(CardSources.ASIDE, (g, p) -> getPlayer(g, p).getAside());		
 		
 		actions.put(GOLD, (game, name) -> {addTreasure(getPlayer(game, name).getTurn(), 3);});
 		actions.put(SILVER, (game, name) -> {addTreasure(getPlayer(game, name).getTurn(), 2);});
@@ -88,7 +105,6 @@ public class ActionService {
 			otherNames.stream().forEach(other -> {
 				startAttack(game, other, MILITIA2, name);
 			});
-			// TODO: wait for completion?
 		});
 		actions.put(MILITIA1, (game, name) -> {
 			PlayerState player = getPlayer(game, name);
@@ -100,31 +116,37 @@ public class ActionService {
 					}
 				});
 			}
-			finishAttackWithChoices(game, name);
+			finishAttack(game, name);
 		});
 		actions.put(MILITIA2, (game, targetName) -> {
 			int handSize = getPlayer(game, targetName).getHand().size();
 
 			int discardSize = handSize - 3;
-			createChoice(game, getPlayer(game, targetName), (g, p) -> chooseFromHand(p), discardSize, MILITIA1, "Choose " + discardSize + " cards to discard");			
+			if (discardSize > 0) {
+				createChoice(game, getPlayer(game, targetName), (g, p) -> chooseFromHand(p), discardSize, MILITIA1, "Choose " + discardSize + " cards to discard");
+			} else {
+				// TODO: maybe need to switch this to the version with choices, but I think I solved that with queuing attacks
+				finishAttack(game, targetName);
+			}
 		});
 		
 		actions.put(BUREAUCRAT, (game, name) -> {
 			// TODO: probably should be wrapped in a "Gain" to trigger Trader, even though it doesn't matter
-			// TODO: handle empty silver supply
-			moveCard(game.getBank().getSupplies().get("Silver"), getPlayer(game, name).getDeck());
+
+			if (game.getBank().getSupplies().get("Silver").getCount() > 0) {
+				moveCard(game.getBank().getSupplies().get("Silver"), getPlayer(game, name).getDeck());
+			}
 			List<String> otherNames = getOtherPlayers(game, name);
 
 			otherNames.stream().forEach(other -> {
 				startAttack(game, other, BUREAUCRAT2, name);
 			});
-			// TODO: wait for completion?
 		});
 		actions.put(BUREAUCRAT1, (game, name) -> {
 			PlayerState player = getPlayer(game, name);
 			String cardName = player.getTurn().getChoicesMade().get(0);
 			moveCard(player.getHand(), player.getDeck(), cardName);
-			finishAttackWithChoices(game, name);
+			finishAttack(game, name);
 		});
 		actions.put(BUREAUCRAT2, (game, targetName) -> {
 			PlayerState otherPlayer = getPlayer(game, targetName);
@@ -134,7 +156,7 @@ public class ActionService {
 				};
 				createChoice(game, otherPlayer, victoryCardFromHand, 1, BUREAUCRAT1, "Choose a victory card to put on your deck");
 			} else {
-				// TODO: reveal, maybe need to switch this to the version with choices
+				// TODO: reveal, maybe need to switch this to the version with choices, but I think I solved that with queuing attacks
 				finishAttack(game, targetName);
 			}
 		});
@@ -146,7 +168,7 @@ public class ActionService {
 			if (CardData.cardInfo.get(player.getLooking().getCards().get(0)).isAction()) {
 				createChoice(game, player, (g,p) -> {return List.of("DISCARD","PLAY");}, 1, VASSAL1, "Do you want to play or discard the top card from your deck?");
 			} else {
-				createChoice(game, player, (g,p) -> {return List.of("DISCARD");}, 1, VASSAL1, "Discard the top card from your deck");
+				createChoice(game, player, (g,p) -> {return List.of("DISCARD");}, 1, VASSAL1, "The top card of your deck is not an action; discard it");
 			}
 			
 		});
@@ -156,9 +178,9 @@ public class ActionService {
 			if (choice.equals("PLAY")) {
 				String cardName = player.getLooking().getCards().get(0);
 				moveCard(player.getLooking(), player.getHand());
-				defaultPlay(game, name, cardName);
+				defaultPlay(game, name, cardName, CardSources.HAND);
 			} else if (choice.equals("DISCARD")) {				
-				discard(game, name, player.getLooking(), choice);
+				discard(game, name, player.getLooking(), player.getLooking().getCards().get(0));
 			}
 		});
 		
@@ -181,11 +203,13 @@ public class ActionService {
 				doGain(game, name, choice);
 			}
 		});
-		discardEvents.put(WEAVER, (game, name) -> {
+		discardEvents.put(WEAVER, (game, name, source) -> {
 			PlayerState player = getPlayer(game, name);
 			if (!player.getTurn().isCleanup()) {
+				// TODO: how can this use the source?
 				createChoice(game, player, (g,p) -> {return List.of("DISCARD","PLAY");}, 1, WEAVER1, "Do you want to play the weaver instead of discarding?");
 			} else {
+				// TODO: this could be in a played state, not hand
 				defaultDiscard(game, name, player.getHand(), ActionService.WEAVER);
 			}
 		});
@@ -193,7 +217,7 @@ public class ActionService {
 			PlayerState player = getPlayer(game, name);
 			String choice = player.getTurn().getChoicesMade().get(0);
 			if (choice.equals("PLAY")) {
-				defaultPlay(game, name, ActionService.WEAVER);
+				defaultPlay(game, name, ActionService.WEAVER, CardSources.HAND);
 				moveCard(player.getPlayed(), player.getDiscard(), ActionService.WEAVER);
 			} else if (choice.equals("DISCARD")) {				
 				defaultDiscard(game, name, player.getHand(), ActionService.WEAVER);
@@ -279,9 +303,9 @@ public class ActionService {
 			}
 		});
 		reactions.put(GUARD_DOG, (game, name) -> {			
-			defaultPlay(game, name, GUARD_DOG);
+			defaultPlay(game, name, GUARD_DOG, CardSources.HAND);
 			PlayerState player = getPlayer(game, name);
-			processAttack(game, name, player.getAttacks().peek().getAttack(), player.getAttacks().peek().getAttacker());
+			processAttack(game, name, player.getAttacks().peek().getAttack(), player.getAttacks().peek().getAttacker(), false);
 		});
 		
 		actions.put(OASIS, (game, name) -> {
@@ -351,7 +375,7 @@ public class ActionService {
 			PlayerState player = getPlayer(game, name);
 			String action = player.getTurn().getChoicesMade().get(0);
 			player.getTurn().pushRepeatedAction(action);
-			defaultPlay(game, name, action);
+			defaultPlay(game, name, action, CardSources.HAND);
 		});
 		
 		actions.put(HIGHWAY, (game, name) -> {
@@ -361,46 +385,57 @@ public class ActionService {
 		});
 		costFunctions.put(HIGHWAY, c -> c > 0 ? c-1 : c);
 		
-		// TODO: technically, something should block you from using the card/action if you're in the buy phase
+		// TODO: technically, something should block you from using the card/action if you're in the buy phase. maybe UI is enough
 		actions.put(TRAIL, (game, name) -> {
 			defaultDraw(game, name); 
 			playerService.defaultActionChange(getPlayer(game, name).getTurn(), 1);
 		});
-		discardEvents.put(TRAIL, (game, name) -> {
+		discardEvents.put(TRAIL, (game, name, source) -> {
 			PlayerState player = getPlayer(game, name);
 			if (!player.getTurn().isCleanup()) {
-				createChoice(game, player, (g,p) -> {return List.of("DISCARD","PLAY");}, 1, TRAIL1, "Do you want to discard the trail, or play?");
+				ChoiceState discardChoice = createChoice(game, player, (g,p) -> {return List.of("DISCARD","PLAY");}, 1, TRAIL1, "Do you want to discard the trail normally, or playit ?");
+				discardChoice.getAdditionalData().put("discardSource", source);
 			}
 		});
 		actions.put(TRAIL1, (game, name) -> {
 			PlayerState player = getPlayer(game, name);
 			String choice = player.getTurn().getChoicesMade().get(0);
+			
 			if (choice.equals("PLAY")) {
-				defaultPlay(game, name, ActionService.TRAIL);
+				CardSources discardSourceName = (CardSources) player.getTurn().getChoicesAvailable().get(0).getAdditionalData().get("discardSource");
+				
+				defaultPlay(game, name, ActionService.TRAIL, discardSourceName);
 				defaultDiscard(game, name, player.getPlayed(), ActionService.TRAIL);
-			} else if (choice.equals("DISCARD")) {				
-				defaultDiscard(game, name, player.getHand(), ActionService.TRAIL);
+			} else if (choice.equals("DISCARD")) {
+				CardSources discardSourceName = (CardSources) player.getTurn().getChoicesAvailable().get(0).getAdditionalData().get("discardSource");
+				CardSource discardSource = cardSourceFunctions.get(discardSourceName).get(game, name);
+				
+				defaultDiscard(game, name, discardSource, ActionService.TRAIL);
 			} else if (choice.equals("TRASH")) {				
 				defaultTrash(game, name, ActionService.TRAIL, player.getHand());
 			} else if (choice.equals("GAIN")) {				
 				defaultGain(game, name, ActionService.TRAIL);
 			} else if (choice.equals("PLAY1")) {
+				// TODO: might need to not move this to hand at some point
 				// TODO: this is going to need to call doGain or defaultGain?
 				moveCard(game.getBank().getSupplies().get(ActionService.TRAIL), getPlayer(game, name).getHand());
-				defaultPlay(game, name, ActionService.TRAIL);
+				defaultPlay(game, name, ActionService.TRAIL, CardSources.HAND);
+			} else if (choice.equals("PLAY2")) {
+				defaultPlay(game, name, ActionService.TRAIL, CardSources.HAND);
+				defaultDiscard(game, name, player.getPlayed(), ActionService.TRAIL);
 			}
 		});
 		gainEvents.put(TRAIL, (game, name) -> {
 			PlayerState player = getPlayer(game, name);
-			createChoice(game, player, (g,p) -> {return List.of("GAIN","PLAY1");}, 1, TRAIL1, "Do you want to play the trail immediately?");			
+			createChoice(game, player, (g,p) -> {return List.of("GAIN","PLAY1");}, 1, TRAIL1, "Do you want to gain the trail normally, or play it immediately?");			
 		});
 		// TODO:not sure how this will interact with actions that are "trash to do X" like Spice Merchant (tested remodel ok)
 		trashEvents.put(TRAIL, (game, name) -> {
 			PlayerState player = getPlayer(game, name);
-			createChoice(game, player, (g,p) -> {return List.of("TRASH","PLAY");}, 1, TRAIL1, "Do you want to trash the trail, or play?");
+			createChoice(game, player, (g,p) -> {return List.of("TRASH","PLAY2");}, 1, TRAIL1, "Do you want to trash the trail normally, or play it?");
 		});
 		
-		discardEvents.put(TUNNEL, (game, name) -> {
+		discardEvents.put(TUNNEL, (game, name, source) -> {
 			PlayerState player = getPlayer(game, name);
 			if (!player.getTurn().isCleanup()) {
 				// TODO: reveal
@@ -467,8 +502,9 @@ public class ActionService {
 		actions.put(STABLES, (game, name) -> {
 			PlayerState player = getPlayer(game, name);
 			ChoiceOptionCreator treasureInHand = (g, p) -> {
-				// TODO: add "no" option
-				return p.getHand().getCards().stream().filter(c -> CardData.cardInfo.get(c).isTreasure()).collect(Collectors.toList());
+				List<String> choices = p.getHand().getCards().stream().filter(c -> CardData.cardInfo.get(c).isTreasure()).collect(Collectors.toList());
+				choices.add("No");
+				return choices;
 			};
 			createChoice(game, player, treasureInHand, 1, STABLES1, "Do you want to discard a treasure?");
 		});
@@ -476,7 +512,7 @@ public class ActionService {
 			PlayerState player = getPlayer(game, name);
 			if (player.getTurn().getChoicesMade().size() > 0) {
 				String choice = player.getTurn().getChoicesMade().get(0);
-				if (!"".equals(choice)) {
+				if (!"".equals(choice) && !"No".equals(choice)) {
 					discard(game, name, player.getHand(), choice);
 					defaultDraw(game, name);
 					defaultDraw(game, name);
@@ -490,14 +526,19 @@ public class ActionService {
 			PlayerState player = getPlayer(game, name);
 			defaultDraw(game, name); 
 			playerService.defaultActionChange(getPlayer(game, name).getTurn(), 1);
-			// TODO: add "no" option
-			createChoice(game, player, (g, p) -> chooseFromHand(p), 1, WHEELWRIGHT1, "Do you want to discard?");
+			ChoiceOptionCreator optionalHandCard = (g, p) -> {
+				List<String> choices = p.getHand().getCards().stream().collect(Collectors.toList());
+				choices.add("No");
+				return choices;
+			};
+			createChoice(game, player, optionalHandCard, 1, WHEELWRIGHT1, "Do you want to discard?");
 		});
 		actions.put(WHEELWRIGHT1, (game, name) -> {
 			PlayerState player = getPlayer(game, name);
 			if (player.getTurn().getChoicesMade().size() > 0) {
 				String choice = player.getTurn().getChoicesMade().get(0);
-				if (!"".equals(choice)) {
+				// TODO: if there are 0 cards matching the cost, does the UI correctly send the empty string option, or do i need something else here? could just bypass this
+				if (!"".equals(choice) && !"No".equals(choice)) {
 					int cost = getCost(game, name, choice);
 					discard(game, name, player.getHand(), choice);
 					ChoiceOptionCreator cheaperFromBank = (g, p) -> {
@@ -540,9 +581,11 @@ public class ActionService {
 		});
 		gainEvents.put(NOMADS, (game, name) -> {
 			addTreasure(getPlayer(game, name).getTurn(), 2);
+			defaultGain(game, name, NOMADS);
 		});
 		trashEvents.put(NOMADS, (game, name) -> {
 			addTreasure(getPlayer(game, name).getTurn(), 2);
+			defaultTrash(game, name, ActionService.NOMADS, getPlayer(game, name).getHand());
 		});
 		
 		actions.put(CACHE, (game, name) -> {addTreasure(getPlayer(game, name).getTurn(), 3);});
@@ -645,7 +688,8 @@ public class ActionService {
 		actions.put(MERCHANT1, (game, name) -> {
 			addTreasure(getPlayer(game, name).getTurn(), 1);
 			PlayerState player = getPlayer(game, name);
-			player.getTurn().getPlayActions().get(SILVER).remove(MERCHANT1);
+			boolean success = player.getTurn().getPlayActions().get(SILVER).remove(MERCHANT1);
+			log.info("remove? " + success);
 		});
 		
 		actions.put(HARBINGER, (game, name) -> {
@@ -776,6 +820,7 @@ public class ActionService {
 			PlayerState player = getPlayer(game, name);
 			if (player.getTurn().getChoicesMade().size() > 0) {
 				int discardCount = player.getTurn().getChoicesMade().size();
+				// TODO: does this order matter for Cellar-Trail or other discard events? Maybe Cellar-Weaver the knowledge of what you drew would inform the choice on Weaver?
 				for (String discard : player.getTurn().getChoicesMade()) {
 					discard(game, name, player.getHand(), discard);
 				}
@@ -855,9 +900,12 @@ public class ActionService {
 			
 			List<String> otherNames = getOtherPlayers(game, name);
 			otherNames.stream().forEach(other -> {
-				//TODO: this actually should wait for outstanding militia/bureaucrat attacks
-				defaultDraw(game, other);
+				startAttack(game, other, COUNCIL_ROOM1, name);
 			});
+		});
+		actions.put(COUNCIL_ROOM1, (game, targetName) -> {
+			defaultDraw(game, targetName);
+			finishAttack(game, targetName);
 		});
 		
 		actions.put(LIBRARY, (game, name) -> {
@@ -868,7 +916,7 @@ public class ActionService {
 				}
 				if (CardData.cardInfo.get(player.getDeck().getCards().get(0)).isAction()) {
 					moveCard(player.getDeck(), player.getLooking());
-					createChoice(game, player, (g, p) -> List.of(player.getLooking().getCards().get(0),"NO"), 1, LIBRARY1, "Do you want to set this action aside?");	
+					createChoice(game, player, (g, p) -> List.of(player.getLooking().getCards().get(0),"NO"), 1, LIBRARY1, "Do you want to set this action aside, to be discarded? (Otherwise it goes to your hand)");	
 				} else {
 					defaultDraw(game, name);
 					actions.get(LIBRARY).execute(game, name);
@@ -913,7 +961,9 @@ public class ActionService {
 		gainEvents.put(ILL_GOTTEN_GAINS, (game, name) -> {
 			List<String> otherNames = getOtherPlayers(game, name);
 			otherNames.stream().forEach(other -> {
-				doGain(game, other, CURSE);
+				if (game.getBank().getSupplies().get(CURSE).getCount() > 0) {
+					doGain(game, other, CURSE);
+				}
 			});
 			
 			defaultGain(game, name, ILL_GOTTEN_GAINS);
@@ -953,7 +1003,7 @@ public class ActionService {
 			PlayerState player = getPlayer(game, targetName);
 			List<String> cardNames = player.getTurn().getChoicesMade();
 			cardNames.stream().forEach(n -> discard(game, targetName, player.getHand(), n));
-			finishAttackWithChoices(game, targetName);
+			finishAttack(game, targetName);
 		});
 		
 		actions.put(INN, (game, name) -> {
@@ -1136,7 +1186,9 @@ public class ActionService {
 			});
 		});
 		actions.put(WITCH1, (game, targetName) -> {
-			doGain(game, targetName, CURSE);
+			if (game.getBank().getSupplies().get(CURSE).getCount() > 0) {
+				doGain(game, targetName, CURSE);
+			}
 			finishAttack(game, targetName);
 		});
 		
@@ -1148,7 +1200,7 @@ public class ActionService {
 			ChoiceOptionCreator cheaperFromBank = (g, p) -> {
 				return getNonEmptyBankSuppliesStream(game).filter(c -> getCost(game, attackerName, c) < cost).collect(Collectors.toList());
 			};
-			createChoice(game, player, cheaperFromBank, 1, BERSERKER1, "Choose a card to gain");
+			createChoice(game, player, cheaperFromBank, 1, BERSERKER1, "Choose a card costing less than Berserker to gain");
 			
 			List<String> otherNames = getOtherPlayers(game, attackerName);
 			otherNames.stream().forEach(other -> {
@@ -1166,20 +1218,23 @@ public class ActionService {
 			if (handSize > 3) {
 				int discardSize = handSize - 3;
 				createChoice(game, getPlayer(game, targetName), (g, p) -> chooseFromHand(p), discardSize, BERSERKER3, "Choose " + discardSize + " cards to discard");
+			} else {
+				// TODO: maybe need to switch this to the version with choices, but I think I solved that with queuing attacks
+				finishAttack(game, targetName);
 			}
 		});
 		actions.put(BERSERKER3, (game, name) -> {
 			PlayerState player = getPlayer(game, name);
 			List<String> cardNames = player.getTurn().getChoicesMade();
 			cardNames.stream().forEach(n -> discard(game, name, player.getHand(), n));
-			finishAttackWithChoices(game, name);
+			finishAttack(game, name);
 		});
 		gainEvents.put(BERSERKER, (game, name) -> {
 			PlayerState player = getPlayer(game, name);
 			if (player.getPlayed().getCards().stream().anyMatch(c -> CardData.cardInfo.get(c).isAction())) {
 				player.getTurn().setGainDestination("HAND");
 				defaultGain(game, name, BERSERKER);
-				defaultPlay(game, name, BERSERKER);
+				defaultPlay(game, name, BERSERKER, CardSources.HAND);
 			} else {
 				defaultGain(game, name, BERSERKER);
 			}
@@ -1201,7 +1256,7 @@ public class ActionService {
 		actions.put(DEVELOP, (game, name) -> {
 			PlayerState player = getPlayer(game, name); 
 			if (player.getHand().size() > 0) {
-				createChoice(game, player, (g, p) -> chooseFromHand(p), 1, DEVELOP1, "Choose a card to trash");
+				createChoice(game, player, (g, p) -> chooseFromHand(p), 1, DEVELOP1, "Choose a card from your hand to trash");
 			}
 		});
 		actions.put(DEVELOP1, (game, name) -> {
@@ -1255,7 +1310,7 @@ public class ActionService {
 						"TRASH : " + player.getLooking().getCards().get(1)
 						);
 			};
-			createChoice(game, player, actions, 1, SENTRY1, "Choose a card and discard, trash, or return to the deck");
+			createChoice(game, player, actions, 1, SENTRY1, "These are the top 2 cards of your deck. Choose a card and whether to discard, trash, or return to the deck. Then you'll have the same choice for the next card.");
 		});
 		actions.put(SENTRY1, (game, name) -> {
 			PlayerState player = getPlayer(game, name);
@@ -1279,7 +1334,7 @@ public class ActionService {
 						"TRASH : " + player.getLooking().getCards().get(0)
 						);
 			};
-			createChoice(game, player, actions, 1, SENTRY2, "Choose a card and discard, trash, or return to the deck");
+			createChoice(game, player, actions, 1, SENTRY2, "Choose whether to discard, trash, or return to the deck");
 		});
 		actions.put(SENTRY2, (game, name) -> {
 			PlayerState player = getPlayer(game, name);
@@ -1303,7 +1358,7 @@ public class ActionService {
 			PlayerState player = getPlayer(game, name);
 			defaultDraw(game, name); defaultDraw(game, name); defaultDraw(game, name); defaultDraw(game, name);
 			
-			createChoice(game, player, (g, p) -> chooseFromHand(p), 2, WITCHS_HUT1, "Choose two cards to discard");			
+			createChoice(game, player, (g, p) -> chooseFromHand(p), 2, WITCHS_HUT1, "Choose two cards from your hand to discard");			
 		});
 		actions.put(WITCHS_HUT1, (game, name) -> {
 			PlayerState player = getPlayer(game, name);
@@ -1323,7 +1378,9 @@ public class ActionService {
 			}
 		});
 		actions.put(WITCHS_HUT2, (game, targetName) -> {
-			doGain(game, targetName, CURSE);
+			if (game.getBank().getSupplies().get(CURSE).getCount() > 0) {
+				doGain(game, targetName, CURSE);
+			}
 			finishAttack(game, targetName);
 		});
 		
@@ -1463,14 +1520,16 @@ public class ActionService {
 			String choice = player.getTurn().getChoicesMade().get(0);
 			moveCard(player.getRevealing(), player.getDeck(), choice);
 			moveCard(player.getRevealing(), player.getDeck(), player.getRevealing().getCards().get(0));
-			finishAttackWithChoices(game, targetName);
+			finishAttack(game, targetName);
 		});
 		
 
 		actions.put(BANDIT, (game, name) -> {
 			PlayerState player = getPlayer(game, name);
 			
-			doGain(game, name, GOLD);
+			if (game.getBank().getSupplies().get(GOLD).getCount() > 0) {
+				doGain(game, name, GOLD);
+			}
 			
 			List<String> otherNames = getOtherPlayers(game, name);
 			otherNames.stream().forEach(other -> {
@@ -1496,7 +1555,7 @@ public class ActionService {
 			ChoiceOptionCreator actions = (g, p) -> {
 				return p.getRevealing().getCards().stream().filter(c -> CardData.cardInfo.get(c).isTreasure() && !c.equals(COPPER)).toList();
 			};
-			createChoice(game, targetPlayer, actions, 1, BANDIT2, "Choose a non-Copper Treasure to trash");			
+			createChoice(game, targetPlayer, actions, 1, BANDIT2, "Someone has played a Bandit - choose a non-Copper Treasure to trash");			
 		});
 		actions.put(BANDIT2, (game, targetName) -> {
 			PlayerState targetPlayer = getPlayer(game, targetName);
@@ -1511,7 +1570,7 @@ public class ActionService {
 			for (int i=0; i<numberRevealed; i++) {
 				discard(game, targetName, targetPlayer.getRevealing(), targetPlayer.getRevealing().getCards().get(0));
 			}
-			finishAttackWithChoices(game, targetName);
+			finishAttack(game, targetName);
 		});
 		
 		actions.put(SPY, (game, name) -> {
@@ -1597,7 +1656,9 @@ public class ActionService {
 			}
 		});
 		actions.put(CAULDRON2, (game, targetName) -> {
-			doGain(game, targetName, CURSE);
+			if (game.getBank().getSupplies().get(CURSE).getCount() > 0) {
+				doGain(game, targetName, CURSE);
+			}
 			finishAttack(game, targetName);
 		});
 		
@@ -1625,7 +1686,7 @@ public class ActionService {
 		});
 		gainEvents.put(DUCHY, (game, name) -> {
 			defaultGain(game, name, DUCHY);
-			if (game.getBank().getSupplies().keySet().contains(DUCHESS)) {
+			if (game.getBank().getSupplies().keySet().contains(DUCHESS) && game.getBank().getSupplies().get(DUCHESS).getCount() > 0) {
 				PlayerState player = getPlayer(game, name);
 				createChoice(game, player, (g,p) -> List.of("YES","NO"), 1, DUCHESS2, "Do you want to gain a Duchess?");
 			}
@@ -1642,7 +1703,7 @@ public class ActionService {
 	private void tryThroneRoom(GameState game, String name) {
 		PlayerState thisPlayer = getPlayer(game, name);
 		if (thisPlayer.getTurn().getChoicesAvailable().size() == 0) {
-			if (getOtherPlayers(game, name).stream().noneMatch(p -> getPlayer(game, p).getAttacks().size() > 0)) {
+			//if (getOtherPlayers(game, name).stream().noneMatch(p -> getPlayer(game, p).getAttacks().size() > 0)) {
 				String action = thisPlayer.getTurn().popRepeatedAction();
 				if (action != null) {
 					if (!action.equals("")) {
@@ -1650,7 +1711,7 @@ public class ActionService {
 						defaultExecute(game, name, action);
 					}
 				}
-			}
+			//}
 		}
 	}
 	
@@ -1659,16 +1720,17 @@ public class ActionService {
 		tryThroneRoom(game, playerName);
 	}
 	
-	private void createChoice(GameState game,
+	private ChoiceState createChoice(GameState game,
 							PlayerState player,
 							ChoiceOptionCreator optionSource,
 							int optionCount,
 							String followupAction,
 							String... text) {
 		List<String> choices = optionSource.createChoices(game, player);
-		ChoiceState thisChoice = ChoiceState.builder().minChoices(optionCount).maxChoices(optionCount).followUpAction(followupAction).text(text.length > 0 ? text[0] : "").build();
+		ChoiceState thisChoice = ChoiceState.builder().minChoices(CollectionUtils.isEmpty(choices) ? 0 : optionCount).maxChoices(optionCount).followUpAction(followupAction).text(text.length > 0 ? text[0] : "").build();
 		thisChoice.addAll(choices);
 		player.getTurn().getChoicesAvailable().add(thisChoice);
+		return thisChoice;
 	}
 	
 	private void createChoice(GameState game,
@@ -1679,7 +1741,7 @@ public class ActionService {
 				String followupAction,
 				String... text) {
 		List<String> choices = optionSource.createChoices(game, player);
-		ChoiceState thisChoice = ChoiceState.builder().minChoices(minOptionCount).maxChoices(maxOptionCount).followUpAction(followupAction).text(text.length > 0 ? text[0] : "").build();
+		ChoiceState thisChoice = ChoiceState.builder().minChoices(CollectionUtils.isEmpty(choices) ? 0 : minOptionCount).maxChoices(maxOptionCount).followUpAction(followupAction).text(text.length > 0 ? text[0] : "").build();
 		thisChoice.addAll(choices);
 		player.getTurn().getChoicesAvailable().add(thisChoice);
 	}
@@ -1692,6 +1754,7 @@ public class ActionService {
 		ChoiceState choice = thisPlayer.getTurn().getChoicesAvailable().get(0);
 		String actionName = choice.getFollowUpAction();
 		for (String s : thisPlayer.getTurn().getChoicesMade()) {
+			//TODO: this should compare to choicesAvailable?
 			if (!StringUtils.isEmpty(s) && !thisPlayer.getTurn().getChoicesMade().contains(s)) {
 				throw new RuntimeException("Invalid choice '" + s + "'");
 			}
@@ -1701,7 +1764,8 @@ public class ActionService {
 		thisPlayer.getTurn().getChoicesMade().clear();
 		
 		tryThroneRoom(game, playerName);
-		
+
+		refreshBuyableBankCards(game, playerName);
 	}
 
 	private List<String> chooseFromHand(PlayerState player) {
@@ -1740,13 +1804,13 @@ public class ActionService {
 		moveCard(player.getDeck(), player.getLooking());
 	}
 	
-	public void defaultDraw(GameState game, String thisPlayer) {
+	public String defaultDraw(GameState game, String thisPlayer) {
 		PlayerState player = getPlayer(game, thisPlayer);
 		if (player.getDeck().getCards().size() == 0) {
 			moveDiscardToDeck(player);
 			shuffle(player);
 		}
-		moveCard(player.getDeck(), player.getHand());
+		return moveCard(player.getDeck(), player.getHand());
 	}
 	
 	private void moveDiscardToDeck(PlayerState player) {
@@ -1772,7 +1836,12 @@ public class ActionService {
 		if (!discardEvents.containsKey(cardName)) {
 			defaultDiscard(game, thisPlayer, source, cardName);
 		} else {
-			discardEvents.get(cardName).execute(game, thisPlayer);
+			// TODO: pass in the enum rather than figuring it out? and then get object later?
+			if (source == getPlayer(game, thisPlayer).getAside()) {
+				discardEvents.get(cardName).execute(game, thisPlayer, CardSources.ASIDE);
+			} else {
+				discardEvents.get(cardName).execute(game, thisPlayer, CardSources.HAND);
+			}			
 		}
 	}
 		
@@ -1786,30 +1855,45 @@ public class ActionService {
 		moveCard(source, player.getDiscard());
 	}
 	
-	private void defaultPlay(GameState game, String thisPlayer, String cardName) {
+	private void defaultPlay(GameState game, String thisPlayer, String cardName, CardSources playFromName) {
 		PlayerState player = getPlayer(game, thisPlayer);
-		// TODO: Trail needs to be able to play not in hand
-		player.getHand().remove(cardName);
-		if (player.getTurn().getPlayActions().containsKey(cardName)) {
-			if (player.getTurn().getPlayActions().get(cardName).size() > 0) {
-				// TODO: if this gets used by more than Merchant, will need to figure out how to loop and have an action remove itself
-				String action = player.getTurn().getPlayActions().get(cardName).get(0);
-				actions.get(action).execute(game, thisPlayer);
-			}
-		}
-		actions.get(cardName).execute(game, thisPlayer);
-		// TODO: this doesn't make much sense when playing a card as an off-turn reaction, eg Guard Dog
-		player.getPlayed().add(cardName);
+		CardSource playFrom = cardSourceFunctions.get(playFromName).get(game, thisPlayer);
 		
-		// TODO: is this ever needed, or does it always get handled through doChoice? currently passing all tests
-		//tryThroneRoom(game, thisPlayer);		
+		synchronized(player) {
+			playFrom.remove(cardName);
+			if (player.getTurn().getPlayActions().containsKey(cardName)) {
+				if (player.getTurn().getPlayActions().get(cardName).size() > 0) {
+					List<String> playActionsClone = new ArrayList<>();
+					player.getTurn().getPlayActions().get(cardName).forEach(s -> playActionsClone.add(s));
+					playActionsClone.forEach(c -> actions.get(c).execute(game, thisPlayer));				
+				}
+			}
+			notificationService.notifyPlay(thisPlayer, cardName);
+			actions.get(cardName).execute(game, thisPlayer);
+			// TODO: this doesn't make much sense when playing a card as an off-turn reaction, eg Guard Dog
+			player.getPlayed().add(cardName);
+		}
 	}
 
 	public void turnPlay(GameState game, String name, String actionName) {
+		if (CardData.cardInfo.get(actionName).isAction() && !getPlayer(game, name).getPhase().equals("action")) {
+			throw new RuntimeException("Cannot play this after the action phase is complete");
+		}
 		if (CardData.cardInfo.get(actionName).isAction()) {
 			playerService.defaultActionChange(getPlayer(game, name).getTurn(), -1);
 		}
-		defaultPlay(game, name, actionName);
+		defaultPlay(game, name, actionName, CardSources.HAND);
+		refreshBuyableBankCards(game, name);
+	}
+	
+	public void refreshBuyableBankCards(GameState game, String playerName) {
+		PlayerState thisPlayer = getPlayer(game, playerName);
+		thisPlayer.getBuyableBankCards().clear();
+		game.getBank().getSupplies().keySet().forEach(c -> {
+			if (thisPlayer.hasBuys() && thisPlayer.treasureAvailable() >= getCost(game, playerName, c) ) {
+				thisPlayer.getBuyableBankCards().add(c);
+			}
+		});
 	}
 
 	public void doBuy(GameState game, String playerName, String buyName) {
@@ -1822,6 +1906,7 @@ public class ActionService {
 		} else {
 			defaultBuy(game, playerName, buyName);
 		}
+		refreshBuyableBankCards(game, playerName);
 	}
 	
 	public void defaultBuy(GameState game, String playerName, String boughtCardName) {
@@ -1862,7 +1947,7 @@ public class ActionService {
 		moveCard(game.getBank().getSupplies().get(gainedCardName), dest);
 	}
 	
-	private int getCost(GameState game, String playerName, String cardName) {
+	public int getCost(GameState game, String playerName, String cardName) {
 		int cost = defaultCost(cardName);
 		List<String> currFunctions = getPlayer(game, playerName).getTurn().getCostFunctions();
 		for (String f : currFunctions) {
@@ -1902,14 +1987,16 @@ public class ActionService {
 	public void startAttack(GameState game, String targetName, String attack, String attacker) {
 		PlayerState target = getPlayer(game, targetName);
 		target.getAttacks().enqueue(new AttackState(attack, attacker));
-		processAttack(game, targetName, attack, attacker);
+		processAttack(game, targetName, attack, attacker, true);
 	}
 	
-	public void processAttack(GameState game, String targetName, String attack, String attacker) {
+	public void processAttack(GameState game, String targetName, String attack, String attacker, boolean isAddingNewAttack) {
 		PlayerState target = getPlayer(game, targetName);
-		if (target.getAttacks().size() == 1) {
+ 
+		if ((target.getAttacks().size() == 1 && isAddingNewAttack) || (target.getAttacks().size() >= 1 && !isAddingNewAttack)) {
 			List<String> reactions = target.getHand().attackReactions();		
-			if (reactions.size() > 0) {
+			boolean isAttack = CardData.cardInfo.entrySet().stream().anyMatch((e) -> attack.equals(e.getValue().getAttackAction()));
+			if (reactions.size() > 0 && isAttack) {
 				reactions.add("No");
 				ChoiceOptionCreator reactionChoices = (g, p) -> {
 					return reactions;
@@ -1925,21 +2012,8 @@ public class ActionService {
 		PlayerState target = getPlayer(game, targetName);		
 		target.getAttacks().dequeue();		
 		if (target.getAttacks().size() > 0) {
-			processAttack(game, targetName, target.getAttacks().peek().getAttack(), target.getAttacks().peek().getAttacker());
+			processAttack(game, targetName, target.getAttacks().peek().getAttack(), target.getAttacks().peek().getAttacker(), false);
 		}
-	}
-	
-	public void finishAttackWithChoices(GameState game, String targetName) {
-		PlayerState target = getPlayer(game, targetName);
-		String attackerName = target.getAttacks().peek().getAttacker();
-		finishAttack(game, targetName);
-		// TODO: should this apply to non-choice attacks too? maybe only matters if there's a reaction paired with it
-		afterAttack(game, attackerName);
-	}
-	
-	public void afterAttack(GameState game, String attackerName) {
-		// TODO: this basically triggers the attack repeat on the targets choice completion, but maybe the attack itself should be queueing up the second attack? would involve altering tryThroneRoom to take the check for current attacks on the target out, and queuing it up anyway
-		tryThroneRoom(game, attackerName);
 	}
 
 	private List<String> getOtherPlayers(GameState game, String thisPlayer) {
@@ -1952,9 +2026,10 @@ public class ActionService {
 		turn.setTreasure(amount + turn.getTreasure());
 	}
 		
-	public void moveCard(CardSource source, CardDestination destination) {
-		String card = source.remove();
-		destination.add(card);
+	public String moveCard(CardSource source, CardDestination destination) {
+		String cardMoved = source.remove();
+		destination.add(cardMoved);
+		return cardMoved;
 	}
 
 	public void moveCard(CardSource source, CardDestination destination, String cardName) {
@@ -1977,11 +2052,40 @@ public class ActionService {
 	}
 	
 	public Stream<String> getNonEmptyBankSuppliesStream(GameState game) {
-		return game.getBank().getSupplies().keySet().stream().filter(c -> game.getBank().getSupplies().get(c).getCount() > 0);
+		return game.getBank().getSupplies().keySet().stream().filter(c -> game.getBank().getSupplies().get(c).getCount() > 0).sorted(new BankComparator(CardData.cardInfo));
 	}
 	
 	private PlayerState getPlayer(GameState game, String name) {
 		return game.getPlayers().get(name);
+	}
+	
+	
+	
+	@AllArgsConstructor
+	public class BankComparator implements Comparator<String> {
+		private Map<String, CardData> cardData;
+
+		@Override
+		public int compare(String o1, String o2) {
+			return ((Integer) getOrderingInt(o1)).compareTo(getOrderingInt(o2));
+		}
+		
+		private int getOrderingInt(String c) {
+			switch(c) {
+			case ActionService.GOLD:
+			case ActionService.SILVER:
+			case ActionService.COPPER:
+				return cardData.get(c).getCost() * -1 - 10;
+			case ActionService.ESTATE:
+			case ActionService.DUCHY:
+			case ActionService.PROVINCE:
+				return cardData.get(c).getCost() + 20;
+			case ActionService.CURSE:
+				return 50;
+			default:
+				return cardData.get(c).getCost();
+			}
+		}
 	}
 	
 	public static final String SMITHY = "Smithy";
@@ -2077,6 +2181,7 @@ public class ActionService {
 	public static final String MONEYLENDER = "Moneylender";
 	public static final String MONEYLENDER1 = "Moneylender1";
 	public static final String COUNCIL_ROOM = "Council Room";
+	public static final String COUNCIL_ROOM1 = "Council Room1";
 	public static final String LIBRARY = "Library";
 	public static final String LIBRARY1 = "Library1";
 	public static final String LIBRARY2 = "Library2";

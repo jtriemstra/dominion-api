@@ -144,7 +144,7 @@ public class ActionServiceSleightOfHandCombosTest extends ActionServiceTestBase 
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Militia")));
 		actionService.doChoice(gameState, "test");
 
-		doAssertion(Checked.TREASURE, () -> Assertions.assertEquals(2, playerState.getTurn().getTreasure()));
+		doAssertion(Checked.TREASURE, () -> Assertions.assertEquals(4, playerState.getTurn().getTreasure()));
 
 		playerState2.getTurn().setChoicesMade(new ArrayList<>(List.of("Copper","Copper")));
 		actionService.doChoice(gameState, "test2");
@@ -421,6 +421,7 @@ public class ActionServiceSleightOfHandCombosTest extends ActionServiceTestBase 
 	
 	@Test
 	public void militiaThenThroneRoomToMilitia() {
+		playerState.getTurn().setActionsAvailable(2);
 		swapHandCards(ActionService.THRONE_ROOM, ActionService.MILITIA, ActionService.MILITIA);
 		loadDeck(ActionService.ESTATE, ActionService.ESTATE);
 		stashGameState();
@@ -442,10 +443,10 @@ public class ActionServiceSleightOfHandCombosTest extends ActionServiceTestBase 
 		actionService.doChoice(gameState, "test");
 		
 		// second militia gains treasure immediately but doesn't change target choices
-		doAssertion(Checked.TREASURE, () -> Assertions.assertEquals(4, playerState.getTurn().getTreasure())); // TODO: maybe this should be 6? otherwise attacker needs cue to wait for target to finish
+		doAssertion(Checked.TREASURE, () -> Assertions.assertEquals(6, playerState.getTurn().getTreasure())); 
 		Assertions.assertEquals(5, playerState2.getTurn().getChoicesAvailable().get(0).getOptions().size());
 		Assertions.assertEquals(1, playerState2.getTurn().getChoicesAvailable().size());
-		Assertions.assertEquals(2, playerState2.getAttacks().size()); // TODO: maybe this should be 3? had another comment about this		
+		Assertions.assertEquals(3, playerState2.getAttacks().size()); 		
 
 		// target responds to first militia, which doesn't trigger third yet
 		playerState2.getTurn().setChoicesMade(new ArrayList<>(List.of("Copper","Copper")));
@@ -453,38 +454,16 @@ public class ActionServiceSleightOfHandCombosTest extends ActionServiceTestBase 
 		playerState3.getTurn().setChoicesMade(new ArrayList<>(List.of("Copper","Copper")));
 		actionService.doChoice(gameState, "test3");
 
-		doAssertion(Checked.TREASURE, () -> Assertions.assertEquals(4, playerState.getTurn().getTreasure())); // TODO: maybe this should be 6? otherwise attacker needs cue to wait for target to finish
-		Assertions.assertEquals(3, playerState2.getTurn().getChoicesAvailable().get(0).getOptions().size());
-		Assertions.assertEquals(0, playerState2.getTurn().getChoicesAvailable().get(0).getMinChoices());
-		Assertions.assertEquals(0, playerState2.getTurn().getChoicesAvailable().get(0).getMaxChoices());
-		Assertions.assertEquals(1, playerState2.getTurn().getChoicesAvailable().size());
-		Assertions.assertEquals(1, playerState2.getAttacks().size());
-		
-		playerState2.getTurn().setChoicesMade(new ArrayList<>(List.of("")));
-		actionService.doChoice(gameState, "test2");
-		playerState3.getTurn().setChoicesMade(new ArrayList<>(List.of("")));
-		actionService.doChoice(gameState, "test3");
-
-		// completing the second militia has triggered the third to go
-		doAssertion(Checked.TREASURE, () -> Assertions.assertEquals(6, playerState.getTurn().getTreasure())); 
-		Assertions.assertEquals(3, playerState2.getTurn().getChoicesAvailable().get(0).getOptions().size());
-		Assertions.assertEquals(0, playerState2.getTurn().getChoicesAvailable().get(0).getMinChoices());
-		Assertions.assertEquals(0, playerState2.getTurn().getChoicesAvailable().get(0).getMaxChoices());
-		Assertions.assertEquals(1, playerState2.getTurn().getChoicesAvailable().size());
-		Assertions.assertEquals(1, playerState2.getAttacks().size());
-		
-		playerState2.getTurn().setChoicesMade(new ArrayList<>(List.of("")));
-		actionService.doChoice(gameState, "test2");
-		playerState3.getTurn().setChoicesMade(new ArrayList<>(List.of("")));
-		actionService.doChoice(gameState, "test3");
-		
 		doAssertion(Checked.TREASURE, () -> Assertions.assertEquals(6, playerState.getTurn().getTreasure())); 
 		Assertions.assertEquals(0, playerState2.getTurn().getChoicesAvailable().size());
 		Assertions.assertEquals(0, playerState2.getAttacks().size());
+		Assertions.assertEquals(0, playerState3.getTurn().getChoicesAvailable().size());
+		Assertions.assertEquals(0, playerState3.getAttacks().size());
 	}
 	
 	@Test
 	public void throneRoomToMilitiaThenCouncilRoom() {
+		playerState.getTurn().setActionsAvailable(2);
 		swapHandCards(ActionService.THRONE_ROOM, ActionService.MILITIA, ActionService.COUNCIL_ROOM);
 		loadDeck(ActionService.ESTATE, ActionService.ESTATE, ActionService.ESTATE, ActionService.ESTATE);
 		loadDeck(playerState2, ActionService.GOLD, ActionService.GOLD);

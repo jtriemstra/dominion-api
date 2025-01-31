@@ -21,6 +21,7 @@ public class CardData {
 	private boolean action;
 	private boolean attackReaction;
 	private boolean treasure;
+	private String attackAction;
 	// types
 	
 	public static Map<String, CardData> cardInfo = new HashMap<>();
@@ -36,8 +37,8 @@ public class CardData {
 		cardInfo.put(ActionService.VILLAGE, new CardDataBuilder().name("Village").cost(3).action(true).build());
 		cardInfo.put(ActionService.SMITHY, new CardDataBuilder().name("Smithy").cost(4).action(true).build());
 		cardInfo.put(ActionService.REMODEL, new CardDataBuilder().name("Remodel").cost(4).action(true).build());
-		cardInfo.put(ActionService.MILITIA, new CardDataBuilder().name("Militia").cost(4).action(true).build());
-		cardInfo.put(ActionService.BUREAUCRAT, new CardDataBuilder().name("Bureaucrat").cost(4).action(true).build());
+		cardInfo.put(ActionService.MILITIA, new CardDataBuilder().name("Militia").cost(4).action(true).attackAction(ActionService.MILITIA2).build());
+		cardInfo.put(ActionService.BUREAUCRAT, new CardDataBuilder().name("Bureaucrat").cost(4).action(true).attackAction(ActionService.BUREAUCRAT2).build());
 		cardInfo.put(ActionService.SCHEME, new CardDataBuilder().name("Scheme").cost(3).action(true).build());
 		cardInfo.put(ActionService.VASSAL, new CardDataBuilder().name("Vassal").cost(3).action(true).build());
 		cardInfo.put(ActionService.HAGGLER, new CardDataBuilder().name("Hagggler").cost(4).action(true).build());
@@ -81,20 +82,20 @@ public class CardData {
 		cardInfo.put(ActionService.INN, new CardDataBuilder().name("Inn").action(true).cost(5).build());
 		cardInfo.put(ActionService.JACK_OF_ALL_TRADES, new CardDataBuilder().name("Jack of All Trades").action(true).cost(4).build());
 		cardInfo.put(ActionService.MANDARIN, new CardDataBuilder().name("Mandarin").action(true).cost(5).build());
-		cardInfo.put(ActionService.MARGRAVE, new CardDataBuilder().name("Margrave").action(true).cost(5).build());
+		cardInfo.put(ActionService.MARGRAVE, new CardDataBuilder().name("Margrave").action(true).attackAction(ActionService.MARGRAVE1).cost(5).build());
 		cardInfo.put(ActionService.NOMAD_CAMP, new CardDataBuilder().name("Nomad Camp").action(true).cost(4).build());
 		cardInfo.put(ActionService.NOBLE_BRIGAND, new CardDataBuilder().name("Noble Brigand").action(true).cost(4).build());
 		cardInfo.put(ActionService.ADVENTURER, new CardDataBuilder().name("Adventurer").action(true).cost(6).build());
-		cardInfo.put(ActionService.WITCH, new CardDataBuilder().name("Witch").action(true).cost(5).build());
-		cardInfo.put(ActionService.BERSERKER, new CardDataBuilder().name("Berserker").action(true).cost(5).build());
+		cardInfo.put(ActionService.WITCH, new CardDataBuilder().name("Witch").action(true).attackAction(ActionService.WITCH1).cost(5).build());
+		cardInfo.put(ActionService.BERSERKER, new CardDataBuilder().name("Berserker").action(true).attackAction(ActionService.BERSERKER2).cost(5).build());
 		cardInfo.put(ActionService.CROSSROADS, new CardDataBuilder().name("Crossroads").action(true).cost(2).build());
 		cardInfo.put(ActionService.DEVELOP, new CardDataBuilder().name("Develop").action(true).cost(3).build());
 		cardInfo.put(ActionService.SENTRY, new CardDataBuilder().name("Sentry").action(true).cost(5).build());
 		cardInfo.put(ActionService.WITCHS_HUT, new CardDataBuilder().name("Witch's Hut").action(true).cost(5).build());
 		cardInfo.put(ActionService.CARTOGRAPHER, new CardDataBuilder().name("Cartographer").action(true).cost(5).build());
 		cardInfo.put(ActionService.ORACLE, new CardDataBuilder().name("Oracle").action(true).cost(3).build());
-		cardInfo.put(ActionService.BANDIT, new CardDataBuilder().name("Bandit").action(true).cost(5).build());
-		cardInfo.put(ActionService.SPY, new CardDataBuilder().name("Spy").action(true).cost(4).build());
+		cardInfo.put(ActionService.BANDIT, new CardDataBuilder().name("Bandit").action(true).attackAction(ActionService.BANDIT1).cost(5).build());
+		cardInfo.put(ActionService.SPY, new CardDataBuilder().name("Spy").action(true).attackAction(ActionService.SPY2).cost(4).build());
 		cardInfo.put(ActionService.CAULDRON, new CardDataBuilder().name("Cauldron").treasure(true).cost(5).build());
 		cardInfo.put(ActionService.GARDENS, new CardDataBuilder().name("Gardens").cost(4).victory(true).build());
 		cardInfo.put(ActionService.SILK_ROAD, new CardDataBuilder().name("Silk Road").cost(4).victory(true).build());

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.jtriemstra.dominion.api.models.Card;
@@ -17,12 +18,14 @@ public class V3GameState {
 	private PlayerState thisPlayer;
 	private List<String> playerNames;
 	private int currentPlayer;
+	private UUID id;
 	
 	public V3GameState(GameState game, String playerName) {
 		if (game != null) {
 			thisPlayer = game.getPlayers().get(playerName);
 			playerNames = new ArrayList<>(game.getPlayerNames());
 			currentPlayer = game.getCurrentPlayer();
+			id = game.getId();
 		}
 	}
 	

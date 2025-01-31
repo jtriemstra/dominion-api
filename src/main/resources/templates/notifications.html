@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Notifications</title>
+</head>
+<body>
+    <p th:each="item : ${notifications}" th:text="${item}">Item</p>
+</body>
+</html>

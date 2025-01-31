@@ -113,8 +113,6 @@ public class ActionServiceDeckTopCombosTest extends ActionServiceTestBase {
 		actionService.doChoice(gameState, "test");
 		
 		Assertions.assertEquals(2, playerState.getLooking().size());
-		doAssertion(Checked.HAND, () -> Assertions.assertEquals(5, playerState.getHand().size()));
-		doAssertion(Checked.ACTIONS, () -> Assertions.assertEquals(1, playerState.getTurn().getActionsAvailable()));
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(6, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
 		
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("DISCARD : Copper")));
@@ -125,10 +123,13 @@ public class ActionServiceDeckTopCombosTest extends ActionServiceTestBase {
 		
 		doAssertion(Checked.DISCARD, () -> Assertions.assertEquals(3, playerState.getDiscard().size()));
 		doAssertion(Checked.DECK, () -> Assertions.assertEquals(0, playerState.getDeck().size()));
+		doAssertion(Checked.HAND, () -> Assertions.assertEquals(5, playerState.getHand().size()));
+		doAssertion(Checked.ACTIONS, () -> Assertions.assertEquals(1, playerState.getTurn().getActionsAvailable()));
 	}
 	
 	@Test
 	public void bureaucratFollowedByCouncilRoom() {
+		playerState.getTurn().setActionsAvailable(2);
 		swapHandCards(ActionService.BUREAUCRAT, ActionService.COUNCIL_ROOM);
 		loadDeck(ActionService.COPPER, ActionService.COPPER, ActionService.COPPER, ActionService.COPPER);
 		loadDeck(playerState2, ActionService.COPPER);
@@ -158,14 +159,69 @@ public class ActionServiceDeckTopCombosTest extends ActionServiceTestBase {
 		playerState3.getTurn().setChoicesMade(new ArrayList<>(List.of("Estate")));
 		actionService.doChoice(gameState, "test3");
 
-		doAssertion(Checked.DECK, () -> Assertions.assertEquals(2, playerState.getDeck().getCards().size()));
-		Assertions.assertEquals(1, playerState2.getTurn().getChoicesAvailable().get(0).getOptions().size());
+		doAssertion(Checked.DECK, () -> Assertions.assertEquals(1, playerState.getDeck().getCards().size()));
+		Assertions.assertEquals(0, playerState2.getTurn().getChoicesAvailable().size());
 		Assertions.assertEquals(0, playerState3.getTurn().getChoicesAvailable().size());
+		
+		Assertions.assertEquals(0, playerState2.getAttacks().size());
+		doAssertion(Checked.HAND, () -> Assertions.assertEquals(5, playerState2.getHand().getCards().size()));
+		doAssertion(Checked.HAND, () -> Assertions.assertEquals(5, playerState3.getHand().getCards().size()));
+	}
+
+	@Test
+	public void twoBureaucratsFollowedByCouncilRoom() {
+		playerState.getTurn().setActionsAvailable(3);
+		swapHandCards(ActionService.BUREAUCRAT, ActionService.BUREAUCRAT, ActionService.COUNCIL_ROOM);
+		loadDeck(ActionService.COPPER, ActionService.COPPER, ActionService.COPPER, ActionService.COPPER);
+		loadDeck(playerState2, ActionService.COPPER);
+		loadDeck(playerState3, ActionService.COPPER);
+		swapHandCards(playerState2, ActionService.ESTATE, ActionService.ESTATE);
+		swapHandCards(playerState3, ActionService.ESTATE);
+		stashGameState();
+		
+		actionService.turnPlay(gameState, "test", ActionService.BUREAUCRAT);
+		
+		//started with 4, gained 1
+		doAssertion(Checked.DECK, () -> Assertions.assertEquals(5, playerState.getDeck().getCards().size()));
+		
+		Assertions.assertEquals(1, playerState2.getTurn().getChoicesAvailable().size());
+		Assertions.assertEquals(2, playerState2.getTurn().getChoicesAvailable().get(0).getOptions().size());
+		Assertions.assertEquals(1, playerState3.getTurn().getChoicesAvailable().get(0).getOptions().size());
+		
+
+		actionService.turnPlay(gameState, "test", ActionService.BUREAUCRAT);
+		
+		//started with 4, gained 2
+		doAssertion(Checked.DECK, () -> Assertions.assertEquals(6, playerState.getDeck().getCards().size()));
+		
+		actionService.turnPlay(gameState, "test", ActionService.COUNCIL_ROOM);
+		
+		doAssertion(Checked.HAND, () -> Assertions.assertEquals(6, playerState.getHand().getCards().size()));
+		doAssertion(Checked.HAND, () -> Assertions.assertEquals(5, playerState2.getHand().getCards().size()));
+		doAssertion(Checked.HAND, () -> Assertions.assertEquals(5, playerState3.getHand().getCards().size()));
 		
 		playerState2.getTurn().setChoicesMade(new ArrayList<>(List.of("Estate")));
 		actionService.doChoice(gameState, "test2");
 		
-		Assertions.assertEquals(0, playerState2.getTurn().getChoicesAvailable().size());
+		playerState3.getTurn().setChoicesMade(new ArrayList<>(List.of("Estate")));
+		actionService.doChoice(gameState, "test3");
+
+		// had 6, drew 4
+		doAssertion(Checked.DECK, () -> Assertions.assertEquals(2, playerState.getDeck().getCards().size()));
+		Assertions.assertEquals(1, playerState2.getTurn().getChoicesAvailable().size());
+		Assertions.assertEquals(0, playerState3.getTurn().getChoicesAvailable().size());
+		
+		// the second bureaucrat plus council room
+		Assertions.assertEquals(2, playerState2.getAttacks().size());
+		doAssertion(Checked.HAND, () -> Assertions.assertEquals(4, playerState2.getHand().getCards().size()));
+		doAssertion(Checked.HAND, () -> Assertions.assertEquals(5, playerState3.getHand().getCards().size()));
+
+		playerState2.getTurn().setChoicesMade(new ArrayList<>(List.of("Estate")));
+		actionService.doChoice(gameState, "test2");
+		
 		Assertions.assertEquals(0, playerState2.getAttacks().size());
+		// started with 5, put 2 on deck, drew one
+		doAssertion(Checked.HAND, () -> Assertions.assertEquals(4, playerState2.getHand().getCards().size()));
+		Assertions.assertTrue(playerState2.getHand().getCards().contains(ActionService.ESTATE));
 	}
 }

@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.Mockito;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jtriemstra.dominion.api.dto.BankState;
@@ -43,7 +44,7 @@ public class ActionServiceTestBase {
 		checked = new HashSet<>();
 		stashedGameState = null;
 		playerService = new PlayerService();
-		actionService = new ActionService(playerService);
+		actionService = new ActionService(playerService, Mockito.mock(NotificationService.class));
 		actionService.init();
 		bankState = new BankState();
 		gameState = new GameState(bankState);
@@ -113,6 +114,12 @@ public class ActionServiceTestBase {
 	protected void assertCardsInHand(Map<String, Integer> expected) {
 		for (String s : expected.keySet()) {
 			Assertions.assertEquals(expected.get(s).intValue(), (int) playerState.getHand().getCards().stream().filter(c -> c.equals(s)).count());
+		}
+	}
+
+	protected void assertCardsInHand(PlayerState player, Map<String, Integer> expected) {
+		for (String s : expected.keySet()) {
+			Assertions.assertEquals(expected.get(s).intValue(), (int) player.getHand().getCards().stream().filter(c -> c.equals(s)).count());
 		}
 	}
 	

@@ -277,9 +277,8 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		doAssertion(Checked.TREASURE, () -> Assertions.assertEquals(2, playerState.getTurn().getTreasure()));
 		
 		Assertions.assertEquals(5, playerState2.getTurn().getChoicesAvailable().get(0).getOptions().size());
-		Assertions.assertEquals(1, playerState3.getTurn().getChoicesAvailable().size());
-		Assertions.assertEquals(0, playerState3.getTurn().getChoicesAvailable().get(0).getMaxChoices());
-		Assertions.assertEquals(0, playerState3.getTurn().getChoicesAvailable().get(0).getMinChoices());
+		Assertions.assertEquals(0, playerState3.getTurn().getChoicesAvailable().size());
+		Assertions.assertEquals(0, playerState3.getAttacks().size());
 		
 		playerState2.getTurn().setChoicesMade(new ArrayList<>(List.of("Copper","Copper")));
 		actionService.doChoice(gameState, "test2");
@@ -334,7 +333,22 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("DISCARD")));		
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(ActionService.VASSAL1, playerState.getTurn().getChoicesAvailable().get(0).getFollowUpAction()));
 	}
-
+	
+	@Test
+	public void vassalNonActionDiscards() {
+		swapHandCards(ActionService.VASSAL);
+		loadDeck(ActionService.GOLD, ActionService.GOLD, ActionService.GOLD);
+		stashGameState();
+		
+		actionService.turnPlay(gameState, "test", ActionService.VASSAL);
+		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("DISCARD")));		
+		actionService.doChoice(gameState, "test");
+		
+		doAssertion(Checked.DISCARD, () -> Assertions.assertEquals(1, playerState.getDiscard().size()));
+		doAssertion(Checked.DECK, () -> Assertions.assertEquals(2, playerState.getDeck().size()));
+		Assertions.assertEquals(0, playerState.getLooking().size());
+	}
+	
 	public void playingWeaverGivesChoice() {
 		swapHandCards(ActionService.WEAVER);
 		stashGameState();
@@ -789,10 +803,10 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		// TODO: is this the right order? does it matter?
 		Assertions.assertEquals("Trail1", playerState.getTurn().getChoicesAvailable().get(0).getFollowUpAction());
 		Assertions.assertEquals(2, playerState.getTurn().getChoicesAvailable().size());
-		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("PLAY"));
+		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("PLAY2"));
 		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("TRASH"));
 		
-		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("PLAY")));
+		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("PLAY2")));
 		actionService.doChoice(gameState, "test");
 		
 		doAssertion(Checked.ACTIONS, () -> Assertions.assertEquals(1, playerState.getTurn().getActionsAvailable()));
@@ -919,7 +933,7 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		stashGameState();
 		
 		actionService.turnPlay(gameState, "test", ActionService.STABLES);
-		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(3, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(4, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size())); //treasure count plus 1 for "no"
 
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Copper")));
 		actionService.doChoice(gameState, "test");
@@ -930,6 +944,25 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		doAssertion(Checked.HAND, () -> Assertions.assertEquals(6, playerState.getHand().size()));
 		doAssertion(Checked.HAND, () -> assertCardsInHand(Map.of(ActionService.GOLD, 3, ActionService.COPPER, 2)));
 	}
+	
+	@Test
+	public void stablesIsOptional() {
+		swapHandCards(ActionService.STABLES, ActionService.ESTATE);
+		loadDeck(ActionService.GOLD, ActionService.GOLD, ActionService.GOLD);
+		stashGameState();
+		
+		actionService.turnPlay(gameState, "test", ActionService.STABLES);
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(4, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size())); //treasure count plus 1 for "no"
+
+		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("No")));
+		actionService.doChoice(gameState, "test");
+
+		doAssertion(Checked.DISCARD, () -> Assertions.assertEquals(0, playerState.getDiscard().getCards().size()));
+
+		doAssertion(Checked.ACTIONS, () -> Assertions.assertEquals(0, playerState.getTurn().getActionsAvailable()));
+		doAssertion(Checked.HAND, () -> Assertions.assertEquals(4, playerState.getHand().size()));
+		doAssertion(Checked.HAND, () -> assertCardsInHand(Map.of(ActionService.COPPER, 3, ActionService.ESTATE, 1)));
+	}
 
 	@Test
 	public void wheelwrightAddsCorrectValuesForCostTwo() {
@@ -938,7 +971,7 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		stashGameState();
 		
 		actionService.turnPlay(gameState, "test", ActionService.WHEELWRIGHT);
-		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(5, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(6, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size())); // hand size plus 1 for "no"
 
 		doAssertion(Checked.ACTIONS, () -> Assertions.assertEquals(1, playerState.getTurn().getActionsAvailable()));
 		doAssertion(Checked.HAND, () -> Assertions.assertEquals(5, playerState.getHand().size()));
@@ -953,13 +986,34 @@ public class ActionServiceTest extends ActionServiceTestBase {
 	}
 
 	@Test
+	public void wheelwrightIsOptional() {
+		swapHandCards(ActionService.WHEELWRIGHT, ActionService.ESTATE);
+		loadDeck(ActionService.GOLD, ActionService.GOLD, ActionService.GOLD);
+		stashGameState();
+		
+		actionService.turnPlay(gameState, "test", ActionService.WHEELWRIGHT);
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(6, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size())); // hand size plus 1 for "no"
+
+		doAssertion(Checked.ACTIONS, () -> Assertions.assertEquals(1, playerState.getTurn().getActionsAvailable()));
+		doAssertion(Checked.HAND, () -> Assertions.assertEquals(5, playerState.getHand().size()));
+		doAssertion(Checked.HAND, () -> assertCardsInHand(Map.of(ActionService.GOLD, 1, ActionService.COPPER, 3)));
+		
+		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("No")));
+		actionService.doChoice(gameState, "test");
+
+		doAssertion(Checked.DISCARD, () -> Assertions.assertEquals(0, playerState.getDiscard().getCards().size()));
+
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(0, playerState.getTurn().getChoicesAvailable().size()));
+	}
+	
+	@Test
 	public void wheelwrightAddsCorrectValuesForCostSix() {
 		swapHandCards(ActionService.WHEELWRIGHT, ActionService.ESTATE);
 		loadDeck(ActionService.GOLD, ActionService.GOLD, ActionService.GOLD);
 		stashGameState();
 		
 		actionService.turnPlay(gameState, "test", ActionService.WHEELWRIGHT);
-		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(5, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(6, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size())); // hand size plus 1 for "no"
 
 		doAssertion(Checked.ACTIONS, () -> Assertions.assertEquals(1, playerState.getTurn().getActionsAvailable()));
 		doAssertion(Checked.HAND, () -> Assertions.assertEquals(5, playerState.getHand().size()));
@@ -1042,6 +1096,7 @@ public class ActionServiceTest extends ActionServiceTestBase {
 	
 	@Test
 	public void gainingNomadsAddsTreasure() {
+		swapBankSupplies(Map.of(ActionService.DUCHY, ActionService.NOMADS));
 		stashGameState();
 		for (int i=1; i<=4; i++) {
 			actionService.turnPlay(gameState, "test", ActionService.COPPER);	
@@ -1174,6 +1229,30 @@ public class ActionServiceTest extends ActionServiceTestBase {
 
 		actionService.turnPlay(gameState, "test", ActionService.SILVER);
 		doAssertion(Checked.TREASURE, () -> Assertions.assertEquals(5, playerState.getTurn().getTreasure()));
+	}
+
+	@Test
+	public void merchantAddsCorrectValues2() {
+		swapHandCards(ActionService.MERCHANT, ActionService.SILVER, ActionService.SILVER);
+		loadDeck(ActionService.GOLD, ActionService.GOLD, ActionService.GOLD);
+		stashGameState();
+		
+		actionService.turnPlay(gameState, "test", ActionService.MERCHANT);
+		
+		doAssertion(Checked.ACTIONS, () -> Assertions.assertEquals(1, playerState.getTurn().getActionsAvailable()));
+		doAssertion(Checked.HAND, () -> Assertions.assertEquals(5, playerState.getHand().size()));
+		doAssertion(Checked.HAND, () -> assertCardsInHand(Map.of(ActionService.GOLD, 1, ActionService.COPPER, 2)));
+		doAssertion(Checked.TREASURE, () -> Assertions.assertEquals(0, playerState.getTurn().getTreasure()));
+
+		actionService.turnPlay(gameState, "test", ActionService.COPPER);
+		actionService.turnPlay(gameState, "test", ActionService.COPPER);
+		doAssertion(Checked.TREASURE, () -> Assertions.assertEquals(2, playerState.getTurn().getTreasure()));
+		
+		actionService.turnPlay(gameState, "test", ActionService.SILVER);
+		doAssertion(Checked.TREASURE, () -> Assertions.assertEquals(5, playerState.getTurn().getTreasure()));
+
+		actionService.turnPlay(gameState, "test", ActionService.SILVER);
+		doAssertion(Checked.TREASURE, () -> Assertions.assertEquals(7, playerState.getTurn().getTreasure()));
 	}
 	
 	@Test

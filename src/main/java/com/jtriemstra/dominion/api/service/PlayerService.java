@@ -73,8 +73,11 @@ public class PlayerService {
 		turn.getCostFunctions().clear();
 		turn.getGainReactions().clear();
 		player.getTurn().getGainedToDiscard().clear();
+		// TODO: watch out for this if i try to combine attacks with throne room implementation that's some kind of pending queue
 		turn.getRepeatedAction().clear();
 		turn.setSkipActions(false);
+		turn.getPlayActions().clear();
+		turn.setBuying(null);
 	}
 
 	public void calculatePoints(GameState game, String playerName) {

@@ -3,6 +3,7 @@ package com.jtriemstra.dominion.api.dto;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,7 @@ public class GameState {
 	private BankState bank;
 	private TrashState trash;
 	private int currentPlayer;
+	private UUID id;
 	
 	public GameState(BankState bank) {
 		players = new HashMap<>();
@@ -23,5 +25,6 @@ public class GameState {
 		trash = new TrashState();
 		playerNames = new ArrayList<>();
 		currentPlayer = 0;
+		this.id = UUID.randomUUID();
 	}
 }
