@@ -82,13 +82,13 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		actionService.doChoice(gameState, "test");
 		
 		Assertions.assertEquals(ActionService.WEAVER1, playerState.getTurn().getChoicesAvailable().get(0).getFollowUpAction());
-		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(s -> s.equals("PLAY")));
+		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("PLAY")));
 		
 		playerState.getTurn().getChoicesMade().clear();
 		playerState.getTurn().getChoicesMade().add("PLAY");
 		actionService.doChoice(gameState, "test");
 		Assertions.assertEquals(ActionService.WEAVER2, playerState.getTurn().getChoicesAvailable().get(0).getFollowUpAction());
-		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(s -> s.equals("2 Silver")));
+		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("2 Silver")));
 	}
 	
 	@Test
@@ -113,8 +113,8 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		actionService.turnPlay(gameState, "test", ActionService.COPPER);
 		
 		actionService.doBuy(gameState, "test", "Border Village");
-		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Embassy"));
-		Assertions.assertFalse(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Gold"));
+		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Embassy")));
+		Assertions.assertFalse(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Gold")));
 		
 		playerState.getTurn().getChoicesMade().add("Embassy");
 		actionService.doChoice(gameState, "test");
@@ -123,8 +123,8 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		Assertions.assertTrue(playerState2.getDiscard().getCards().contains(ActionService.SILVER));
 		Assertions.assertTrue(playerState3.getDiscard().getCards().contains(ActionService.SILVER));
 
-		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Embassy"));
-		Assertions.assertFalse(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Gold"));
+		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Embassy")));
+		Assertions.assertFalse(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Gold")));
 
 		playerState.getTurn().getChoicesMade().add("Silver");
 		actionService.doChoice(gameState, "test");
@@ -244,8 +244,8 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		
 		actionService.turnPlay(gameState, "test", ActionService.REMODEL);
 		
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Silver")));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Copper")));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Silver"))));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Copper"))));
 		
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Silver")));
 		actionService.doChoice(gameState, "test");
@@ -253,10 +253,10 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		doAssertion(Checked.CHOICES, () -> Assertions.assertFalse(playerState.getHand().getCards().contains("Silver")));
 		doAssertion(Checked.HAND, () -> Assertions.assertEquals(3, playerState.getHand().size()));
 		
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Silver")));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Embassy")));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertFalse(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Gold")));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertFalse(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Border Village")));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Silver"))));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Embassy"))));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertFalse(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Gold"))));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertFalse(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Border Village"))));
 		
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Embassy")));
 		actionService.doChoice(gameState, "test");
@@ -315,8 +315,8 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		
 		doAssertion(Checked.TREASURE, () -> Assertions.assertEquals(2, playerState.getTurn().getTreasure()));
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(2, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("PLAY")));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("DISCARD")));			
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("PLAY"))));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("DISCARD"))));			
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(ActionService.VASSAL1, playerState.getTurn().getChoicesAvailable().get(0).getFollowUpAction()));
 	}
 
@@ -330,7 +330,7 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		
 		doAssertion(Checked.TREASURE, () -> Assertions.assertEquals(2, playerState.getTurn().getTreasure()));
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(1, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("DISCARD")));		
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("DISCARD"))));		
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(ActionService.VASSAL1, playerState.getTurn().getChoicesAvailable().get(0).getFollowUpAction()));
 	}
 	
@@ -406,7 +406,7 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		actionService.cleanup(gameState, "test");
 
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(1, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Scheme")));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Scheme"))));
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(ActionService.SCHEME2, playerState.getTurn().getChoicesAvailable().get(0).getFollowUpAction()));
 	}
 
@@ -421,8 +421,8 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		actionService.cleanup(gameState, "test");
 
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(2, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Scheme")));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Village")));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Scheme"))));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Village"))));
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(ActionService.SCHEME2, playerState.getTurn().getChoicesAvailable().get(0).getFollowUpAction()));
 	}
 
@@ -452,10 +452,10 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		Assertions.assertEquals(0, playerState.getTurn().getGainedToDiscard().size());
 		
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(ActionService.HAGGLER2, playerState.getTurn().getChoicesAvailable().get(0).getFollowUpAction()));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Embassy")));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Silver")));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertFalse(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Duchy")));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertFalse(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Gold")));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Embassy"))));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Silver"))));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertFalse(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Duchy"))));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertFalse(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Gold"))));
 	}
 
 	@Test
@@ -679,26 +679,26 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Remodel")));
 		actionService.doChoice(gameState, "test");
 				
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Silver")));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Copper")));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Silver"))));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Copper"))));
 		
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Silver")));
 		actionService.doChoice(gameState, "test");
 
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Silver")));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Embassy")));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertFalse(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Gold")));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertFalse(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Border Village")));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Silver"))));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Embassy"))));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertFalse(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Gold"))));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertFalse(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Border Village"))));
 		
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Embassy")));
 		actionService.doChoice(gameState, "test");
 
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Copper")));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Copper"))));
 		
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Copper")));
 		actionService.doChoice(gameState, "test");
 
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Copper")));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Copper"))));
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(1, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
 
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Copper")));
@@ -777,7 +777,7 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		actionService.doBuy(gameState, "test", "Trail");
 
 		Assertions.assertEquals(2, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size());
-		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("PLAY1"));
+		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("PLAY1")));
 		
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("PLAY1")));
 		actionService.doChoice(gameState, "test");
@@ -795,7 +795,7 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		
 		actionService.turnPlay(gameState, "test", ActionService.REMODEL);
 
-		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains(ActionService.TRAIL));
+		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals(ActionService.TRAIL)));
 		
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Trail")));
 		actionService.doChoice(gameState, "test");
@@ -803,8 +803,8 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		// TODO: is this the right order? does it matter?
 		Assertions.assertEquals("Trail1", playerState.getTurn().getChoicesAvailable().get(0).getFollowUpAction());
 		Assertions.assertEquals(2, playerState.getTurn().getChoicesAvailable().size());
-		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("PLAY2"));
-		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("TRASH"));
+		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("PLAY2")));
+		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("TRASH")));
 		
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("PLAY2")));
 		actionService.doChoice(gameState, "test");
@@ -815,8 +815,8 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		
 		Assertions.assertEquals("Remodel2", playerState.getTurn().getChoicesAvailable().get(0).getFollowUpAction());
 		Assertions.assertEquals(1, playerState.getTurn().getChoicesAvailable().size());
-		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Gold"));
-		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Duchy"));
+		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Gold")));
+		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Duchy")));
 
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Gold")));
 		actionService.doChoice(gameState, "test");
@@ -834,8 +834,8 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		actionService.discard(gameState, "test", gameState.getPlayers().get("test").getHand(), ActionService.TUNNEL);
 		
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(2, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("YES")));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("NO")));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("YES"))));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("NO"))));
 		
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("YES")));
 		actionService.doChoice(gameState, "test");
@@ -852,8 +852,8 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		actionService.discard(gameState, "test", gameState.getPlayers().get("test").getHand(), ActionService.TUNNEL);
 		
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(2, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("YES")));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("NO")));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("YES"))));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("NO"))));
 		
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("NO")));
 		actionService.doChoice(gameState, "test");
@@ -892,8 +892,8 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		actionService.doChoice(gameState, "test");
 
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(2, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("CARDS")));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("BUY")));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("CARDS"))));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("BUY"))));
 
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("CARDS")));
 		actionService.doChoice(gameState, "test");
@@ -916,8 +916,8 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		actionService.doChoice(gameState, "test");
 
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(2, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("CARDS")));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("BUY")));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("CARDS"))));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("BUY"))));
 
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("BUY")));
 		actionService.doChoice(gameState, "test");
@@ -1025,8 +1025,8 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		doAssertion(Checked.DISCARD, () -> Assertions.assertEquals(1, playerState.getDiscard().getCards().size()));
 
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(3, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Border Village")));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertFalse(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Silver")));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Border Village"))));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertFalse(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Silver"))));
 	}
 	
 	@Test
@@ -1129,15 +1129,15 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		actionService.doBuy(gameState, "test", ActionService.FARMLAND);
 
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(3, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Silver")));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Copper")));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Silver"))));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Copper"))));
 
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Silver")));
 		actionService.doChoice(gameState, "test");
 
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(2, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Embassy")));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Duchy")));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Embassy"))));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Duchy"))));
 
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Embassy")));
 		actionService.doChoice(gameState, "test");
@@ -1153,9 +1153,9 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		actionService.turnPlay(gameState, "test", ActionService.ARTISAN);
 		
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(5, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Duchy")));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Embassy")));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertFalse(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Gold")));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Duchy"))));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Embassy"))));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertFalse(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Gold"))));
 		
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Embassy")));
 		actionService.doChoice(gameState, "test");
@@ -1164,7 +1164,7 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		doAssertion(Checked.HAND, () -> Assertions.assertTrue(playerState.getHand().getCards().contains("Embassy")));
 		
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(5, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertFalse(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Duchy")));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertFalse(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Duchy"))));
 
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Embassy")));
 		actionService.doChoice(gameState, "test");		

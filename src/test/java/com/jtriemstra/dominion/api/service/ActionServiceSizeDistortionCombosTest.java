@@ -24,7 +24,7 @@ public class ActionServiceSizeDistortionCombosTest extends ActionServiceTestBase
 		actionService.turnPlay(gameState, "test", ActionService.THRONE_ROOM);
 		
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(1, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Witch"));
+		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Witch")));
 				
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Witch")));
 		actionService.doChoice(gameState, "test");
@@ -44,7 +44,7 @@ public class ActionServiceSizeDistortionCombosTest extends ActionServiceTestBase
 		actionService.turnPlay(gameState, "test", ActionService.THRONE_ROOM);
 		
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(1, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Festival"));
+		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Festival")));
 				
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Festival")));
 		actionService.doChoice(gameState, "test");
@@ -239,8 +239,8 @@ public class ActionServiceSizeDistortionCombosTest extends ActionServiceTestBase
 		
 		doAssertion(Checked.HAND, () -> Assertions.assertEquals(4, playerState.getHand().size()));
 		doAssertion(Checked.HAND, () -> assertCardsInHand(Map.of(ActionService.COPPER, 3, ActionService.WITCH, 1)));
-		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("DISCARD : Duchy"));
-		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("DECK : Silver"));
+		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals(("DISCARD : Duchy"))));
+		Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("DECK : Silver")));
 		
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("DISCARD : Duchy")));
 		actionService.doChoice(gameState, "test");

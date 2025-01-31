@@ -26,8 +26,8 @@ public class ActionServiceAttackReactionTest extends ActionServiceTestBase {
 		
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(2, playerState2.getTurn().getChoicesAvailable().get(0).getOptions().size()));
 		Assertions.assertEquals(ActionService.ATTACK_REACTION, playerState2.getTurn().getChoicesAvailable().get(0).getFollowUpAction());
-		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().contains("Guard Dog"));
-		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().contains("No"));
+		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Guard Dog")));
+		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("No")));
 		
 		playerState2.getTurn().setChoicesMade(new ArrayList<>(List.of("Guard Dog")));
 		actionService.doChoice(gameState, "test2");
@@ -68,8 +68,8 @@ public class ActionServiceAttackReactionTest extends ActionServiceTestBase {
 		
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(2, playerState2.getTurn().getChoicesAvailable().get(0).getOptions().size()));
 		Assertions.assertEquals(ActionService.ATTACK_REACTION, playerState2.getTurn().getChoicesAvailable().get(0).getFollowUpAction());
-		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().contains("Guard Dog"));
-		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().contains("No"));
+		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Guard Dog")));
+		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("No")));
 		
 		playerState2.getTurn().setChoicesMade(new ArrayList<>(List.of("Guard Dog")));
 		actionService.doChoice(gameState, "test2");
@@ -91,8 +91,8 @@ public class ActionServiceAttackReactionTest extends ActionServiceTestBase {
 		actionService.turnPlay(gameState, "test", ActionService.MILITIA);
 		
 		Assertions.assertEquals(2, playerState3.getTurn().getChoicesAvailable().get(0).getOptions().size());
-		Assertions.assertTrue(playerState3.getTurn().getChoicesAvailable().get(0).getOptions().contains("Moat"));
-		Assertions.assertTrue(playerState3.getTurn().getChoicesAvailable().get(0).getOptions().contains("No"));
+		Assertions.assertTrue(playerState3.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Moat")));
+		Assertions.assertTrue(playerState3.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("No")));
 		Assertions.assertEquals(5, playerState2.getTurn().getChoicesAvailable().get(0).getOptions().size());
 		
 		playerState3.getTurn().setChoicesMade(new ArrayList<>(List.of("Moat")));
@@ -276,8 +276,8 @@ public class ActionServiceAttackReactionTest extends ActionServiceTestBase {
 		actionService.turnPlay(gameState, "test", ActionService.BUREAUCRAT);
 		
 		Assertions.assertEquals(2, playerState3.getTurn().getChoicesAvailable().get(0).getOptions().size());
-		Assertions.assertTrue(playerState3.getTurn().getChoicesAvailable().get(0).getOptions().contains("Moat"));
-		Assertions.assertTrue(playerState3.getTurn().getChoicesAvailable().get(0).getOptions().contains("No"));
+		Assertions.assertTrue(playerState3.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Moat")));
+		Assertions.assertTrue(playerState3.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("No")));
 		
 		playerState3.getTurn().setChoicesMade(new ArrayList<>(List.of("Moat")));
 		actionService.doChoice(gameState, "test3");
@@ -320,8 +320,8 @@ public class ActionServiceAttackReactionTest extends ActionServiceTestBase {
 		
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(2, playerState2.getTurn().getChoicesAvailable().get(0).getOptions().size()));
 		Assertions.assertEquals(ActionService.ATTACK_REACTION, playerState2.getTurn().getChoicesAvailable().get(0).getFollowUpAction());
-		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().contains("Guard Dog"));
-		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().contains("No"));
+		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Guard Dog")));
+		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("No")));
 		
 		playerState2.getTurn().setChoicesMade(new ArrayList<>(List.of("Guard Dog")));
 		actionService.doChoice(gameState, "test2");
@@ -369,8 +369,8 @@ public class ActionServiceAttackReactionTest extends ActionServiceTestBase {
 		actionService.turnPlay(gameState, "test", ActionService.MARGRAVE);
 		
 		Assertions.assertEquals(2, playerState3.getTurn().getChoicesAvailable().get(0).getOptions().size());
-		Assertions.assertTrue(playerState3.getTurn().getChoicesAvailable().get(0).getOptions().contains("Moat"));
-		Assertions.assertTrue(playerState3.getTurn().getChoicesAvailable().get(0).getOptions().contains("No"));
+		Assertions.assertTrue(playerState3.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Moat")));
+		Assertions.assertTrue(playerState3.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("No")));
 		
 		playerState3.getTurn().setChoicesMade(new ArrayList<>(List.of("Moat")));
 		actionService.doChoice(gameState, "test3");
@@ -419,8 +419,8 @@ public class ActionServiceAttackReactionTest extends ActionServiceTestBase {
 		
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(2, playerState2.getTurn().getChoicesAvailable().get(0).getOptions().size()));
 		Assertions.assertEquals(ActionService.ATTACK_REACTION, playerState2.getTurn().getChoicesAvailable().get(0).getFollowUpAction());
-		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().contains("Guard Dog"));
-		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().contains("No"));
+		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Guard Dog")));
+		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("No")));
 		
 		playerState2.getTurn().setChoicesMade(new ArrayList<>(List.of("Guard Dog")));
 		actionService.doChoice(gameState, "test2");
@@ -468,8 +468,8 @@ public class ActionServiceAttackReactionTest extends ActionServiceTestBase {
 		
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(2, playerState2.getTurn().getChoicesAvailable().get(0).getOptions().size()));
 		Assertions.assertEquals(ActionService.ATTACK_REACTION, playerState2.getTurn().getChoicesAvailable().get(0).getFollowUpAction());
-		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().contains("Moat"));
-		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().contains("No"));
+		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Moat")));
+		Assertions.assertTrue(playerState2.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("No")));
 		
 	}
 }

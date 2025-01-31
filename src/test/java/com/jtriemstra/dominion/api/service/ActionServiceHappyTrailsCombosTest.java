@@ -107,7 +107,7 @@ public class ActionServiceHappyTrailsCombosTest extends ActionServiceTestBase  {
 		doAssertion(Checked.HAND, () -> Assertions.assertEquals(5, playerState.getHand().size()));
 		doAssertion(Checked.CHOICES, ()-> Assertions.assertEquals(1, playerState.getTurn().getChoicesAvailable().size()));
 		doAssertion(Checked.CHOICES, ()-> Assertions.assertEquals(2, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		doAssertion(Checked.CHOICES, ()-> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Trail")));
+		doAssertion(Checked.CHOICES, ()-> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Trail"))));
 		
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Trail")));
 		actionService.doChoice(gameState, "test");
@@ -135,7 +135,7 @@ public class ActionServiceHappyTrailsCombosTest extends ActionServiceTestBase  {
 		doAssertion(Checked.HAND, () -> Assertions.assertEquals(4, playerState.getHand().size()));
 		doAssertion(Checked.CHOICES, ()-> Assertions.assertEquals(1, playerState.getTurn().getChoicesAvailable().size()));
 		doAssertion(Checked.CHOICES, ()-> Assertions.assertEquals(2, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		doAssertion(Checked.CHOICES, ()-> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Trail")));
+		doAssertion(Checked.CHOICES, ()-> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Trail"))));
 		
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Trail")));
 		actionService.doChoice(gameState, "test");
@@ -143,7 +143,7 @@ public class ActionServiceHappyTrailsCombosTest extends ActionServiceTestBase  {
 		doAssertion(Checked.HAND, () -> Assertions.assertEquals(4, playerState.getHand().size()));
 		doAssertion(Checked.CHOICES, ()-> Assertions.assertEquals(1, playerState.getTurn().getChoicesAvailable().size()));
 		doAssertion(Checked.CHOICES, ()-> Assertions.assertEquals(2, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		doAssertion(Checked.CHOICES, ()-> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Trail")));
+		doAssertion(Checked.CHOICES, ()-> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Trail"))));
 
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Trail")));
 		actionService.doChoice(gameState, "test");
@@ -182,7 +182,7 @@ public class ActionServiceHappyTrailsCombosTest extends ActionServiceTestBase  {
 		doAssertion(Checked.HAND, () -> Assertions.assertEquals(4, playerState.getHand().size()));
 		doAssertion(Checked.CHOICES, ()-> Assertions.assertEquals(1, playerState.getTurn().getChoicesAvailable().size()));
 		doAssertion(Checked.CHOICES, ()-> Assertions.assertEquals(2, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		doAssertion(Checked.CHOICES, ()-> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Trail")));
+		doAssertion(Checked.CHOICES, ()-> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Trail"))));
 		
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Trail")));
 		actionService.doChoice(gameState, "test");
@@ -190,7 +190,7 @@ public class ActionServiceHappyTrailsCombosTest extends ActionServiceTestBase  {
 		doAssertion(Checked.HAND, () -> Assertions.assertEquals(4, playerState.getHand().size()));
 		doAssertion(Checked.CHOICES, ()-> Assertions.assertEquals(1, playerState.getTurn().getChoicesAvailable().size()));
 		doAssertion(Checked.CHOICES, ()-> Assertions.assertEquals(2, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
-		doAssertion(Checked.CHOICES, ()-> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().contains("Trail")));
+		doAssertion(Checked.CHOICES, ()-> Assertions.assertTrue(playerState.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(o -> o.getText().equals("Trail"))));
 
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Trail")));
 		actionService.doChoice(gameState, "test");

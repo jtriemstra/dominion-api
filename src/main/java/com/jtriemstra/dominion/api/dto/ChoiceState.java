@@ -15,25 +15,24 @@ import lombok.Data;
 @AllArgsConstructor
 public class ChoiceState {
 	@Builder.Default
-	List<String> options = new ArrayList<>();
+	List<ChoiceStateOption> options = new ArrayList<>();
 	int minChoices;
 	int maxChoices;
 	String text;
 	String followUpAction;
 	@Builder.Default
 	Map<String, Object> additionalData = new HashMap<>();
-	@Builder.Default
-	List<String> ids = new ArrayList<>();
 	
 	public ChoiceState() {
 		options = new ArrayList<>();
 	}
 	
-	public void addAll(List<String> in) {
+	public void addAll(List<ChoiceStateOption> in) {
 		options.addAll(in);
-		for (String s : in) {
-			ids.add(UUID.randomUUID().toString());
-		}
+	}
+	
+	public void addAllByName(List<String> in) {
+		in.forEach(s -> options.add(new ChoiceStateOption(s)));
 	}
 	
 	public void clear() {

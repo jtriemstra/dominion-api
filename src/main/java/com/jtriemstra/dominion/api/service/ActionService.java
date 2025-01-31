@@ -23,6 +23,7 @@ import com.jtriemstra.dominion.api.dto.CardDestination;
 import com.jtriemstra.dominion.api.dto.CardSource;
 import com.jtriemstra.dominion.api.dto.ChoiceOptionCreator;
 import com.jtriemstra.dominion.api.dto.ChoiceState;
+import com.jtriemstra.dominion.api.dto.ChoiceStateOption;
 import com.jtriemstra.dominion.api.dto.DeckState;
 import com.jtriemstra.dominion.api.dto.GameState;
 import com.jtriemstra.dominion.api.dto.PlayerState;
@@ -1277,7 +1278,7 @@ public class ActionService {
 				doGain(game, name, gainedCardName);		
 				
 				int gainedCost = getCost(game, name, gainedCardName);
-				List<String> otherCostCards = player.getTurn().getChoicesAvailable().get(0).getOptions().stream().filter(c -> getCost(game, name, c) != gainedCost).toList();
+				List<String> otherCostCards = player.getTurn().getChoicesAvailable().get(0).getOptions().stream().map(o -> o.getText()).filter(c -> getCost(game, name, c) != gainedCost).toList();
 				ChoiceOptionCreator otherCostFromBank = (g, p) -> {
 					return otherCostCards;
 				};
@@ -1728,7 +1729,7 @@ public class ActionService {
 							String... text) {
 		List<String> choices = optionSource.createChoices(game, player);
 		ChoiceState thisChoice = ChoiceState.builder().minChoices(CollectionUtils.isEmpty(choices) ? 0 : optionCount).maxChoices(optionCount).followUpAction(followupAction).text(text.length > 0 ? text[0] : "").build();
-		thisChoice.addAll(choices);
+		thisChoice.addAllByName(choices);
 		player.getTurn().getChoicesAvailable().add(thisChoice);
 		return thisChoice;
 	}
@@ -1742,7 +1743,7 @@ public class ActionService {
 				String... text) {
 		List<String> choices = optionSource.createChoices(game, player);
 		ChoiceState thisChoice = ChoiceState.builder().minChoices(CollectionUtils.isEmpty(choices) ? 0 : minOptionCount).maxChoices(maxOptionCount).followUpAction(followupAction).text(text.length > 0 ? text[0] : "").build();
-		thisChoice.addAll(choices);
+		thisChoice.addAllByName(choices);
 		player.getTurn().getChoicesAvailable().add(thisChoice);
 	}
 	
