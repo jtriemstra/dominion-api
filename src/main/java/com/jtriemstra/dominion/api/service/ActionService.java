@@ -645,7 +645,9 @@ public class ActionService {
 					doGain(game, name, choice);
 				}
 			}
-			createChoice(game, player, (g, p) -> chooseFromHand(p), 1, ARTISAN2, "Choose a card to put on your deck");
+			if (player.getHand().size() > 0) {
+				createChoice(game, player, (g, p) -> chooseFromHand(p), 1, ARTISAN2, "Choose a card to put on your deck");
+			}
 		});
 		actions.put(ARTISAN2, (game, name) -> {
 			PlayerState player = getPlayer(game, name);

@@ -168,28 +168,30 @@ public class V3Controller {
 	public List<V3BankCard> bank() {
 		//TODO: return an array like the properties of the Player object, so UI code is consistent
 		List<V3BankCard> result = new ArrayList<>();
-		for (String card : game.getBank().getSupplies().keySet()) {
-			if (card.equals("Gold") ||
-				card.equals("Silver") ||
-				card.equals("Copper") ||
-				card.equals("Estate") ||
-				card.equals("Duchy") ||
-				card.equals("Province") ||
-				card.equals("Curse")) {				
+		if (game != null) {
+			for (String card : game.getBank().getSupplies().keySet()) {
+				if (card.equals("Gold") ||
+					card.equals("Silver") ||
+					card.equals("Copper") ||
+					card.equals("Estate") ||
+					card.equals("Duchy") ||
+					card.equals("Province") ||
+					card.equals("Curse")) {				
+				}
+				else {
+					result.add(new V3BankCard(card, game.getBank().getSupplies().get(card).getCount()));
+				}			
 			}
-			else {
-				result.add(new V3BankCard(card, game.getBank().getSupplies().get(card).getCount()));
-			}			
+			
+			result.sort((c1, c2) -> CardData.cardInfo.get(c1.getName()).getCost() - CardData.cardInfo.get(c2.getName()).getCost());
+			result.add(0, new V3BankCard("Copper", game.getBank().getSupplies().get("Copper").getCount()));
+			result.add(0, new V3BankCard("Silver", game.getBank().getSupplies().get("Silver").getCount()));
+			result.add(0, new V3BankCard("Gold", game.getBank().getSupplies().get("Gold").getCount()));
+			result.add(new V3BankCard("Estate", game.getBank().getSupplies().get("Estate").getCount()));
+			result.add(new V3BankCard("Duchy", game.getBank().getSupplies().get("Duchy").getCount()));
+			result.add(new V3BankCard("Province", game.getBank().getSupplies().get("Province").getCount()));
+			result.add(new V3BankCard("Curse", game.getBank().getSupplies().get("Curse").getCount()));
 		}
-		
-		result.sort((c1, c2) -> CardData.cardInfo.get(c1.getName()).getCost() - CardData.cardInfo.get(c2.getName()).getCost());
-		result.add(0, new V3BankCard("Copper", game.getBank().getSupplies().get("Copper").getCount()));
-		result.add(0, new V3BankCard("Silver", game.getBank().getSupplies().get("Silver").getCount()));
-		result.add(0, new V3BankCard("Gold", game.getBank().getSupplies().get("Gold").getCount()));
-		result.add(new V3BankCard("Estate", game.getBank().getSupplies().get("Estate").getCount()));
-		result.add(new V3BankCard("Duchy", game.getBank().getSupplies().get("Duchy").getCount()));
-		result.add(new V3BankCard("Province", game.getBank().getSupplies().get("Province").getCount()));
-		result.add(new V3BankCard("Curse", game.getBank().getSupplies().get("Curse").getCount()));
 		
 		return result;
 	}
@@ -197,7 +199,7 @@ public class V3Controller {
 	
 	@RequestMapping("/v3/end")
 	public void end() {
-		game = new GameState(bankService.createRandom());
+		game = null;
 	}
 	
 	@RequestMapping("/v3/activeGame")

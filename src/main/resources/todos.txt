@@ -1,52 +1,27 @@
 
--on workshop, may or must gain card? eg, only copper?
-? uncheck options by default
--mine "may" trash card
--militia appears to work if you only discard 1, probably 0 also
 
--make workshop single select - can only gain 1 card - ditto for remodel phase 1, phase 2
-
-- timing of attack cards
-
-- UI for weaver, moat
-
-- play actions before money
-
-- zero possible choices - remodel
-
-- add "looking" tp choices
-
-- three supply pile end game
 
 if cookie exists, and player isn't in active game, clear cookie
 
--sentry peek didn't pull discard into deck
-
--cleanup should do nothing if open actions
-
--add card breakdown to end game json
-
-- remodel with supplies at zero
 
 handle choices with 0 max options - this is an action by action thing
 - bureaucrat, bandit or others with zero bank supplies
 
 can i combine the throne room repeat + attack queing + council room queueing in one idea?
 
-add province cards for > 4players
+
 
 notifications
 - buys
 - collapse money
 
-did a refresh of JS, and the refresh/bank methods kept player name, but the play action lost it. second refresh also lost it on the join code
 
 reveals
 
-if the browser crashes, the cookie's lost....
 
-gained cards don't immediately go to discard, breaks harbinger if there are gain actions? what about played actions? - vassal-harbinger - this was action dependent on nomads gain check for that combo though
-artisan with no cards in hand? maybe only possible if you're gaining and immediately playing trail
+problem combos i don't currently have
+- gained cards don't immediately go to discard, breaks harbinger if there are gain actions? what about played actions? - vassal-harbinger - this was action dependent on nomads gain check for that combo though
+- test artisan with no cards in hand? maybe only possible if you're gaining and immediately playing trail/berserker, and don't have a combo for that right now
 
 
 changes
@@ -59,7 +34,8 @@ manual refresh lost playername for the play action but kept it for the refresh..
 end game button on join screen does a page refresh instead of end call
 something went wrong with berserker forcing discard and play of trail. might have drawn another trail, and then tried to immediately discard?
 - was it a throne room -> berserker?
-need to bring back popup for the end game points?
-berserker didn't trigger attack for either other player - multiple attacks are sitting there
+
+end game not doing anything
 
 
+switch to a heartbeat for changes, then a refresh?
