@@ -10,6 +10,10 @@ handle choices with 0 max options - this is an action by action thing
 can i combine the throne room repeat + attack queing + council room queueing in one idea?
 
 
+harbinger should have an n/a option. or checkboxes with 0 min?
+looks like throne room doesn't repeat notificaitons
+mine presents checkboxes for 0/1 min/max options - do they validate correctly? use radio with a n/a option?
+passing setEndingGame may be pointless
 
 notifications
 - buys

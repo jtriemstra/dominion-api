@@ -43,6 +43,7 @@ import com.jtriemstra.dominion.api.models.Player;
 import com.jtriemstra.dominion.api.service.ActionService;
 import com.jtriemstra.dominion.api.service.BankService;
 import com.jtriemstra.dominion.api.service.GameService;
+import com.jtriemstra.dominion.api.service.NotificationService;
 import com.jtriemstra.dominion.api.service.PlayerService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -62,6 +63,8 @@ public class V3Controller {
 	ActionService actionService;
 	@Autowired
 	PlayerService playerService;
+	@Autowired
+	NotificationService notificationService;
 	
 	
 	@PostConstruct
@@ -200,6 +203,7 @@ public class V3Controller {
 	@RequestMapping("/v3/end")
 	public void end() {
 		game = null;
+		notificationService.clearNotifications();
 	}
 	
 	@RequestMapping("/v3/activeGame")

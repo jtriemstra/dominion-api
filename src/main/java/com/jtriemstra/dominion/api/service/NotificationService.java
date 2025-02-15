@@ -66,4 +66,8 @@ public class NotificationService {
 	public List<String> getNotifications() {
 		return notifications;
 	}
+	
+	public void clearNotifications() {
+		notifications.clear();
+	}
 }
