@@ -156,7 +156,7 @@ public class ActionService {
 			PlayerState otherPlayer = getPlayer(game, targetName);
 			if (otherPlayer.getHand().hasVictory()) {
 				ChoiceOptionCreator victoryCardFromHand = (g, p) -> {
-					return p.getHand().getCards().stream().filter(n -> CardData.cardInfo.get(n).isVictory()).toList();
+					return p.getHand().getCards().stream().filter(n -> CardData.cardInfo.get(n).isVictory()).collect(Collectors.toList());
 				};
 				createChoice(game, otherPlayer, victoryCardFromHand, 1, BUREAUCRAT1, "Choose a victory card to put on your deck");
 			} else {
@@ -238,7 +238,7 @@ public class ActionService {
 		actions.put(SCHEME1, (game, name) -> {
 			PlayerState player = getPlayer(game, name);
 			ChoiceOptionCreator playedActions = (g, p) -> {
-				return p.getPlayed().getCards().stream().filter(c -> CardData.cardInfo.get(c).isAction()).toList();
+				return p.getPlayed().getCards().stream().filter(c -> CardData.cardInfo.get(c).isAction()).collect(Collectors.toList());
 			};
 			createChoice(game, player, playedActions, 1, SCHEME2, "Do you want to put an action card on top of your deck?");
 		});
@@ -1156,7 +1156,7 @@ public class ActionService {
 				
 			} else {
 				ChoiceOptionCreator nobleBrigand = (g, p) -> {
-					ArrayList<String> result = new ArrayList<>(player.getLooking().getCards().stream().map(c -> {return targetName + " : " + c;}).toList());
+					ArrayList<String> result = new ArrayList<>(player.getLooking().getCards().stream().map(c -> {return targetName + " : " + c;}).collect(Collectors.toList()));
 					result.add(targetName + " : " + "Discard both");
 					return result;
 				};
@@ -1307,7 +1307,7 @@ public class ActionService {
 				doGain(game, name, gainedCardName);		
 				
 				int gainedCost = getCost(game, name, gainedCardName);
-				List<String> otherCostCards = player.getTurn().getChoicesAvailable().get(0).getOptions().stream().map(o -> o.getText()).filter(c -> getCost(game, name, c) != gainedCost).toList();
+				List<String> otherCostCards = player.getTurn().getChoicesAvailable().get(0).getOptions().stream().map(o -> o.getText()).filter(c -> getCost(game, name, c) != gainedCost).collect(Collectors.toList());
 				ChoiceOptionCreator otherCostFromBank = (g, p) -> {
 					return otherCostCards;
 				};
@@ -1585,7 +1585,7 @@ public class ActionService {
 			
 			notificationService.reveal(targetName, targetPlayer.getRevealing().getCards());
 			ChoiceOptionCreator actions = (g, p) -> {
-				return p.getRevealing().getCards().stream().filter(c -> CardData.cardInfo.get(c).isTreasure() && !c.equals(COPPER)).toList();
+				return p.getRevealing().getCards().stream().filter(c -> CardData.cardInfo.get(c).isTreasure() && !c.equals(COPPER)).collect(Collectors.toList());
 			};
 			createChoice(game, targetPlayer, actions, 1, BANDIT2, "Someone has played a Bandit - choose a non-Copper Treasure to trash");			
 		});
