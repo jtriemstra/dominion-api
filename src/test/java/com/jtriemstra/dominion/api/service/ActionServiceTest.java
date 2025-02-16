@@ -20,6 +20,7 @@ import com.jtriemstra.dominion.api.dto.BankState;
 import com.jtriemstra.dominion.api.dto.BankSupply;
 import com.jtriemstra.dominion.api.dto.GameState;
 import com.jtriemstra.dominion.api.dto.PlayerState;
+import com.jtriemstra.dominion.api.service.ActionServiceTestBase.Checked;
 
 import lombok.SneakyThrows;
 
@@ -984,6 +985,11 @@ public class ActionServiceTest extends ActionServiceTestBase {
 
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(0, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
 	}
+	
+	@Test
+	public void wheelwrightAddsCorrectValuesForCostZero() {
+		throw new RuntimeException("test not implemented");
+	}
 
 	@Test
 	public void wheelwrightIsOptional() {
@@ -1294,12 +1300,34 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		doAssertion(Checked.HAND, () -> assertCardsInHand(Map.of(ActionService.GOLD, 1, ActionService.COPPER, 4)));
 		
 		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(1, playerState.getTurn().getChoicesAvailable().size()));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(1, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(1 + 1, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
 		
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Estate")));
 		actionService.doChoice(gameState, "test");
 		
 		doAssertion(Checked.DISCARD, () -> Assertions.assertEquals(0, playerState.getDiscard().getCards().size()));
+	}
+
+	@Test
+	public void harbingerCanSkipMovingCard() {
+		swapHandCards(ActionService.HARBINGER);
+		playerState.getDiscard().getCards().add("Estate");
+		loadDeck(ActionService.GOLD, ActionService.GOLD, ActionService.GOLD);
+		stashGameState();
+		
+		actionService.turnPlay(gameState, "test", ActionService.HARBINGER);
+		
+		doAssertion(Checked.ACTIONS, () -> Assertions.assertEquals(1, playerState.getTurn().getActionsAvailable()));
+		doAssertion(Checked.HAND, () -> Assertions.assertEquals(5, playerState.getHand().size()));
+		doAssertion(Checked.HAND, () -> assertCardsInHand(Map.of(ActionService.GOLD, 1, ActionService.COPPER, 4)));
+		
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(1, playerState.getTurn().getChoicesAvailable().size()));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(1 + 1, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
+		
+		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("NO")));
+		actionService.doChoice(gameState, "test");
+		
+		doAssertion(Checked.DISCARD, () -> Assertions.assertEquals(1, playerState.getDiscard().getCards().size()));
 	}
 	
 	@Test
@@ -1433,6 +1461,33 @@ public class ActionServiceTest extends ActionServiceTestBase {
 		
 		doAssertion(Checked.DISCARD, () -> Assertions.assertEquals(1, playerState.getDiscard().getCards().size()));
 		doAssertion(Checked.DISCARD, () -> Assertions.assertEquals("Silver", playerState.getDiscard().getCards().get(0)));
+	}
+	
+	@Test
+	public void afterPlayingTraderTheReactionIsNoLongerInHand() {
+		swapBankSupplies(Map.of(ActionService.DUCHY, ActionService.ESTATE));
+		swapHandCards(ActionService.TRADER);
+		stashGameState();
+
+		actionService.turnPlay(gameState, "test", ActionService.TRADER);
+		
+		doAssertion(Checked.CHOICES, ()-> Assertions.assertEquals(1, playerState.getTurn().getChoicesAvailable().size()));
+		doAssertion(Checked.CHOICES, ()-> Assertions.assertEquals(ActionService.TRADER2, playerState.getTurn().getChoicesAvailable().get(0).getFollowUpAction()));
+
+		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Copper")));
+		actionService.doChoice(gameState, "test");
+		
+		doAssertion(Checked.CHOICES, ()-> Assertions.assertEquals(0, playerState.getTurn().getChoicesAvailable().size()));
+		
+		actionService.turnPlay(gameState, "test", ActionService.COPPER);
+		actionService.turnPlay(gameState, "test", ActionService.COPPER);
+		
+		actionService.doBuy(gameState, "test", ActionService.ESTATE);
+		
+		doAssertion(Checked.CHOICES, ()-> Assertions.assertEquals(0, playerState.getTurn().getChoicesAvailable().size()));
+		
+		doAssertion(Checked.DISCARD, () -> Assertions.assertEquals("Estate", playerState.getDiscard().getCards().get(0)));
+		doAssertion(Checked.DISCARD, () -> Assertions.assertEquals(1, playerState.getDiscard().size()));
 	}
 	
 	@Test

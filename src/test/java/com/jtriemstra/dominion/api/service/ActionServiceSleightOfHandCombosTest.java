@@ -114,7 +114,7 @@ public class ActionServiceSleightOfHandCombosTest extends ActionServiceTestBase 
 		
 		doAssertion(Checked.HAND, () -> Assertions.assertEquals(4, playerState.getHand().size()));
 		doAssertion(Checked.ACTIONS, () -> Assertions.assertEquals(1, playerState.getTurn().getActionsAvailable()));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(2, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(2 + 1, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
 		
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Silver")));
 		actionService.doChoice(gameState, "test");
@@ -124,7 +124,7 @@ public class ActionServiceSleightOfHandCombosTest extends ActionServiceTestBase 
 
 		doAssertion(Checked.HAND, () -> Assertions.assertEquals(5, playerState.getHand().size()));
 		doAssertion(Checked.ACTIONS, () -> Assertions.assertEquals(2, playerState.getTurn().getActionsAvailable()));
-		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(1, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
+		doAssertion(Checked.CHOICES, () -> Assertions.assertEquals(1 + 1, playerState.getTurn().getChoicesAvailable().get(0).getOptions().size()));
 
 		playerState.getTurn().setChoicesMade(new ArrayList<>(List.of("Estate")));
 		actionService.doChoice(gameState, "test");

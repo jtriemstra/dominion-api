@@ -9,18 +9,7 @@ handle choices with 0 max options - this is an action by action thing
 
 can i combine the throne room repeat + attack queing + council room queueing in one idea?
 
-
-harbinger should have an n/a option. or checkboxes with 0 min?
-looks like throne room doesn't repeat notificaitons
-mine presents checkboxes for 0/1 min/max options - do they validate correctly? use radio with a n/a option?
-passing setEndingGame may be pointless
-
-notifications
-- buys
-- collapse money
-
-
-reveals
+deal with some of the ui state with routing instead
 
 
 problem combos i don't currently have
@@ -39,7 +28,9 @@ end game button on join screen does a page refresh instead of end call
 something went wrong with berserker forcing discard and play of trail. might have drawn another trail, and then tried to immediately discard?
 - was it a throne room -> berserker?
 
-end game not doing anything
+
 
 
 switch to a heartbeat for changes, then a refresh?
+
+add validation on money to buys

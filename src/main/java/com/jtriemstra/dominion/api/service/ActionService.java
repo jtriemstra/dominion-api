@@ -88,6 +88,7 @@ public class ActionService {
 			if (player.getTurn().getChoicesMade().size() > 0) {
 				String trashedCardName = player.getTurn().getChoicesMade().get(0);
 				int trashedCost = getCost(game, name, trashedCardName);
+				notificationService.notifyChoice(name, REMODEL1, trashedCardName);
 				doTrash(game, name, trashedCardName, player.getHand());
 				ChoiceOptionCreator cheaperFromBank = (g, p) -> {
 					return getNonEmptyBankSuppliesStream(game).filter(c -> getCost(game, name, c) <= 2 + trashedCost).collect(Collectors.toList());
@@ -135,6 +136,7 @@ public class ActionService {
 			// TODO: probably should be wrapped in a "Gain" to trigger Trader, even though it doesn't matter
 
 			if (game.getBank().getSupplies().get("Silver").getCount() > 0) {
+				notificationService.notifyGain(name, SILVER);
 				moveCard(game.getBank().getSupplies().get("Silver"), getPlayer(game, name).getDeck());
 			}
 			List<String> otherNames = getOtherPlayers(game, name);
@@ -146,6 +148,7 @@ public class ActionService {
 		actions.put(BUREAUCRAT1, (game, name) -> {
 			PlayerState player = getPlayer(game, name);
 			String cardName = player.getTurn().getChoicesMade().get(0);
+			notificationService.reveal(name, List.of(cardName));
 			moveCard(player.getHand(), player.getDeck(), cardName);
 			finishAttack(game, name);
 		});
@@ -157,7 +160,7 @@ public class ActionService {
 				};
 				createChoice(game, otherPlayer, victoryCardFromHand, 1, BUREAUCRAT1, "Choose a victory card to put on your deck");
 			} else {
-				// TODO: reveal, maybe need to switch this to the version with choices, but I think I solved that with queuing attacks
+				notificationService.reveal(targetName, otherPlayer.getHand().getCards());
 				finishAttack(game, targetName);
 			}
 		});
@@ -200,6 +203,7 @@ public class ActionService {
 			if (choice.equals("2 Silver")) {
 				doGain(game, name, "Silver");
 				doGain(game, name, "Silver");
+				notificationService.notifyChoice(name, WEAVER2, "");
 			} else {
 				doGain(game, name, choice);
 			}
@@ -301,6 +305,9 @@ public class ActionService {
 			for (int i=1; i<=2; i++) {defaultDraw(game, name);}
 			if (player.getHand().size() <= 5) {
 				for (int i=1; i<=2; i++) {defaultDraw(game, name);}
+				notificationService.notifyChoice(name, GUARD_DOG, 4);
+			} else {
+				notificationService.notifyChoice(name, GUARD_DOG, 2);
 			}
 		});
 		reactions.put(GUARD_DOG, (game, name) -> {			
@@ -428,6 +435,7 @@ public class ActionService {
 		});
 		gainEvents.put(TRAIL, (game, name) -> {
 			PlayerState player = getPlayer(game, name);
+			// TODO: does this need to insert this choice before other pending ones? think so
 			createChoice(game, player, (g,p) -> {return List.of("GAIN","PLAY1");}, 1, TRAIL1, "Do you want to gain the trail normally, or play it immediately?");			
 		});
 		// TODO:not sure how this will interact with actions that are "trash to do X" like Spice Merchant (tested remodel ok)
@@ -439,7 +447,7 @@ public class ActionService {
 		discardEvents.put(TUNNEL, (game, name, source) -> {
 			PlayerState player = getPlayer(game, name);
 			if (!player.getTurn().isCleanup()) {
-				// TODO: reveal
+				notificationService.reveal(name, List.of(TUNNEL));
 				createChoice(game, player, (g,p) -> {return List.of("YES","NO");}, 1, TUNNEL1, "Do you want to reveal this to gain a gold?");
 			} else {
 				defaultDiscard(game, name, player.getHand(), TUNNEL);
@@ -460,8 +468,10 @@ public class ActionService {
 			PlayerState player = getPlayer(game, name);
 			if (player.getPlayed().getCards().stream().anyMatch(c -> c.equals(FOOLS_GOLD))) {
 				addTreasure(getPlayer(game, name).getTurn(), 4);
+				notificationService.notifyChoice(name, FOOLS_GOLD, 4);
 			} else {
 				addTreasure(getPlayer(game, name).getTurn(), 1);
+				notificationService.notifyChoice(name, FOOLS_GOLD, 1);
 			}
 		});
 		// TODO: the reaction part
@@ -493,9 +503,11 @@ public class ActionService {
 					defaultDraw(game, name);
 					defaultDraw(game, name); 
 					playerService.defaultActionChange(getPlayer(game, name).getTurn(), 1);
+					notificationService.notifyChoice(name, SPICE_MERCHANT2, "2 cards and 1 action");
 				} else if ("BUY".equals(choice)) {
 					addTreasure(getPlayer(game, name).getTurn(), 2);
 					getPlayer(game, name).getTurn().setBuys(1 + getPlayer(game, name).getTurn().getBuys());
+					notificationService.notifyChoice(name, SPICE_MERCHANT2, "2 money and 1 buy");
 				}
 			}
 		});
@@ -519,6 +531,7 @@ public class ActionService {
 					defaultDraw(game, name);
 					defaultDraw(game, name); 
 					playerService.defaultActionChange(getPlayer(game, name).getTurn(), 1);
+					notificationService.notifyChoice(name, STABLES1, "");
 				}
 			}
 		});
@@ -701,15 +714,18 @@ public class ActionService {
 			playerService.defaultActionChange(getPlayer(game, name).getTurn(), 1); 
 			
 			if (player.getDiscard().getCards().size() > 0) {
-				createChoice(game, player, (g, p) -> chooseFromDiscard(p), 1, HARBINGER1, "Do you want to put a card from discard onto deck?");	
+				List<String> options = new ArrayList(List.of("NO"));
+				options.addAll(chooseFromDiscard(player));
+				createChoice(game, player, (g, p) -> options, 1, HARBINGER1, "Do you want to put a card from discard onto deck?");	
 			}
 		});
 		actions.put(HARBINGER1, (game, name) -> {
 			PlayerState player = getPlayer(game, name);
 			if (player.getTurn().getChoicesMade().size() > 0) {
 				String choice = player.getTurn().getChoicesMade().get(0);
-				if (!"".equals(choice)) {
+				if (!"".equals(choice) && !"NO".equals(choice)) {
 					moveCard(player.getDiscard(), player.getDeck(), choice);
+					notificationService.notifyChoice(name, name, "");
 				}
 			}
 		});
@@ -783,14 +799,19 @@ public class ActionService {
 		gainReactions.put(TRADER, (game, name, cardName) -> {
 			PlayerState player = getPlayer(game, name);
 			
-			createChoice(game, player, (g, p) -> List.of("Silver",cardName), 1, TRADER1, "Do you want to gain the original card or a silver?");		
+			if (!ActionService.SILVER.equals(cardName)) {
+				createChoice(game, player, (g, p) -> List.of("Silver",cardName), 1, TRADER1, "Do you want to gain the original card or a silver?");
+			} else {
+				defaultGain(game, name, cardName);
+			}
 			
 		});
 		actions.put(TRADER1, (game, name) -> {
 			PlayerState player = getPlayer(game, name);
 			if (player.getTurn().getChoicesMade().size() > 0) {
 				String choice = player.getTurn().getChoicesMade().get(0);
-				defaultGain(game, name, choice);
+				// TODO: notify reveal
+				doGainStep2(game, name, choice);
 			}
 		});
 		actions.put(TRADER, (game, name) -> {
@@ -887,6 +908,7 @@ public class ActionService {
 			if (player.getTurn().getChoicesMade().size() > 0) {
 				String choice = player.getTurn().getChoicesMade().get(0);
 				if ("YES".equals(choice)) {
+					notificationService.notifyChoice(name, MONEYLENDER1, "");
 					doTrash(game, name, COPPER, player.getHand());
 					addTreasure(player.getTurn(), 3);
 				}
@@ -957,6 +979,7 @@ public class ActionService {
 				String choice = player.getTurn().getChoicesMade().get(0);
 				if ("YES".equals(choice)) {
 					player.getTurn().setGainDestination("HAND");
+					notificationService.notifyChoice(name, ILL_GOTTEN_GAINS1, "");
 					doGain(game, name, ActionService.COPPER);
 				}
 			}
@@ -1039,6 +1062,7 @@ public class ActionService {
 			PlayerState player = getPlayer(game, name);
 			if (player.getTurn().getChoicesMade().size() > 0) {
 				List<String> cardNames = player.getTurn().getChoicesMade();
+				notificationService.reveal(name, cardNames);
 				for(String card : cardNames) {
 					moveCard(player.getDiscard(), player.getDeck(), card);
 					shuffle(player);
@@ -1245,15 +1269,18 @@ public class ActionService {
 
 		actions.put(CROSSROADS, (game, name) -> {
 			PlayerState player = getPlayer(game, name);
-			// TODO: reveal hand
+			notificationService.reveal(name, player.getHand().getCards());
 			long victoryCards = player.getHand().getCards().stream().filter(c -> CardData.cardInfo.get(c).isVictory()).count();
 			boolean playedCrossroads = player.getPlayed().getCards().stream().anyMatch(c -> c.equals(CROSSROADS));
+			int addedActions = 0;
 			for (int i=0; i<victoryCards; i++) {
 				defaultDraw(game, name);
 			}
 			if (!playedCrossroads) {
 				playerService.defaultActionChange(player.getTurn(), 3);
+				addedActions = 3;
 			}
+			notificationService.notifyChoice(name, CROSSROADS, victoryCards, addedActions);
 		});
 		
 		actions.put(DEVELOP, (game, name) -> {
@@ -1365,8 +1392,9 @@ public class ActionService {
 		});
 		actions.put(WITCHS_HUT1, (game, name) -> {
 			PlayerState player = getPlayer(game, name);
-			// TODO: reveal
+			
 			if (player.getTurn().getChoicesMade().size() > 0) {
+				notificationService.reveal(name, player.getTurn().getChoicesMade());
 				String card1 = player.getTurn().getChoicesMade().get(1);
 				discard(game, name, player.getHand(), card1);
 				String card2 = player.getTurn().getChoicesMade().get(0);
@@ -1451,7 +1479,7 @@ public class ActionService {
 				shuffle(player);
 			}
 			moveCard(player.getDeck(), player.getRevealing());
-			
+			notificationService.reveal(name, player.getRevealing().getCards());
 			ChoiceOptionCreator actions = (g, p) -> {
 				return List.of(player.getRevealing().getCards().get(0),
 						player.getRevealing().getCards().get(1),
@@ -1491,6 +1519,7 @@ public class ActionService {
 				shuffle(targetPlayer);
 			}
 			moveCard(targetPlayer.getDeck(), targetPlayer.getRevealing());
+			notificationService.reveal(targetName, targetPlayer.getRevealing().getCards());
 			PlayerState attackerPlayer = getPlayer(game, targetPlayer.getAttacks().peek().getAttacker());			
 			
 			ChoiceOptionCreator actions = (g, p) -> {
@@ -1554,7 +1583,7 @@ public class ActionService {
 			}
 			moveCard(targetPlayer.getDeck(), targetPlayer.getRevealing());
 			
-			// TODO: reveal
+			notificationService.reveal(targetName, targetPlayer.getRevealing().getCards());
 			ChoiceOptionCreator actions = (g, p) -> {
 				return p.getRevealing().getCards().stream().filter(c -> CardData.cardInfo.get(c).isTreasure() && !c.equals(COPPER)).toList();
 			};
@@ -1587,7 +1616,7 @@ public class ActionService {
 				shuffle(player);
 			}
 			moveCard(player.getDeck(), player.getRevealing());
-			
+			notificationService.reveal(name, player.getRevealing().getCards());
 			ChoiceOptionCreator actions = (g, p) -> {
 				return List.of("DECK",
 						"DISCARD"
@@ -1618,6 +1647,7 @@ public class ActionService {
 				shuffle(targetPlayer);
 			}
 			moveCard(targetPlayer.getDeck(), targetPlayer.getRevealing());
+			notificationService.reveal(targetName, targetPlayer.getRevealing().getCards());
 			PlayerState attackerPlayer = getPlayer(game, targetPlayer.getAttacks().peek().getAttacker());			
 			
 			ChoiceOptionCreator actions = (g, p) -> {
@@ -1711,6 +1741,7 @@ public class ActionService {
 				if (action != null) {
 					if (!action.equals("")) {
 						//thisPlayer.getTurn().pushRepeatedAction("");
+						notificationService.notifyPlay(name, action);
 						defaultExecute(game, name, action);
 					}
 				}
@@ -1732,7 +1763,12 @@ public class ActionService {
 		List<String> choices = optionSource.createChoices(game, player);
 		ChoiceState thisChoice = ChoiceState.builder().minChoices(CollectionUtils.isEmpty(choices) ? 0 : optionCount).maxChoices(optionCount).followUpAction(followupAction).text(text.length > 0 ? text[0] : "").build();
 		thisChoice.addAllByName(choices);
-		player.getTurn().getChoicesAvailable().add(thisChoice);
+		// TODO: create an override to this method and move this out to the TRAIL gain event
+		if (TRAIL1.equals(followupAction) && "GAIN".equals(choices.get(0)) && player.getTurn().getChoicesAvailable().size() > 0) {
+			player.getTurn().getChoicesAvailable().add(1, thisChoice);
+		} else {
+			player.getTurn().getChoicesAvailable().add(thisChoice);
+		}
 		return thisChoice;
 	}
 	
@@ -1757,11 +1793,11 @@ public class ActionService {
 		ChoiceState choice = thisPlayer.getTurn().getChoicesAvailable().get(0);
 		String actionName = choice.getFollowUpAction();
 		for (String s : thisPlayer.getTurn().getChoicesMade()) {
-			//TODO: this should compare to choicesAvailable?
-			if (!StringUtils.isEmpty(s) && !thisPlayer.getTurn().getChoicesMade().contains(s)) {
+			if (!StringUtils.isEmpty(s) && !thisPlayer.getTurn().getChoicesAvailable().get(0).getOptions().stream().anyMatch(cso -> cso.getText().equals(s))) {
 				throw new RuntimeException("Invalid choice '" + s + "'");
 			}
 		}
+		notificationService.notifyChoice(playerName, actionName, thisPlayer.getTurn().getChoicesMade().toArray());
 		actions.get(actionName).execute(game, playerName);
 		thisPlayer.getTurn().getChoicesAvailable().remove(0);
 		thisPlayer.getTurn().getChoicesMade().clear();
@@ -1928,6 +1964,12 @@ public class ActionService {
 				return;
 			}
 		}
+		doGainStep2(game, playerName, gainedCardName);
+	}
+	
+	// TODO: this multi-step gain might not be flexible enough for all scenarios
+	public void doGainStep2(GameState game, String playerName, String gainedCardName) {
+		PlayerState player = getPlayer(game, playerName);
 		for (String r : player.getTurn().getGainReactions()) {
 			gainReactions.get(r).execute(game, playerName, gainedCardName);
 		}
@@ -1947,6 +1989,7 @@ public class ActionService {
 		if (dest.getKey().equals("Discard")) {
 			getPlayer(game, playerName).getTurn().getGainedToDiscard().add(gainedCardName);
 		}
+		notificationService.notifyGain(playerName, gainedCardName);
 		moveCard(game.getBank().getSupplies().get(gainedCardName), dest);
 	}
 	
