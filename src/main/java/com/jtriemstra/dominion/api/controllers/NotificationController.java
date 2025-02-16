@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jtriemstra.dominion.api.service.NotificationService;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net", "http://jtriemstra-dominion-ui.s3-website.us-east-2.amazonaws.com", "https://master.d1a91xjfjcbhnv.amplifyapp.com", "http://localhost:3000", "http://localhost:6006"})
+@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net", "http://jtriemstra-dominion-ui.s3-website.us-east-2.amazonaws.com", "https://master.d1a91xjfjcbhnv.amplifyapp.com", "http://localhost:3000", "http://localhost:6006", "https://v3-temp.d1a91xjfjcbhnv.amplifyapp.com"})
 public class NotificationController {
 	
 	@Autowired

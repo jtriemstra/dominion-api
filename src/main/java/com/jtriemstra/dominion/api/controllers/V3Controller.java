@@ -50,7 +50,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net", "http://jtriemstra-dominion-ui.s3-website.us-east-2.amazonaws.com", "https://master.d1a91xjfjcbhnv.amplifyapp.com", "http://localhost:3000"})
+@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net", "http://jtriemstra-dominion-ui.s3-website.us-east-2.amazonaws.com", "https://master.d1a91xjfjcbhnv.amplifyapp.com", "http://localhost:3000", "https://v3-temp.d1a91xjfjcbhnv.amplifyapp.com"})
 public class V3Controller {
 	
 	GameState game;

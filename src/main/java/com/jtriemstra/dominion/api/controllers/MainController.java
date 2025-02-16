@@ -37,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net", "http://jtriemstra-dominion-ui.s3-website.us-east-2.amazonaws.com", "https://master.d1a91xjfjcbhnv.amplifyapp.com"})
+@CrossOrigin(origins = {"http://localhost:8001", "https://jtriemstra-dominion-ui.azurewebsites.net", "http://jtriemstra-dominion-ui.s3-website.us-east-2.amazonaws.com", "https://master.d1a91xjfjcbhnv.amplifyapp.com", "https://v3-temp.d1a91xjfjcbhnv.amplifyapp.com"})
 public class MainController {
 	
 	Game game = new Game();
